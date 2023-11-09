@@ -1,0 +1,110 @@
+:root {
+    --background-color-dark: #101010;
+    --background-color-light: #1f1f1f;
+    --white-accent-dark: rgb(50, 50, 50);
+    --white-accent-mid: rgb(150, 150, 150);
+    --white-accent-light: rgb(250, 250, 250);
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    background-color: var(--background-color-dark);
+    width: 100vw;
+    height: 100vh;
+}
+
+.background {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.search_div {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search_container {
+    position: relative;
+    height: 40px;
+    width: 400px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.search_input {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--background-color-light);
+    background-color: transparent;
+    border-radius: 20px;
+    background-color: transparent;
+    color: white;
+    padding: 0;
+    margin: 0;
+    padding-left: 20px;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.search_input:focus+.search_button {
+    color: white;
+}
+
+.search_button {
+    position: absolute;
+    right: 2px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    margin-right: 2px;
+    padding: 0;
+    font-size: 14px;
+    background-color: transparent;
+    border: var(--background-color-light);
+    color: var(--white-accent-mid);
+    cursor: pointer;
+    transition: transform 500ms ease;
+}
+
+.search_button:hover {
+    transform: rotate(360deg);
+}
+
+.filter_div {
+    width: 100%;
+    height: 10%;
+    border-bottom: 1px solid white;
+}
+
+/* Hide the default checkbox */
+input[type="checkbox"] {
+    display: none;
+}
+
+.filter_box:checked + .filter_text {
+    color: var(--white-accent-light);
+    border-color: var(--white-accent-light);
+}
+
+.filter_text {
+    padding: 5px 10px 5px 10px;
+    color: var(--white-accent-mid);
+    user-select: none;
+    cursor: pointer;
+    border: 1px solid var(--white-accent-dark);
+    transition: color 250ms ease, border-color 250ms ease;
+    border-radius: 20px;
+}
+
+
+.movies_div {}

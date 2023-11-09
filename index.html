@@ -2,15 +2,53 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="index.css">
-	<title>Movie Collection</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Movie Collection</title>
 </head>
 
 <body>
-	<script src="renderer.js"></script>
+    <div class="background">
+        <div class="search_div">
+            <div class="search_container">
+                <input type="text" class="search_input" placeholder="Search movie..." />
+                <button class="search_button">🔎︎</button>
+            </div>
+        </div>
+
+        <div class="filter_div">
+            <label>
+                <input class="filter_box" type="checkbox" id="filter">
+                <span class="filter_text">Filter</span>
+            </label>
+
+            <label>
+                <input class="filter_box" type="checkbox" id="filter">
+                <span class="filter_text">Filter</span>
+            </label>
+
+            <label>
+                <input class="filter_box" type="checkbox" id="filter">
+                <span class="filter_text">Filter</span>
+            </label>
+
+            <label>
+                <input class="filter_box" type="checkbox" id="filter">
+                <span class="filter_text">Filter</span>
+            </label>
+        </div>
+
+        <div class="movies_div"></div>
+    </div>
+
+    <script src="renderer.js"></script>
 </body>
 
 </html>

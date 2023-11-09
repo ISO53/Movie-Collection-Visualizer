@@ -1,0 +1,22 @@
+{
+  "name": "movie-collection-visualizer",
+  "version": "1.0.0",
+  "description": "a program that visualizes your movie collection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ISO53/Movie-Collection-Visualizer.git"
+  },
+  "author": "ISO53",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ISO53/Movie-Collection-Visualizer/issues"
+  },
+  "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer#readme",
+  "dependencies": {
+    "electron": "^27.0.4"
+  }
+}

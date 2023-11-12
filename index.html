@@ -16,6 +16,7 @@
 
 <body>
     <div class="background">
+
         <div class="search_div">
             <div class="search_container">
                 <input type="text" class="search_input" placeholder="Search movie..." />
@@ -23,14 +24,29 @@
             </div>
         </div>
 
-        <div class="filter_div">
-            <label class="filter">
-                <input class="filter_box" type="checkbox" id="filter">
-                <span class="filter_text">Filter</span>
-            </label>
+        <div class="middle_bar">
+
+            <div class="filter_div">
+                <label class="filter">
+                    <input class="filter_box" type="checkbox" id="filter">
+                    <span class="filter_text">Filter</span>
+                </label>
+            </div>
+
+            <div class="sort_div">
+                <svg class="sort_icon" xmlns="http://www.w3.org/2000/svg" fill="rgb(150, 150, 150)" height="24" viewBox="0 -960 960 960" width="24"><path d="M320-440v-287L217-624l-57-56 200-200 200 200-57 56-103-103v287h-80ZM600-80 400-280l57-56 103 103v-287h80v287l103-103 57 56L600-80Z"/></svg>
+            </div>
+
         </div>
 
-        <div class="movies_div"></div>
+        <div class="movies_div">
+            <div class="movie_div">
+                <img class="movie_poster" src="https://m.media-amazon.com/images/M/MV5BMTY2ODE1MTgxMV5BMl5BanBnXkFtZTcwNTM1NTM2Mg@@._V1_SX300.jpg" alt="">
+                <h2 class="movie_name_and_year">Taken - 2012</h2>
+                <h2 class="movie_time">79 min</h2>
+                <h2 class="movie_genres">Adventure Action Horror</h2>
+            </div>
+        </div>
     </div>
 
     <script src="renderer.js"></script>

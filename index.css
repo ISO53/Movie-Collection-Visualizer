@@ -75,6 +75,7 @@ body {
     color: var(--white-accent-mid);
     cursor: pointer;
     transition: transform 500ms ease;
+    user-select: none;
 }
 
 .search_button:hover {
@@ -82,8 +83,7 @@ body {
 }
 
 .filter_div {
-    width: auto;
-    margin: 0 2% 0 2%;
+    width: 100%;
     border-radius: 20px;
     background-color: var(--background-color-light);
     display: flex;
@@ -93,6 +93,7 @@ body {
 .filter {
     border: 1px solid var(--white-accent-dark);
     border-radius: 20px;
+    height: 20px;
     margin: 10px;
     display: flex;
     align-items: center;
@@ -104,20 +105,20 @@ body {
     transition: box-shadow 250ms ease;
 }
 
-.filter:hover {
-    background-color: var(--background-color-dark);
+.filter:hover>.filter_text {
+    color: var(--white-accent-light);
 }
 
 input[type="checkbox"] {
     display: none;
 }
 
-.filter_box:checked + .filter_text {
+.filter_box:checked+.filter_text {
     border-color: var(--white-accent-light);
     color: var(--main-color)
 }
 
-.filter_box:checked ~ .filter {
+.filter_box:checked~.filter {
     border-color: var(--white-accent-light);
 }
 
@@ -132,4 +133,116 @@ input[type="checkbox"] {
     transform: translateY(-200px);
 }
 
-.movies_div {}
+.middle_bar {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    margin: 0px 5% 0 5%;
+}
+
+.sort_div {
+    background-color: var(--background-color-light);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.sort_div:hover>.sort_icon {
+    fill: var(--white-accent-light);
+}
+
+.sort_icon {
+    width: 30px;
+    height: 30px;
+    transition: fill 250ms ease;
+}
+
+.movies_div {
+    margin: 20px 5% 0 5%;
+}
+
+.movie_div {
+    position: relative;
+    width: 200px;
+    height: 300px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    color: var(--white-accent-light);
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 12px;
+    overflow: hidden;
+    transition: --black 250ms ease;
+    background: linear-gradient(to top, var(--black) 15%, transparent);
+    cursor: pointer;
+    user-select: none;
+}
+
+@property --black {
+    syntax: '<color>';
+    initial-value: transparent;
+    inherits: false;
+}
+
+.movie_div:hover {
+    --black: black;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.movie_div:hover>.movie_poster {
+    filter: blur(2px);
+}
+
+.movie_div:hover>.movie_name_and_year {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.movie_div:hover>.movie_time {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.movie_div:hover>.movie_genres {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.movie_poster {
+    position: absolute;
+    z-index: -1;
+    transition: filter 250ms ease;
+}
+
+.movie_name_and_year {
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease, transform 250ms ease;
+    transform: translateY(10px);
+}
+
+.movie_time {
+    font-weight: 500;
+    margin: 0 0 5px 0;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease, transform 250ms ease;
+    transform: translateY(10px);
+}
+
+.movie_genres {
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0 0 20px 0;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease, transform 250ms ease;
+    transform: translateY(10px);
+}

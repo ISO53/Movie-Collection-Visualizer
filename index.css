@@ -82,9 +82,9 @@ body {
 }
 
 .filter_div {
-    width: 100%;
-    height: 10%;
-    border-bottom: 1px solid white;
+    width: auto;
+    margin: 0 2% 0 2%;
+    border-radius: 20px;
     background-color: var(--background-color-light);
     display: flex;
     flex-direction: row;
@@ -101,7 +101,11 @@ body {
     width: min-content;
     padding: 5px 10px 5px 10px;
     cursor: pointer;
-    transition: color 250ms ease, border-color 250ms ease, text-shadow 250ms ease;
+    transition: box-shadow 250ms ease;
+}
+
+.filter:hover {
+    background-color: var(--background-color-dark);
 }
 
 input[type="checkbox"] {
@@ -110,7 +114,6 @@ input[type="checkbox"] {
 
 .filter_box:checked + .filter_text {
     border-color: var(--white-accent-light);
-    text-shadow: 0px 0px 10px var(--main-color);
     color: var(--main-color)
 }
 
@@ -122,6 +125,7 @@ input[type="checkbox"] {
     color: var(--white-accent-mid);
     user-select: none;
     transition: color 250ms ease, border-color 250ms ease;
+    font-weight: 500;
 }
 
 .filter_box {

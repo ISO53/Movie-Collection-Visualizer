@@ -4,6 +4,7 @@
     --white-accent-dark: rgb(50, 50, 50);
     --white-accent-mid: rgb(150, 150, 150);
     --white-accent-light: rgb(250, 250, 250);
+    --main-color: #ce2233;
 }
 
 body {
@@ -84,27 +85,47 @@ body {
     width: 100%;
     height: 10%;
     border-bottom: 1px solid white;
+    background-color: var(--background-color-light);
+    display: flex;
+    flex-direction: row;
 }
 
-/* Hide the default checkbox */
+.filter {
+    border: 1px solid var(--white-accent-dark);
+    border-radius: 20px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: min-content;
+    width: min-content;
+    padding: 5px 10px 5px 10px;
+    cursor: pointer;
+    transition: color 250ms ease, border-color 250ms ease, text-shadow 250ms ease;
+}
+
 input[type="checkbox"] {
     display: none;
 }
 
 .filter_box:checked + .filter_text {
-    color: var(--white-accent-light);
+    border-color: var(--white-accent-light);
+    text-shadow: 0px 0px 10px var(--main-color);
+    color: var(--main-color)
+}
+
+.filter_box:checked ~ .filter {
     border-color: var(--white-accent-light);
 }
 
 .filter_text {
-    padding: 5px 10px 5px 10px;
     color: var(--white-accent-mid);
     user-select: none;
-    cursor: pointer;
-    border: 1px solid var(--white-accent-dark);
     transition: color 250ms ease, border-color 250ms ease;
-    border-radius: 20px;
 }
 
+.filter_box {
+    transform: translateY(-200px);
+}
 
 .movies_div {}

@@ -3,3 +3,6 @@
 // ************************ JS Starts ************************
 
 // ******************** Declare Functions ********************
+function showImportMoviesPopup() {
+    
+}

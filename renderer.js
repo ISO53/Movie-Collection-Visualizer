@@ -7,6 +7,7 @@ getMessageFromMain("open-omdb-api-popup", openOmdbApiPopup);
 popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromCSVButtonListener();
+omdbApiButtonListener();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {
@@ -47,5 +48,12 @@ function importFromFileSystemButtonListener() {
 function importFromCSVButtonListener() {
     document.getElementById("import_from_csv_button").addEventListener("click", () => {
         sendMessageToMain("open-file-system", "csv");
+    });
+}
+
+function omdbApiButtonListener() {
+    document.getElementById("omdb_api_button").addEventListener("click", ()=> {
+        const key = document.getElementById("omdb_api_input").value;
+        sendMessageToMain("omdb-api-key", key);
     });
 }

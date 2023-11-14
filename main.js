@@ -4,11 +4,13 @@ const fs = require("fs");
 const path = require("path");
 
 let win;
+let KEY;
 
 // ************************ JS Starts ************************
 app.whenReady().then(createWindow);
 app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
 getMessageFromRenderer("open-file-system", openFileSystem);
+getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
 
 // ******************** Declare Functions ********************
 function createWindow() {
@@ -137,4 +139,10 @@ function writeFoldersToJson(folderNames) {
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(folderObjects, null, 2), "utf-8");
     console.log("Folders written to JSON file.");
+}
+
+function setOmdbApiKey(key) {
+    KEY = key;
+    const jsonFilePath = path.join(__dirname,"res", "key.json");
+    fs.writeFileSync(jsonFilePath, JSON.stringify({key: key}), "utf-8");
 }

@@ -39,3 +39,6 @@ build/
 ### npm libraries ###
 .node_modules/
 node_modules/
+
+### res folder for this project ###
+.res/

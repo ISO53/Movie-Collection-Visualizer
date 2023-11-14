@@ -41,6 +41,7 @@ body {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    margin: 20px 0px 20px 0px;
 }
 
 .search_input {
@@ -177,25 +178,6 @@ input[type="checkbox"] {
     background-color: transparent
 }
 
-@keyframes lazy_loading_animation {
-    0% {
-        background-color: var(--white-accent-dark);
-    }
-
-    50% {
-        background-color: var(--background-color-light);
-    }
-
-    100% {
-        background-color: var(--white-accent-dark);
-    }
-}
-
-.lazy {
-    background-color: var(--white-accent-dark);
-    animation: lazy_loading_animation 1.5s infinite ease-in-out;
-}
-
 .movies_div {
     margin: 20px 5% 20px 5%;
     height: 100%;
@@ -314,13 +296,37 @@ input[type="checkbox"] {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: opacity 250ms ease, transform 250ms ease, display 250ms ease;
+    visibility: visible;
+    transition: opacity 250ms ease, transform 250ms ease, visibility 250ms ease;
+}
+
+.popup_close_button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--white-accent-light);
+    cursor: pointer;
+    user-select: none;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    line-height: 20px;
+}
+
+.popup_close_button:hover{
+    background-color: var(--white-accent-dark);
 }
 
 .hide_popup {
     opacity: 0;
-    transform: scale(90%);
-    display: none;
+    transform: translate(-50%, -50%) scale(90%);
+    visibility: hidden;
 }
 
 .popup_logo {
@@ -419,12 +425,12 @@ input[type="checkbox"] {
     top: 0;
     left: 0;
     z-index: 5;
-    display: none;
-    transition: backdrop-filter 250ms ease, background-color 250ms ease, display 250ms ease;
+    visibility: hidden;
+    transition: backdrop-filter 250ms ease, background-color 250ms ease, visibility 250ms ease;
 }
 
 .blur {
     backdrop-filter: blur(10px);
     background-color: rgba(0, 0, 0, 0.5);
-    display: initial;
+    visibility: visible;
 }

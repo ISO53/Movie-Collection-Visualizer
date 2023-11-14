@@ -2,12 +2,8 @@
 const {ipcRenderer} = require("electron");
 
 // ************************ JS Starts ************************
-getMessageFromMain("open-import-movies-popup", openImportMoviesPopup);
-getMessageFromMain("open-omdb-api-popup", openOmdbApiPopup);
-getMessageFromMain("close-omdb-api-popup", closeOmdbApiPopup);
-getMessageFromMain("open-db-create-popup", openDbCreatePopup);
-getMessageFromMain("movie-db-status-loading", updateMovieDbStatus);
-getMessageFromMain("close-import-movies-popup", closeImportMoviesPopup);
+getMessageFromMain("popup", popupHandler);
+getMessageFromMain("movie-db-status", updateMovieDbStatus);
 popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromCSVButtonListener();
@@ -22,6 +18,20 @@ function getMessageFromMain(channel, handler) {
     ipcRenderer.on(channel, (event, arg) => {
         handler(arg);
     });
+}
+
+function popupHandler(arg) {
+    const popupID = arg.substring(2);
+
+    if (arg.startsWith("o")) {
+        // Open popup
+        document.getElementById(popupID).classList.remove("hide_popup");
+        document.getElementById("blur_background").classList.add("blur");
+    } else {
+        // Close popup
+        document.getElementById(popupID).classList.add("hide_popup");
+        document.getElementById("blur_background").classList.remove("blur");
+    }
 }
 
 function openImportMoviesPopup() {
@@ -78,12 +88,23 @@ function omdbApiButtonListener() {
 }
 
 function updateMovieDbStatus(status) {
-    document.getElementById("db_status").innerHTML = status;
+    const statusElm = document.getElementById("db_status");
+    if (status.startsWith("l")) {
+        // Loading
+        const extractedStatus = status.substring(1);
+        const parts = extractedStatus.split("/");
+        const firstNumber = parseInt(parts[0], 10);
+        const secondNumber = parseInt(parts[1], 10);
 
-    const parts = status.split("/");
-
-    const firstNumber = parseInt(parts[0], 10);
-    const secondNumber = parseInt(parts[1], 10);
-
-    document.getElementById("loaded_amount_div").style.width = (firstNumber / secondNumber * 100) + "%";
+        statusElm.innerHTML = `${firstNumber} out of ${secondNumber} completed.`;
+        document.getElementById("loaded_amount_div").style.width = (firstNumber / secondNumber) * 100 + "%";
+    } else if (status.startsWith("a")) {
+        // Almost done
+        statusElm.innerHTML = "We're nearing completion. Please hold for the final steps.";
+    } else if (status.startsWith("d")) {
+        // Done
+        statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
+    } else {
+        console.log("something went wrong", status);
+    }
 }

@@ -7,10 +7,14 @@ var win;
 var KEY;
 
 // ************************ JS Starts ************************
-app.whenReady().then(createWindow);
-app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
-getMessageFromRenderer("open-file-system", openFileSystem);
-getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
+app.whenReady()
+    .then(createWindow)
+    .then(() => {
+        app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
+        getMessageFromRenderer("open-file-system", openFileSystem);
+        getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
+        readOmdbApiKeyFromFile();
+    });
 
 // ******************** Declare Functions ********************
 function createWindow() {
@@ -32,11 +36,11 @@ function createWindow() {
     const menu = Menu.buildFromTemplate([
         {
             label: "File",
-            submenu: [{role: "quit"}, {label: "Import Movies", click: () => sendMessageToRenderer("open-import-movies-popup")}],
+            submenu: [{role: "quit"}, {label: "Import Movies", click: () => sendMessageToRenderer("popup", "o_import_movies_div")}],
         },
         {
             label: "Settings",
-            submenu: [{label: "OMDB Api", click: () => sendMessageToRenderer("open-omdb-api-popup")}],
+            submenu: [{label: "OMDB Api", click: () => sendMessageToRenderer("popup", "o_omdb_api_div")}],
         },
     ]);
 
@@ -66,8 +70,8 @@ function openFileSystem(arg) {
                 if (!result.canceled) {
                     const selectedFolder = result.filePaths[0];
                     const movies = getFolderNames(selectedFolder);
-                    sendMessageToRenderer("close-import-movies-popup", ".");
-                    sendMessageToRenderer("open-db-create-popup", ".");
+                    sendMessageToRenderer("popup", "c_import_movies_div");
+                    sendMessageToRenderer("popup", "o_create_movies_library_div");
                     writeFoldersToJson(movies);
                 }
             })
@@ -82,8 +86,8 @@ function openFileSystem(arg) {
             .then((result) => {
                 if (!result.canceled) {
                     const selectedCsvFile = result.filePaths[0];
-                    sendMessageToRenderer("close-import-movies-popup", ".");
-                    sendMessageToRenderer("open-db-create-popup", ".");
+                    sendMessageToRenderer("popup", "c_import_movies_div");
+                    sendMessageToRenderer("popup", "o_create_movies_library_div");
                     readAndParseCsv(selectedCsvFile).then(writeFoldersToJson).catch(console.error);
                 }
             })
@@ -160,27 +164,46 @@ async function writeFoldersToJson(movieNames) {
             movieDetailsArray.push(movieDetails);
         }
 
-        sendMessageToRenderer("movie-db-status-loading", `${i + 1}/${movieNames.length}`);
+        sendMessageToRenderer("movie-db-status", `l${i + 1}/${movieNames.length}`);
     }
 
-    sendMessageToRenderer("movie-db-status-almost", ".");
+    sendMessageToRenderer("movie-db-status", "a");
 
     try {
-        fs.writeFile(jsonFilePath, JSON.stringify(movieDetailsArray), "utf-8", callback);
-        console.log(`Movie details written to ${jsonFilePath}`);
-        sendMessageToRenderer("movie-db-status-done", ".");
+        fs.writeFile(jsonFilePath, JSON.stringify(movieDetailsArray), "utf-8", () => {
+            console.log(`Movie details written to ${jsonFilePath}`);
+            sendMessageToRenderer("movie-db-status", "d");
+        });
     } catch (error) {
         console.error("Error writing to JSON file:", error.message);
     }
-}
-
-function callback() {
-    console.log("DONE");
 }
 
 function setOmdbApiKey(key) {
     KEY = key;
     const jsonFilePath = path.join(__dirname, "res", "key.json");
     fs.writeFileSync(jsonFilePath, JSON.stringify({key: key}), "utf-8");
-    sendMessageToRenderer("close-omdb-api-popup", ".");
+    sendMessageToRenderer("popup", "c_omdb_api_div");
+}
+
+async function readOmdbApiKeyFromFile() {
+    try {
+        const filePath = path.join(__dirname, "res", "key.json");
+        fs.readFile(filePath, "utf-8", (err, jsonStr) => {
+
+            if (err) {
+                console.log("Something went wrong trying to read JSON file.");
+            }
+
+            const jsonContent = JSON.parse(jsonStr);
+
+            if (jsonContent && jsonContent.key) {
+                KEY = jsonContent.key;
+            } else {
+                console.error("Invalid JSON file format or missing key.");
+            }
+        });
+    } catch (error) {
+        console.error("Error reading JSON file:", error.message);
+    }
 }

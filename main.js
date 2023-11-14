@@ -3,8 +3,8 @@ const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
 const fs = require("fs");
 const path = require("path");
 
-let win;
-let KEY;
+var win;
+var KEY;
 
 // ************************ JS Starts ************************
 app.whenReady().then(createWindow);
@@ -66,6 +66,8 @@ function openFileSystem(arg) {
                 if (!result.canceled) {
                     const selectedFolder = result.filePaths[0];
                     const movies = getFolderNames(selectedFolder);
+                    sendMessageToRenderer("close-import-movies-popup", ".");
+                    sendMessageToRenderer("open-db-create-popup", ".");
                     writeFoldersToJson(movies);
                 }
             })
@@ -80,14 +82,13 @@ function openFileSystem(arg) {
             .then((result) => {
                 if (!result.canceled) {
                     const selectedCsvFile = result.filePaths[0];
-
+                    sendMessageToRenderer("close-import-movies-popup", ".");
+                    sendMessageToRenderer("open-db-create-popup", ".");
                     readAndParseCsv(selectedCsvFile).then(writeFoldersToJson).catch(console.error);
                 }
             })
             .catch(console.error);
     }
-
-    console.log(movies);
 }
 
 function getFolderNames(folderPath) {
@@ -131,14 +132,6 @@ function readAndParseCsv(filePath) {
     });
 }
 
-function writeFoldersToJson(folderNames) {
-    const jsonFilePath = path.join(__dirname, "res", "db.json");
-    const folderObjects = folderNames.map((folderName) => ({folderName}));
-
-    fs.writeFileSync(jsonFilePath, JSON.stringify(folderObjects, null, 2), "utf-8");
-    console.log("Folders written to JSON file.");
-}
-
 async function writeFoldersToJson(movieNames) {
     const movieDetailsArray = [];
     const jsonFilePath = path.join(__dirname, "res", "db.json");
@@ -160,24 +153,34 @@ async function writeFoldersToJson(movieNames) {
         }
     }
 
-    for (const movieName of movieNames) {
-        const movieDetails = await fetchMovieDetails(movieName);
+    for (let i = 0; i < movieNames.length; i++) {
+        const movieDetails = await fetchMovieDetails(movieNames[i]);
 
         if (movieDetails) {
             movieDetailsArray.push(movieDetails);
         }
+
+        sendMessageToRenderer("movie-db-status-loading", `${i + 1}/${movieNames.length}`);
     }
 
+    sendMessageToRenderer("movie-db-status-almost", ".");
+
     try {
-        fs.writeFile(jsonFilePath, JSON.stringify(movieDetailsArray, null, 2), "utf-8");
+        fs.writeFile(jsonFilePath, JSON.stringify(movieDetailsArray), "utf-8", callback);
         console.log(`Movie details written to ${jsonFilePath}`);
+        sendMessageToRenderer("movie-db-status-done", ".");
     } catch (error) {
         console.error("Error writing to JSON file:", error.message);
     }
+}
+
+function callback() {
+    console.log("DONE");
 }
 
 function setOmdbApiKey(key) {
     KEY = key;
     const jsonFilePath = path.join(__dirname, "res", "key.json");
     fs.writeFileSync(jsonFilePath, JSON.stringify({key: key}), "utf-8");
+    sendMessageToRenderer("close-omdb-api-popup", ".");
 }

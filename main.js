@@ -81,9 +81,7 @@ function openFileSystem(arg) {
                 if (!result.canceled) {
                     const selectedCsvFile = result.filePaths[0];
 
-                    readAndParseCsv(selectedCsvFile)
-                        .then(writeFoldersToJson)
-                        .catch(console.error);
+                    readAndParseCsv(selectedCsvFile).then(writeFoldersToJson).catch(console.error);
                 }
             })
             .catch(console.error);
@@ -134,15 +132,52 @@ function readAndParseCsv(filePath) {
 }
 
 function writeFoldersToJson(folderNames) {
-    const jsonFilePath = path.join(__dirname, "db.json");
+    const jsonFilePath = path.join(__dirname, "res", "db.json");
     const folderObjects = folderNames.map((folderName) => ({folderName}));
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(folderObjects, null, 2), "utf-8");
     console.log("Folders written to JSON file.");
 }
 
+async function writeFoldersToJson(movieNames) {
+    const movieDetailsArray = [];
+    const jsonFilePath = path.join(__dirname, "res", "db.json");
+
+    async function fetchMovieDetails(movieName) {
+        const apiUrl = `http://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`;
+
+        try {
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                throw new Error(`Error fetching details for ${movieName}: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error(error.message);
+            return null;
+        }
+    }
+
+    for (const movieName of movieNames) {
+        const movieDetails = await fetchMovieDetails(movieName);
+
+        if (movieDetails) {
+            movieDetailsArray.push(movieDetails);
+        }
+    }
+
+    try {
+        fs.writeFile(jsonFilePath, JSON.stringify(movieDetailsArray, null, 2), "utf-8");
+        console.log(`Movie details written to ${jsonFilePath}`);
+    } catch (error) {
+        console.error("Error writing to JSON file:", error.message);
+    }
+}
+
 function setOmdbApiKey(key) {
     KEY = key;
-    const jsonFilePath = path.join(__dirname,"res", "key.json");
+    const jsonFilePath = path.join(__dirname, "res", "key.json");
     fs.writeFileSync(jsonFilePath, JSON.stringify({key: key}), "utf-8");
 }

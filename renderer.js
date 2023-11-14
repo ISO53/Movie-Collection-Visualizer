@@ -104,7 +104,30 @@ function updateMovieDbStatus(status) {
     } else if (status.startsWith("d")) {
         // Done
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
+        readMoviesFromFile();
     } else {
         console.log("something went wrong", status);
     }
+}
+
+async function readMoviesFromFile() {
+    try {
+        const filePath = path.join(__dirname, "res", "db.json");
+        fs.readFile(filePath, "utf-8", (err, jsonStr) => {
+            if (err) {
+                console.log("Something went wrong trying to read JSON file.");
+            }
+
+            const jsonContent = JSON.parse(jsonStr);
+            listMoviesOnGUI(jsonContent);
+        });
+    } catch (error) {
+        console.error("Error reading JSON file:", error.message);
+    }
+}
+
+function listMoviesOnGUI(movies) {
+    movies.forEach((movie) => {
+        
+    });
 }

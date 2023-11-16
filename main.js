@@ -26,14 +26,14 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            devTools: true,
+            // devTools: true,
             contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
         },
     });
 
     win.loadFile("index.html");
     win.maximize();
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
     const menu = Menu.buildFromTemplate([
         {
@@ -98,7 +98,7 @@ function openFileSystem(arg) {
 }
 
 function getFolderNames(folderPath) {
-    const folderNames = [];
+    const folderNamesSet = new Set();
 
     function traverseFolder(currentPath) {
         const files = fs.readdirSync(currentPath);
@@ -107,14 +107,16 @@ function getFolderNames(folderPath) {
             const filePath = path.join(currentPath, file);
 
             if (fs.statSync(filePath).isDirectory()) {
-                folderNames.push(file);
+                folderNamesSet.add(file);
                 traverseFolder(filePath);
             }
         });
     }
 
     traverseFolder(folderPath);
-    return folderNames;
+
+    // Convert the Set to an array before returning
+    return Array.from(folderNamesSet);
 }
 
 function readAndParseCsv(filePath) {
@@ -140,6 +142,7 @@ function readAndParseCsv(filePath) {
 
 async function writeFoldersToJson(movieNames) {
     const movieDetailsArray = [];
+    const nonFoundMovies = [];
     const jsonFilePath = path.join(__dirname, "res", "db.json");
 
     async function fetchMovieDetails(movieName) {
@@ -163,16 +166,24 @@ async function writeFoldersToJson(movieNames) {
         const movieDetails = await fetchMovieDetails(movieNames[i]);
 
         if (movieDetails) {
-            if (movieDetails.Poster) {
-                downloadImage(movieDetails.Poster, movieDetails.Title);
-                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
-            }
+            // if (movieDetails.Poster) {
+            //     downloadImage(movieDetails.Poster, movieDetails.Title);
+            //     movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+            // }
 
             movieDetailsArray.push(movieDetails);
+        } else {
+            nonFoundMovies.push(movieNames[i]);
         }
 
         sendMessageToRenderer("movie-db-status", `l${i + 1}/${movieNames.length}`);
     }
+
+    if (nonFoundMovies.length > 0) {
+        console.log("Some movies couldn't be found. Here are the names:");
+        console.log(nonFoundMovies);
+    }
+
 
     sendMessageToRenderer("movie-db-status", "a");
 

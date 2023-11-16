@@ -1,5 +1,7 @@
 // ******************** Declare Variables ********************
 const {ipcRenderer} = require("electron");
+const fs = require("fs");
+const path = require("path");
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -127,7 +129,43 @@ async function readMoviesFromFile() {
 }
 
 function listMoviesOnGUI(movies) {
+    let moviesDiv = document.getElementById("movies_div");
+    
     movies.forEach((movie) => {
-        
+        var movieDiv = document.createElement("div");
+        movieDiv.className = "movie_div";
+
+        var posterAndRatingDiv = document.createElement("div");
+        posterAndRatingDiv.className = "movie_poster_and_rating";
+
+        var posterImg = document.createElement("img");
+        posterImg.className = "movie_poster";
+        posterImg.src = movie.Poster;
+
+        var ratingH2 = document.createElement("h2");
+        ratingH2.className = "movie_rating";
+        ratingH2.textContent = movie.imdbRating;
+
+        posterAndRatingDiv.appendChild(posterImg);
+        posterAndRatingDiv.appendChild(ratingH2);
+
+        var nameAndGenresDiv = document.createElement("div");
+        nameAndGenresDiv.className = "movie_name_and_genres";
+
+        var nameH2 = document.createElement("h2");
+        nameH2.className = "movie_name";
+        nameH2.textContent = movie.Title;
+
+        var genresH2 = document.createElement("h2");
+        genresH2.className = "movie_genres";
+        genresH2.textContent = movie.Genre;
+
+        nameAndGenresDiv.appendChild(nameH2);
+        nameAndGenresDiv.appendChild(genresH2);
+
+        movieDiv.appendChild(posterAndRatingDiv);
+        movieDiv.appendChild(nameAndGenresDiv);
+
+        moviesDiv.appendChild(movieDiv);
     });
 }

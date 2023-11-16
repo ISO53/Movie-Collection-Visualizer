@@ -249,7 +249,7 @@ input[type="checkbox"] {
     align-items: center;
     font-size: 14px;
     color: var(--main-color-four);
-    box-shadow: 0 0 5px 2px black;
+    box-shadow: 0 0 5px 1px black;
 }
 
 .movie_name_and_genres {

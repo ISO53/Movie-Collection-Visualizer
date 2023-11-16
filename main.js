@@ -7,16 +7,17 @@ var win;
 var KEY;
 
 // ************************ JS Starts ************************
-app.whenReady()
-    .then(createWindow)
-    .then(() => {
-        app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
-        getMessageFromRenderer("open-file-system", openFileSystem);
-        getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
-        readOmdbApiKeyFromFile();
-    });
+app.whenReady().then(createWindow).then(startApp);
 
 // ******************** Declare Functions ********************
+function startApp() {
+    app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
+    getMessageFromRenderer("open-file-system", openFileSystem);
+    getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
+    readOmdbApiKeyFromFile();
+    sendMessageToRenderer("movie-db-status", "d");
+}
+
 function createWindow() {
     win = new BrowserWindow({
         width: 800,
@@ -32,6 +33,7 @@ function createWindow() {
 
     win.loadFile("index.html");
     win.maximize();
+    win.webContents.openDevTools();
 
     const menu = Menu.buildFromTemplate([
         {
@@ -161,6 +163,11 @@ async function writeFoldersToJson(movieNames) {
         const movieDetails = await fetchMovieDetails(movieNames[i]);
 
         if (movieDetails) {
+            if (movieDetails.Poster) {
+                downloadImage(movieDetails.Poster, movieDetails.Title);
+                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+            }
+
             movieDetailsArray.push(movieDetails);
         }
 
@@ -190,7 +197,6 @@ async function readOmdbApiKeyFromFile() {
     try {
         const filePath = path.join(__dirname, "res", "key.json");
         fs.readFile(filePath, "utf-8", (err, jsonStr) => {
-
             if (err) {
                 console.log("Something went wrong trying to read JSON file.");
             }
@@ -205,5 +211,38 @@ async function readOmdbApiKeyFromFile() {
         });
     } catch (error) {
         console.error("Error reading JSON file:", error.message);
+    }
+}
+
+async function downloadImage(url, fileName) {
+    try {
+        const response = await fetch(url);
+        const folderPath = path.join(__dirname, "res", "posters");
+
+        // Ensure the folder exists
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, {recursive: true});
+        }
+
+        // Get the image blob from the response
+        const blob = await response.blob();
+
+        // Create a ReadableStream from the blob
+        const stream = fs.createWriteStream(path.join(folderPath, `${fileName}.jpg`));
+        await new Promise((resolve, reject) => {
+            const reader = blob.stream().getReader();
+            reader.read().then(function process({done, value}) {
+                if (done) {
+                    resolve();
+                    return;
+                }
+                stream.write(Buffer.from(value));
+                reader.read().then(process);
+            });
+        });
+
+        console.log(`Image downloaded and saved.`);
+    } catch (error) {
+        console.error("Error downloading image:", error.message);
     }
 }

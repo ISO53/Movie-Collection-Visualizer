@@ -2,6 +2,7 @@
 const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
 const fs = require("fs");
 const path = require("path");
+const readline = require("readline");
 
 var win;
 var KEY;
@@ -81,16 +82,16 @@ function openFileSystem(arg) {
     } else {
         dialog
             .showOpenDialog(win, {
-                title: "Open CSV File",
-                filters: [{name: "CSV Files", extensions: ["csv"]}],
+                title: "Open TXT File",
+                filters: [{name: "TXT Files", extensions: ["txt"]}],
                 properties: ["openFile"],
             })
             .then((result) => {
                 if (!result.canceled) {
-                    const selectedCsvFile = result.filePaths[0];
+                    const selectedTxtFile = result.filePaths[0];
                     sendMessageToRenderer("popup", "c_import_movies_div");
                     sendMessageToRenderer("popup", "o_create_movies_library_div");
-                    readAndParseCsv(selectedCsvFile).then(writeFoldersToJson).catch(console.error);
+                    readAndParseTxt(selectedTxtFile).then(writeFoldersToJson).catch(console.error);
                 }
             })
             .catch(console.error);
@@ -119,30 +120,31 @@ function getFolderNames(folderPath) {
     return Array.from(folderNamesSet);
 }
 
-function readAndParseCsv(filePath) {
-    const csvData = fs.readFileSync(filePath, "utf-8");
-
+function readAndParseTxt(filePath) {
     return new Promise((resolve, reject) => {
-        parse(
-            csvData,
-            {
-                columns: true,
-                skip_empty_lines: true,
-            },
-            (err, records) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(records);
-                }
-            }
-        );
+        const lines = [];
+
+        const rl = readline.createInterface({
+            input: fs.createReadStream(filePath),
+            crlfDelay: Infinity, // Recognize both '\r\n' and '\n' as line endings
+        });
+
+        rl.on("line", (line) => {
+            lines.push(line);
+        });
+
+        rl.on("close", () => {
+            resolve(lines);
+        });
+
+        rl.on("error", (err) => {
+            reject(err);
+        });
     });
 }
 
 async function writeFoldersToJson(movieNames) {
     const movieDetailsArray = [];
-    const nonFoundMovies = [];
     const jsonFilePath = path.join(__dirname, "res", "db.json");
 
     async function fetchMovieDetails(movieName) {
@@ -166,24 +168,20 @@ async function writeFoldersToJson(movieNames) {
         const movieDetails = await fetchMovieDetails(movieNames[i]);
 
         if (movieDetails) {
+            // Add downloaded poster path to movie data
             // if (movieDetails.Poster) {
             //     downloadImage(movieDetails.Poster, movieDetails.Title);
             //     movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
             // }
 
+            // Add file name for movie to movie data
+            movieDetails.fileName = movieNames[i];
+
             movieDetailsArray.push(movieDetails);
-        } else {
-            nonFoundMovies.push(movieNames[i]);
         }
 
         sendMessageToRenderer("movie-db-status", `l${i + 1}/${movieNames.length}`);
     }
-
-    if (nonFoundMovies.length > 0) {
-        console.log("Some movies couldn't be found. Here are the names:");
-        console.log(nonFoundMovies);
-    }
-
 
     sendMessageToRenderer("movie-db-status", "a");
 

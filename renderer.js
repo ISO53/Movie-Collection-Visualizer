@@ -8,7 +8,7 @@ getMessageFromMain("popup", popupHandler);
 getMessageFromMain("movie-db-status", updateMovieDbStatus);
 popupCloseButtonListener();
 importFromFileSystemButtonListener();
-importFromCSVButtonListener();
+importFromTXTButtonListener();
 omdbApiButtonListener();
 
 // ******************** Declare Functions ********************
@@ -36,31 +36,6 @@ function popupHandler(arg) {
     }
 }
 
-function openImportMoviesPopup() {
-    document.getElementById("import_movies_div").classList.remove("hide_popup");
-    document.getElementById("blur_background").classList.add("blur");
-}
-
-function openOmdbApiPopup() {
-    document.getElementById("omdb_api_div").classList.remove("hide_popup");
-    document.getElementById("blur_background").classList.add("blur");
-}
-
-function openDbCreatePopup() {
-    document.getElementById("create_movies_library_div").classList.remove("hide_popup");
-    document.getElementById("blur_background").classList.add("blur");
-}
-
-function closeOmdbApiPopup() {
-    document.getElementById("omdb_api_div").classList.add("hide_popup");
-    document.getElementById("blur_background").classList.remove("blur");
-}
-
-function closeImportMoviesPopup() {
-    document.getElementById("import_movies_div").classList.add("hide_popup");
-    document.getElementById("blur_background").classList.remove("blur");
-}
-
 function popupCloseButtonListener() {
     document.querySelectorAll(".popup_close_button").forEach((closeButton) => {
         closeButton.addEventListener("click", () => {
@@ -76,9 +51,9 @@ function importFromFileSystemButtonListener() {
     });
 }
 
-function importFromCSVButtonListener() {
-    document.getElementById("import_from_csv_button").addEventListener("click", () => {
-        sendMessageToMain("open-file-system", "csv");
+function importFromTXTButtonListener() {
+    document.getElementById("import_from_txt_button").addEventListener("click", () => {
+        sendMessageToMain("open-file-system", "txt");
     });
 }
 
@@ -140,7 +115,7 @@ function listMoviesOnGUI(movies) {
 
         var posterImg = document.createElement("img");
         posterImg.className = "movie_poster";
-        posterImg.src = movie.Poster;
+        posterImg.src = movie.Poster === "N/A" ? path.join(__dirname, "res", "img", "not_available.jpg") : movie.Poster;
 
         var ratingH2 = document.createElement("h2");
         ratingH2.className = "movie_rating";
@@ -154,7 +129,7 @@ function listMoviesOnGUI(movies) {
 
         var nameH2 = document.createElement("h2");
         nameH2.className = "movie_name";
-        nameH2.textContent = movie.Title;
+        nameH2.textContent = movie.fileName; // Title
 
         var genresH2 = document.createElement("h2");
         genresH2.className = "movie_genres";

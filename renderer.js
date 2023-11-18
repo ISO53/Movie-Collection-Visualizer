@@ -10,6 +10,7 @@ popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
 omdbApiButtonListener();
+readMoviesFromFile();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {

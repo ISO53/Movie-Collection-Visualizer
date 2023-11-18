@@ -105,7 +105,7 @@ async function readMoviesFromFile() {
 
 function listMoviesOnGUI(movies) {
     let moviesDiv = document.getElementById("movies_div");
-    
+
     movies.forEach((movie) => {
         var movieDiv = document.createElement("div");
         movieDiv.className = "movie_div";
@@ -115,31 +115,59 @@ function listMoviesOnGUI(movies) {
 
         var posterImg = document.createElement("img");
         posterImg.className = "movie_poster";
-        posterImg.src = movie.Poster === "N/A" ? path.join(__dirname, "res", "img", "not_available.jpg") : movie.Poster;
+        posterImg.src = !movie.PosterPath ? path.join(__dirname, "res", "img", "not_available.png") : movie.PosterPath;
 
         var ratingH2 = document.createElement("h2");
         ratingH2.className = "movie_rating";
-        ratingH2.textContent = movie.imdbRating;
+        ratingH2.textContent = movie.imdbRating === "N/A" || !movie.imdbRating ? "?" : movie.imdbRating;
 
         posterAndRatingDiv.appendChild(posterImg);
         posterAndRatingDiv.appendChild(ratingH2);
+
+        var nameGenresAndMoreDiv = document.createElement("div");
+        nameGenresAndMoreDiv.className = "movie_name_genres_and_more";
+
+        var problemDiv = document.createElement("div");
+        problemDiv.className = "problem_div";
+        problemDiv.innerHTML = "⋮";
+
+        var problemPopupDiv = document.createElement("div");
+        problemPopupDiv.className = "problem_popup_div";
+        problemPopupDiv.classList.add("hide");
+        problemDiv.appendChild(problemPopupDiv);
+
+        var problemPopupElementWrong = document.createElement("h2");
+        problemPopupElementWrong.textContent = "Wrong Movie/Poster?";
+        problemPopupElementWrong.className = "problem_popup_element";
+        problemPopupDiv.appendChild(problemPopupElementWrong);
+
+        problemDiv.addEventListener("click", () => {
+            problemPopupDiv.classList.toggle("hide");
+        });
+
+        problemPopupElementWrong.addEventListener("click", ()=> {
+
+        });
 
         var nameAndGenresDiv = document.createElement("div");
         nameAndGenresDiv.className = "movie_name_and_genres";
 
         var nameH2 = document.createElement("h2");
         nameH2.className = "movie_name";
-        nameH2.textContent = movie.fileName; // Title
+        nameH2.textContent = !movie.Title ? movie.fileName : movie.Title;
 
         var genresH2 = document.createElement("h2");
         genresH2.className = "movie_genres";
-        genresH2.textContent = movie.Genre;
+        genresH2.textContent = movie.Genre === "N/A" || !movie.Genre ? "Not found" : movie.Genre;
 
         nameAndGenresDiv.appendChild(nameH2);
         nameAndGenresDiv.appendChild(genresH2);
 
         movieDiv.appendChild(posterAndRatingDiv);
-        movieDiv.appendChild(nameAndGenresDiv);
+        movieDiv.appendChild(nameGenresAndMoreDiv);
+
+        nameGenresAndMoreDiv.appendChild(nameAndGenresDiv);
+        nameGenresAndMoreDiv.appendChild(problemDiv);
 
         moviesDiv.appendChild(movieDiv);
     });

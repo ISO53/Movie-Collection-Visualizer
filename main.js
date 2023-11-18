@@ -27,14 +27,14 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            // devTools: true,
+            devTools: true,
             contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
         },
     });
 
     win.loadFile("index.html");
     win.maximize();
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
 
     const menu = Menu.buildFromTemplate([
         {
@@ -169,10 +169,10 @@ async function writeFoldersToJson(movieNames) {
 
         if (movieDetails) {
             // Add downloaded poster path to movie data
-            // if (movieDetails.Poster) {
-            //     downloadImage(movieDetails.Poster, movieDetails.Title);
-            //     movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
-            // }
+            if (movieDetails.Poster) {
+                downloadImage(movieDetails.Poster, movieDetails.Title);
+                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+            }
 
             // Add file name for movie to movie data
             movieDetails.fileName = movieNames[i];

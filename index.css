@@ -221,6 +221,10 @@ input[type="checkbox"] {
     transform: translateY(-5px);
 }
 
+.movie_div:hover .problem_div {
+    opacity: 1;
+}
+
 .movie_poster_and_rating {
     position: relative;
     width: 100%;
@@ -252,8 +256,58 @@ input[type="checkbox"] {
     box-shadow: 0 0 5px 1px black;
 }
 
-.movie_name_and_genres {
+.movie_name_genres_and_more {
+    display: flex;
+    flex-direction: row;
     width: 100%;
+}
+
+.problem_div {
+    position: relative;
+    width: 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-accent-light);
+    font-size: 30px;
+    opacity: 0;
+}
+
+.problem_popup_div {
+    position: absolute;
+    width: max-content;
+    height: auto;
+    opacity: 1;
+    transform: scaleY(100%);
+    bottom: 50px;
+    right: 0;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--white-accent-dark);
+    z-index: 9;
+    overflow: hidden;
+    transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.problem_popup_element {
+    font-size: 10px;
+    font-weight: 300;
+    padding: 5px 10px 5px 10px;
+}
+
+.problem_popup_element:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hide {
+    opacity: 0;
+    transform: scaleY(0) translateY(100%);
+}
+
+.movie_name_and_genres {
+    width: calc(100% - 20px);
     height: 15%;
     margin: 0;
 }

@@ -84,6 +84,38 @@
         </div>
     </div>
 
+    <div class="popup wrong_movie_poster_div hide_popup" id="wrong_movie_poster_div">
+        <div class="popup_close_button">✖</div>
+        <div class="popup_logo_div">
+            <svg class="popup_logo" xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 -960 960 960" width="24"><path d="m840-234-80-80v-446H314l-80-80h526q33 0 56.5 23.5T840-760v526ZM792-56l-64-64H200q-33 0-56.5-23.5T120-200v-528l-64-64 56-56 736 736-56 56ZM240-280l120-160 90 120 33-44-283-283v447h447l-80-80H240Zm297-257ZM424-424Z"/></svg>
+        </div>
+        <h1 class="popup_header">Wrong Poster or Movie?</h1>
+        <p class="popup_paragraph">Spot a movie name or poster that seems off? No worries! If you think there's a mistake, just type in the correct movie name below. It's a good idea to cross-check the movie name on IMDb for accuracy.</p>
+        
+        <div class="wrong_right_movie_div">
+            <div class="wrong_right_movie_inner_div">
+                <img class="wrong_right_movie_poster" id="wrong_movie_poster" src="" alt="">
+                <h2 class="wrong_movie_name" id="wrong_movie_name">.</h2>
+                <span id="wrong_movie_id" style="display: none;"></span>
+            </div>
+
+            <div class="wrong_right_movie_inner_div">
+                <img class="wrong_right_movie_poster" id="right_movie_poster" src="" alt="">
+                <div class="right_movie_input_div">
+                    <input type="text" class="simple_search_input" id="right_movie_search_input" placeholder="Movie Name..." />
+                    <button class="simple_search_button" id="right_movie_search_button">🔎︎</button>
+                    <span id="right_movie_id" style="display: none;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="choose_right_movie_div">
+            <h2 class="choose_right_movie_txt">Is that the right movie?</h2>
+            <button class="popup_button" id="choose_right_movie_button">Choose This Movie</button>
+        </div>
+        
+    </div>
+
     <div class="blur_background" id="blur_background"></div>
 
     <script src="renderer.js"></script>

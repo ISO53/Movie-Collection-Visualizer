@@ -2,15 +2,20 @@
 const {ipcRenderer} = require("electron");
 const fs = require("fs");
 const path = require("path");
+var KEY;
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
 getMessageFromMain("movie-db-status", updateMovieDbStatus);
+getMessageFromMain("movies", movieHandler);
 popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
 omdbApiButtonListener();
 readMoviesFromFile();
+readOmdbApiKeyFromFile();
+rightMovieSearchButtonListener();
+chooseRightMovieButtonListener();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {
@@ -34,6 +39,12 @@ function popupHandler(arg) {
         // Close popup
         document.getElementById(popupID).classList.add("hide_popup");
         document.getElementById("blur_background").classList.remove("blur");
+    }
+}
+
+function movieHandler(arg) {
+    if (arg == "refresh") {
+        readMoviesFromFile();
     }
 }
 
@@ -106,10 +117,12 @@ async function readMoviesFromFile() {
 
 function listMoviesOnGUI(movies) {
     let moviesDiv = document.getElementById("movies_div");
+    moviesDiv.innerHTML = "";
 
     movies.forEach((movie) => {
         var movieDiv = document.createElement("div");
         movieDiv.className = "movie_div";
+        movieDiv.id = movie.imdbID;
 
         var posterAndRatingDiv = document.createElement("div");
         posterAndRatingDiv.className = "movie_poster_and_rating";
@@ -142,14 +155,6 @@ function listMoviesOnGUI(movies) {
         problemPopupElementWrong.className = "problem_popup_element";
         problemPopupDiv.appendChild(problemPopupElementWrong);
 
-        problemDiv.addEventListener("click", () => {
-            problemPopupDiv.classList.toggle("hide");
-        });
-
-        problemPopupElementWrong.addEventListener("click", ()=> {
-
-        });
-
         var nameAndGenresDiv = document.createElement("div");
         nameAndGenresDiv.className = "movie_name_and_genres";
 
@@ -171,5 +176,105 @@ function listMoviesOnGUI(movies) {
         nameGenresAndMoreDiv.appendChild(problemDiv);
 
         moviesDiv.appendChild(movieDiv);
+
+        problemDiv.addEventListener("click", () => {
+            problemPopupDiv.classList.toggle("hide");
+        });
+
+        problemPopupElementWrong.addEventListener("click", () => {
+            document.getElementById("wrong_movie_poster").src = posterImg.src;
+            document.getElementById("wrong_movie_name").textContent = nameH2.textContent;
+            document.getElementById("right_movie_poster").src = posterImg.src;
+            document.getElementById("wrong_movie_id").textContent = movie.imdbID;
+            document.getElementById("wrong_movie_poster_div").classList.remove("hide_popup");
+            document.getElementById("blur_background").classList.add("blur");
+        });
+    });
+}
+
+async function readOmdbApiKeyFromFile() {
+    try {
+        const filePath = path.join(__dirname, "res", "key.json");
+        fs.readFile(filePath, "utf-8", (err, jsonStr) => {
+            if (err) {
+                console.log("Something went wrong trying to read JSON file.");
+            }
+
+            const jsonContent = JSON.parse(jsonStr);
+
+            if (jsonContent && jsonContent.key) {
+                KEY = jsonContent.key;
+            } else {
+                console.error("Invalid JSON file format or missing key.");
+            }
+        });
+    } catch (error) {
+        console.error("Error reading JSON file:", error.message);
+    }
+}
+
+function rightMovieSearchButtonListener() {
+    document.getElementById("right_movie_search_button").addEventListener("click", () => {
+        let movieName = document.getElementById("right_movie_search_input").value;
+        document.getElementById("right_movie_poster").src = path.join(__dirname, "res", "img", "loading.svg");
+
+        fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                document.getElementById("right_movie_poster").src = data.Poster;
+                document.getElementById("right_movie_search_button").value = data.Title;
+                document.getElementById("right_movie_id").textContent = data.imdbID;
+            })
+            .catch((error) => {
+                console.error("Fetch error:", error);
+            });
+    });
+}
+
+function chooseRightMovieButtonListener() {
+    document.getElementById("choose_right_movie_button").addEventListener("click", () => {
+        let wrongMovieID = document.getElementById("wrong_movie_id").textContent;
+        let rightMovieID = document.getElementById("right_movie_id").textContent;
+
+        const jsonData = require(path.join(__dirname, "res", "db.json"));
+
+        // Find the index of the object with the wrong movie id
+        const indexToRemove = jsonData.findIndex((movie) => movie.imdbID === wrongMovieID);
+
+        if (indexToRemove !== -1) {
+            // Remove the object with the wrong movie name
+            jsonData.splice(indexToRemove, 1);
+
+            fetch(`https://www.omdbapi.com/?i=${rightMovieID}&apikey=${KEY}`)
+                .then((response) => {
+                    console.log("Response:", response);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    // Modify the data object
+                    data.ads = "asd";
+                    console.log(data.ads);
+                    jsonData.push(data);
+
+                    // Write modified json to file
+                    fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                })
+                .catch((error) => {
+                    console.error("Error fetching movie details:", error);
+                });
+
+
+            console.log("Update successful. JSON file has been modified.");
+        } else {
+            console.log("Movie not found in the JSON data.");
+        }
     });
 }

@@ -39,7 +39,11 @@ function createWindow() {
     const menu = Menu.buildFromTemplate([
         {
             label: "File",
-            submenu: [{role: "quit"}, {label: "Import Movies", click: () => sendMessageToRenderer("popup", "o_import_movies_div")}],
+            submenu: [
+                {role: "quit"},
+                {label: "Import Movies", click: () => sendMessageToRenderer("popup", "o_import_movies_div")},
+                {label: "Refresh Movies", click: () => sendMessageToRenderer("movies", "refresh")},
+            ],
         },
         {
             label: "Settings",
@@ -148,7 +152,7 @@ async function writeFoldersToJson(movieNames) {
     const jsonFilePath = path.join(__dirname, "res", "db.json");
 
     async function fetchMovieDetails(movieName) {
-        const apiUrl = `http://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`;
+        const apiUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`;
 
         try {
             const response = await fetch(apiUrl);
@@ -170,8 +174,10 @@ async function writeFoldersToJson(movieNames) {
         if (movieDetails) {
             // Add downloaded poster path to movie data
             if (movieDetails.Poster) {
-                downloadImage(movieDetails.Poster, movieDetails.Title);
-                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+                if (movieDetails.Poster != "N/A") {
+                    downloadImage(movieDetails.Poster, movieDetails.Title);
+                    movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+                }
             }
 
             // Add file name for movie to movie data

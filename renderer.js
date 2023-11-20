@@ -155,6 +155,11 @@ function listMoviesOnGUI(movies) {
         problemPopupElementWrong.className = "problem_popup_element";
         problemPopupDiv.appendChild(problemPopupElementWrong);
 
+        var problemPopupDeleteMovie = document.createElement("h2");
+        problemPopupDeleteMovie.textContent = "Delete This Movie";
+        problemPopupDeleteMovie.className = "problem_popup_element";
+        problemPopupDiv.appendChild(problemPopupDeleteMovie);
+
         var nameAndGenresDiv = document.createElement("div");
         nameAndGenresDiv.className = "movie_name_and_genres";
 
@@ -188,6 +193,11 @@ function listMoviesOnGUI(movies) {
             document.getElementById("wrong_movie_id").textContent = movie.imdbID;
             document.getElementById("wrong_movie_poster_div").classList.remove("hide_popup");
             document.getElementById("blur_background").classList.add("blur");
+        });
+
+        problemPopupDeleteMovie.addEventListener("click", ()=>{
+            sendMessageToMain("movie", `removeWithFileName,${movie.fileName}`);
+            setTimeout(readMoviesFromFile, 200);
         });
     });
 }
@@ -243,5 +253,7 @@ function chooseRightMovieButtonListener() {
 
         sendMessageToMain("movie", `remove,${wrongMovieID}`);
         sendMessageToMain("movie", `add,${rightMovieID}`);
+
+        setTimeout(readMoviesFromFile, 200);
     });
 }

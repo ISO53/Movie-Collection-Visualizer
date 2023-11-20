@@ -302,5 +302,20 @@ function movieHandler(arg) {
             .catch((error) => {
                 console.error("Error fetching movie details:", error);
             });
+    } else if (opt === "removeWithFileName") {
+        // Here imdbID variable is actually filename
+        // Find the index of the object with the filename
+        const indexToRemove = jsonData.findIndex((movie) => movie.fileName === imdbID);
+
+        // Remove the object
+        if (indexToRemove !== -1) {
+            jsonData.splice(indexToRemove, 1);
+        } else {
+            console.log("Movie not found in the JSON data.");
+        }
+
+        // Write modified json to file
+        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+        console.log("Update successful. JSON file has been modified.");
     }
 }

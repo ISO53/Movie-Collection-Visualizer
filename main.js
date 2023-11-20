@@ -263,59 +263,71 @@ async function downloadImage(url, fileName) {
 
 function movieHandler(arg) {
     const [opt, imdbID] = arg.split(",");
-    const jsonData = require(path.join(__dirname, "res", "db.json"));
 
-    if (opt === "remove") {
-        // Find the index of the object with the wrong movie id
-        const indexToRemove = jsonData.findIndex((movie) => movie.imdbID === imdbID);
-
-        // Remove the object with the wrong movie name
-        if (indexToRemove !== -1) {
-            jsonData.splice(indexToRemove, 1);
-        } else {
-            console.log("Movie not found in the JSON data.");
+    fs.readFile(path.join(__dirname, "res", "db.json"), "utf-8", (err, data) => {
+        if (err) {
+            console.error("Error reading JSON file:", err.message);
+            return;
         }
 
-        // Write modified json to file
-        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
-        console.log("Update successful. JSON file has been modified.");
-    } else if (opt === "add") {
-        fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${KEY}`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                // Download poster image for the movie
-                downloadImage(data.Poster, data.Title);
-                data.PosterPath = path.join(__dirname, "res", "posters", `${data.Title}.jpg`);
+        try {
+            const jsonData = JSON.parse(data);
 
-                // Modify the data object
-                jsonData.push(data);
+            if (opt === "remove") {
+                // Find the index of the object with the wrong movie id
+                const indexToRemove = jsonData.findIndex((movie) => movie.imdbID === imdbID);
+
+                // Remove the object with the wrong movie name
+                if (indexToRemove !== -1) {
+                    jsonData.splice(indexToRemove, 1);
+                } else {
+                    console.log("Movie not found in the JSON data.");
+                }
 
                 // Write modified json to file
                 fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                 console.log("Update successful. JSON file has been modified.");
-            })
-            .catch((error) => {
-                console.error("Error fetching movie details:", error);
-            });
-    } else if (opt === "removeWithFileName") {
-        // Here imdbID variable is actually filename
-        // Find the index of the object with the filename
-        const indexToRemove = jsonData.findIndex((movie) => movie.fileName === imdbID);
+            } else if (opt === "add") {
+                fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${KEY}`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        // Download poster image for the movie
+                        downloadImage(data.Poster, data.Title);
+                        data.PosterPath = path.join(__dirname, "res", "posters", `${data.Title}.jpg`);
 
-        // Remove the object
-        if (indexToRemove !== -1) {
-            jsonData.splice(indexToRemove, 1);
-        } else {
-            console.log("Movie not found in the JSON data.");
+                        // Modify the data object
+                        jsonData.push(data);
+
+                        // Write modified json to file
+                        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                        console.log("Update successful. JSON file has been modified.");
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching movie details:", error);
+                    });
+            } else if (opt === "removeWithFileName") {
+                // Here imdbID variable is actually filename
+                // Find the index of the object with the filename
+                const indexToRemove = jsonData.findIndex((movie) => movie.fileName === imdbID);
+
+                // Remove the object
+                if (indexToRemove !== -1) {
+                    jsonData.splice(indexToRemove, 1);
+                } else {
+                    console.log("Movie not found in the JSON data.");
+                }
+
+                // Write modified json to file
+                fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                console.log("Update successful. JSON file has been modified.");
+            }
+        } catch (parseError) {
+            console.error("Error parsing JSON:", parseError.message);
         }
-
-        // Write modified json to file
-        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
-        console.log("Update successful. JSON file has been modified.");
-    }
+    });
 }

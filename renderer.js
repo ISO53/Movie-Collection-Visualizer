@@ -12,7 +12,7 @@ popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
 omdbApiButtonListener();
-readMoviesFromFile();
+readMoviesFromFile(listMoviesOnGUI)
 readOmdbApiKeyFromFile();
 rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
@@ -44,7 +44,7 @@ function popupHandler(arg) {
 
 function movieHandler(arg) {
     if (arg == "refresh") {
-        readMoviesFromFile();
+        readMoviesFromFile(listMoviesOnGUI)
     }
 }
 
@@ -93,26 +93,39 @@ function updateMovieDbStatus(status) {
     } else if (status.startsWith("d")) {
         // Done
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
-        readMoviesFromFile();
+        readMoviesFromFile(listMoviesOnGUI)
     } else {
         console.log("something went wrong", status);
     }
 }
 
-async function readMoviesFromFile() {
-    try {
-        const filePath = path.join(__dirname, "res", "db.json");
-        fs.readFile(filePath, "utf-8", (err, jsonStr) => {
-            if (err) {
-                console.log("Something went wrong trying to read JSON file.");
-            }
+function readMoviesFromFile(callback) {
+    const filePath = path.join(__dirname, "res", "db.json");
 
+    fs.readFile(filePath, "utf-8", (err, jsonStr) => {
+        if (err) {
+            console.error("Error reading JSON file:", err.message);
+            return callback(null); // Pass null to the callback to indicate an error
+        }
+
+        try {
             const jsonContent = JSON.parse(jsonStr);
-            listMoviesOnGUI(jsonContent);
-        });
-    } catch (error) {
-        console.error("Error reading JSON file:", error.message);
-    }
+            callback(jsonContent);
+        } catch (parseError) {
+            console.error("Error parsing JSON:", parseError.message);
+            callback(null); // Pass null to the callback to indicate a parsing error
+        }
+    });
+}
+
+function filterMovies(movies) {
+    const filteredMovies = movies.filter((movie) => movie.genre === "Action");
+
+    return filteredMovies;
+}
+
+function listFiltersOnGUI() {
+    
 }
 
 function listMoviesOnGUI(movies) {
@@ -195,9 +208,9 @@ function listMoviesOnGUI(movies) {
             document.getElementById("blur_background").classList.add("blur");
         });
 
-        problemPopupDeleteMovie.addEventListener("click", ()=>{
+        problemPopupDeleteMovie.addEventListener("click", () => {
             sendMessageToMain("movie", `removeWithFileName,${movie.fileName}`);
-            setTimeout(readMoviesFromFile, 200);
+            setTimeout(readMoviesFromFile(listMoviesOnGUI), 200);
         });
     });
 }
@@ -254,6 +267,6 @@ function chooseRightMovieButtonListener() {
         sendMessageToMain("movie", `remove,${wrongMovieID}`);
         sendMessageToMain("movie", `add,${rightMovieID}`);
 
-        setTimeout(readMoviesFromFile, 200);
+        setTimeout(readMoviesFromFile(listMoviesOnGUI), 200);
     });
 }

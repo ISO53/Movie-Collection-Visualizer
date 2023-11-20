@@ -241,40 +241,7 @@ function chooseRightMovieButtonListener() {
         let wrongMovieID = document.getElementById("wrong_movie_id").textContent;
         let rightMovieID = document.getElementById("right_movie_id").textContent;
 
-        const jsonData = require(path.join(__dirname, "res", "db.json"));
-
-        // Find the index of the object with the wrong movie id
-        const indexToRemove = jsonData.findIndex((movie) => movie.imdbID === wrongMovieID);
-
-        if (indexToRemove !== -1) {
-            // Remove the object with the wrong movie name
-            jsonData.splice(indexToRemove, 1);
-
-            fetch(`https://www.omdbapi.com/?i=${rightMovieID}&apikey=${KEY}`)
-                .then((response) => {
-                    console.log("Response:", response);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    // Modify the data object
-                    data.ads = "asd";
-                    console.log(data.ads);
-                    jsonData.push(data);
-
-                    // Write modified json to file
-                    fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
-                })
-                .catch((error) => {
-                    console.error("Error fetching movie details:", error);
-                });
-
-
-            console.log("Update successful. JSON file has been modified.");
-        } else {
-            console.log("Movie not found in the JSON data.");
-        }
+        sendMessageToMain("movie", `remove,${wrongMovieID}`);
+        sendMessageToMain("movie", `add,${rightMovieID}`);
     });
 }

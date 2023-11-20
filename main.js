@@ -15,6 +15,7 @@ function startApp() {
     app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
     getMessageFromRenderer("open-file-system", openFileSystem);
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
+    getMessageFromRenderer("movie", movieHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
 }
@@ -173,11 +174,9 @@ async function writeFoldersToJson(movieNames) {
 
         if (movieDetails) {
             // Add downloaded poster path to movie data
-            if (movieDetails.Poster) {
-                if (movieDetails.Poster != "N/A") {
-                    downloadImage(movieDetails.Poster, movieDetails.Title);
-                    movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
-                }
+            if (movieDetails.Poster && movieDetails.Poster != "N/A") {
+                downloadImage(movieDetails.Poster, movieDetails.Title);
+                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
             }
 
             // Add file name for movie to movie data
@@ -259,5 +258,49 @@ async function downloadImage(url, fileName) {
         console.log(`Image downloaded and saved.`);
     } catch (error) {
         console.error("Error downloading image:", error.message);
+    }
+}
+
+function movieHandler(arg) {
+    const [opt, imdbID] = arg.split(",");
+    const jsonData = require(path.join(__dirname, "res", "db.json"));
+
+    if (opt === "remove") {
+        // Find the index of the object with the wrong movie id
+        const indexToRemove = jsonData.findIndex((movie) => movie.imdbID === imdbID);
+
+        // Remove the object with the wrong movie name
+        if (indexToRemove !== -1) {
+            jsonData.splice(indexToRemove, 1);
+        } else {
+            console.log("Movie not found in the JSON data.");
+        }
+
+        // Write modified json to file
+        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+        console.log("Update successful. JSON file has been modified.");
+    } else if (opt === "add") {
+        fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${KEY}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Download poster image for the movie
+                downloadImage(data.Poster, data.Title);
+                data.PosterPath = path.join(__dirname, "res", "posters", `${data.Title}.jpg`);
+
+                // Modify the data object
+                jsonData.push(data);
+
+                // Write modified json to file
+                fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                console.log("Update successful. JSON file has been modified.");
+            })
+            .catch((error) => {
+                console.error("Error fetching movie details:", error);
+            });
     }
 }

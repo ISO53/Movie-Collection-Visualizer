@@ -3,6 +3,7 @@ const {ipcRenderer} = require("electron");
 const fs = require("fs");
 const path = require("path");
 var KEY;
+var FILTERS = new Set();
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -12,7 +13,7 @@ popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
 omdbApiButtonListener();
-readMoviesFromFile(listMoviesOnGUI)
+readMoviesFromFile(listMoviesOnGUI);
 readOmdbApiKeyFromFile();
 rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
@@ -44,7 +45,7 @@ function popupHandler(arg) {
 
 function movieHandler(arg) {
     if (arg == "refresh") {
-        readMoviesFromFile(listMoviesOnGUI)
+        readMoviesFromFile(listMoviesOnGUI);
     }
 }
 
@@ -93,7 +94,7 @@ function updateMovieDbStatus(status) {
     } else if (status.startsWith("d")) {
         // Done
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
-        readMoviesFromFile(listMoviesOnGUI)
+        readMoviesFromFile(listMoviesOnGUI);
     } else {
         console.log("something went wrong", status);
     }
@@ -110,6 +111,9 @@ function readMoviesFromFile(callback) {
 
         try {
             const jsonContent = JSON.parse(jsonStr);
+
+            setFilters(jsonContent);
+            listFiltersOnGUI();
             callback(jsonContent);
         } catch (parseError) {
             console.error("Error parsing JSON:", parseError.message);
@@ -118,14 +122,31 @@ function readMoviesFromFile(callback) {
     });
 }
 
-function filterMovies(movies) {
-    const filteredMovies = movies.filter((movie) => movie.genre === "Action");
-
-    return filteredMovies;
+function setFilters(movies) {
+    FILTERS.clear();
+    movies.forEach((movie) => movie.Genre && movie.Genre.split(",").forEach((genre) => FILTERS.add(genre.replace(/\s/g, ''))));
 }
 
 function listFiltersOnGUI() {
-    
+    let mainFilterDiv = document.getElementById("filter_div");
+    mainFilterDiv.innerHTML = "";
+
+    FILTERS.forEach(filter => {
+        let filterDiv = document.createElement("label");
+        filterDiv.className = "filter";
+
+        let filterBox = document.createElement("input");
+        filterBox.type = "checkbox";
+        filterBox.className = "filter_box";
+        filterDiv.appendChild(filterBox);
+
+        let filterText = document.createElement("span");
+        filterText.textContent = filter;
+        filterText.className = "filter_text";
+        filterDiv.appendChild(filterText);
+
+        mainFilterDiv.appendChild(filterDiv);
+    });
 }
 
 function listMoviesOnGUI(movies) {

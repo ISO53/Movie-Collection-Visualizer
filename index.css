@@ -92,13 +92,22 @@ body {
     background-color: var(--background-color-light);
     display: flex;
     flex-direction: row;
+    padding-bottom: 10px;
+    max-height: 40px;
+    flex-wrap: wrap;
+    overflow: hidden;
+    transition: max-height 250ms ease;
+}
+
+.filter_div:hover {
+    max-height: 500px;
 }
 
 .filter {
     border: 1px solid var(--white-accent-dark);
     border-radius: 20px;
     height: 20px;
-    margin: 10px;
+    margin: 10px 10px 0px 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -127,6 +136,7 @@ input[type="checkbox"] {
     user-select: none;
     transition: color 250ms ease, border-color 250ms ease;
     font-weight: 500;
+    text-wrap: nowrap;
 }
 
 .filter_box {
@@ -149,6 +159,7 @@ input[type="checkbox"] {
     width: 50px;
     margin-left: 15px;
     cursor: pointer;
+    max-height: 50px;
 }
 
 .sort_div:hover>.sort_icon {

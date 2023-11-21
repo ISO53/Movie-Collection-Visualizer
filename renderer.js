@@ -124,14 +124,20 @@ function readMoviesFromFile(callback) {
 
 function setFilters(movies) {
     FILTERS.clear();
-    movies.forEach((movie) => movie.Genre && movie.Genre.split(",").forEach((genre) => FILTERS.add(genre.replace(/\s/g, ''))));
+    const genres = new Set();
+
+    movies.forEach((movie) => movie.Genre && movie.Genre.split(",").forEach((genre) => genres.add(genre.replace(/\s/g, ""))));
+
+    Array.from(genres)
+        .sort()
+        .forEach((genre) => FILTERS.add(genre));
 }
 
 function listFiltersOnGUI() {
     let mainFilterDiv = document.getElementById("filter_div");
     mainFilterDiv.innerHTML = "";
 
-    FILTERS.forEach(filter => {
+    FILTERS.forEach((filter) => {
         let filterDiv = document.createElement("label");
         filterDiv.className = "filter";
 

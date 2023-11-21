@@ -24,6 +24,7 @@ An Electron-based application to visualize and manage your movie collection. Thi
   - [Running Locally](#running-locally)
   - [Building the Application](#building-the-application)
 - [Contributing](#contributing)
+- [Attribution](#attribution)
 - [License](#license)
 
 ## Getting Started
@@ -69,6 +70,9 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 ## Contributing
    Contributions are welcome! Fork the repository and create a pull request with your changes.
+   
+## Attribution
+   Movie data provided by [OMDb API](https://www.omdbapi.com/). This data is licensed under [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc/4.0).
 
 ## License
    This project is licensed under the [GNU General Public License v3.0](LICENSE). Feel free to modify the content and structure based on your preferences and project specifics.

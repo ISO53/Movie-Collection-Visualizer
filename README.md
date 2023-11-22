@@ -66,7 +66,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
    ### Building the Application
    ```bash
-   npm run build
+   npm run dist
    ```
    This will create a build of the application for your platform.
 

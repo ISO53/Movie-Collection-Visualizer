@@ -39,5 +39,7 @@ build/
 ### npm libraries ###
 node_modules/
 
-### res folder for this project ###
-res/
+### some res folders for this project ###
+res/posters
+db.json
+key.json

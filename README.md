@@ -2,12 +2,14 @@
 
 An Electron-based application to visualize and manage your movie collection. This project allows users to import movie information from the file explorer or a TXT file, fetch details from the OMDB API, and view and manage their movie collection with a user-friendly interface.
 
+![gui ss final-min](https://github.com/ISO53/Movie-Collection-Visualizer/assets/102249575/67fbd418-6115-498e-9dab-f36ff0c85d6f)
+
 ## Features
 
 - Import movies from the file explorer or a TXT file.
 - Fetch movie details from the OMDB API.
 - View and manage your movie collection.
-- Interactive filtering based on movie genres.
+- Interactive filtering based on movie genres. (Still in beta)
 - Movie searching with movie names, genres, actor names etc. (Still in beta)
 - Simple and intuitive user interface.
 

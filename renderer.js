@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 var KEY;
 var FILTERS = new Set();
+var MOVIES = [];
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -13,10 +14,11 @@ popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
 omdbApiButtonListener();
-readMoviesFromFile(listMoviesOnGUI);
+readMoviesFromFile();
 readOmdbApiKeyFromFile();
 rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
+filtersDivClickListener();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {
@@ -45,7 +47,7 @@ function popupHandler(arg) {
 
 function movieHandler(arg) {
     if (arg == "refresh") {
-        readMoviesFromFile(listMoviesOnGUI);
+        readMoviesFromFile();
     }
 }
 
@@ -77,6 +79,12 @@ function omdbApiButtonListener() {
     });
 }
 
+function filtersDivClickListener() {
+    document.getElementById("filter_div").addEventListener("click", () => {
+        listMoviesOnGUI({filter: getSelectedFilters()});
+    });
+}
+
 function updateMovieDbStatus(status) {
     const statusElm = document.getElementById("db_status");
     if (status.startsWith("l")) {
@@ -94,13 +102,13 @@ function updateMovieDbStatus(status) {
     } else if (status.startsWith("d")) {
         // Done
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
-        readMoviesFromFile(listMoviesOnGUI);
+        readMoviesFromFile();
     } else {
         console.log("something went wrong", status);
     }
 }
 
-function readMoviesFromFile(callback) {
+function readMoviesFromFile() {
     const filePath = path.join(__dirname, "res", "db.json");
 
     fs.readFile(filePath, "utf-8", (err, jsonStr) => {
@@ -110,14 +118,15 @@ function readMoviesFromFile(callback) {
         }
 
         try {
-            const jsonContent = JSON.parse(jsonStr);
+            const jsonContent = JSON.parse(jsonStr); // movies
 
             setFilters(jsonContent);
             listFiltersOnGUI();
-            callback(jsonContent);
+            setMovies(jsonContent);
+            listMoviesOnGUI();
         } catch (parseError) {
             console.error("Error parsing JSON:", parseError.message);
-            callback(null); // Pass null to the callback to indicate a parsing error
+            listMoviesOnGUI(); // Pass null to the callback to indicate a parsing error
         }
     });
 }
@@ -131,6 +140,10 @@ function setFilters(movies) {
     Array.from(genres)
         .sort()
         .forEach((genre) => FILTERS.add(genre));
+}
+
+function setMovies(movies) {
+    MOVIES = movies;
 }
 
 function listFiltersOnGUI() {
@@ -155,11 +168,31 @@ function listFiltersOnGUI() {
     });
 }
 
-function listMoviesOnGUI(movies) {
+function listMoviesOnGUI(options) {
     let moviesDiv = document.getElementById("movies_div");
     moviesDiv.innerHTML = "";
 
-    movies.forEach((movie) => {
+    MOVIES.forEach((movie) => {
+        if (options !== undefined) {
+            if (options.filter !== undefined && options.filter.length !== 0) {
+                // Filter, based on movie genre
+                if (
+                    movie.Genre !== undefined &&
+                    movie.Genre !== "N/A" &&
+                    options.filter.some((filterGenre) => movie.Genre.includes(filterGenre))
+                ) {
+                    listMovie(movie);
+                }
+            } else if (options.search !== undefined && options.search.length !== 0) {
+            } else {
+                listMovie(movie);
+            }
+        } else {
+            listMovie(movie);
+        }
+    });
+
+    function listMovie(movie) {
         var movieDiv = document.createElement("div");
         movieDiv.className = "movie_div";
         movieDiv.id = movie.imdbID;
@@ -237,9 +270,9 @@ function listMoviesOnGUI(movies) {
 
         problemPopupDeleteMovie.addEventListener("click", () => {
             sendMessageToMain("movie", `removeWithFileName,${movie.fileName}`);
-            setTimeout(readMoviesFromFile(listMoviesOnGUI), 200);
+            setTimeout(readMoviesFromFile, 200);
         });
-    });
+    }
 }
 
 async function readOmdbApiKeyFromFile() {
@@ -294,6 +327,16 @@ function chooseRightMovieButtonListener() {
         sendMessageToMain("movie", `remove,${wrongMovieID}`);
         sendMessageToMain("movie", `add,${rightMovieID}`);
 
-        setTimeout(readMoviesFromFile(listMoviesOnGUI), 200);
+        setTimeout(readMoviesFromFile, 200);
     });
+}
+
+function getSelectedFilters() {
+    let selectedFilters = [];
+    let filterDiv = document.getElementById("filter_div");
+    let checkboxes = filterDiv.querySelectorAll(".filter_box");
+
+    checkboxes.forEach((checkbox) => checkbox.checked && selectedFilters.push(checkbox.nextElementSibling.textContent));
+
+    return selectedFilters;
 }

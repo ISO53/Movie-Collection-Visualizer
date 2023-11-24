@@ -9,7 +9,7 @@ An Electron-based application to visualize and manage your movie collection. Thi
 - Import movies from the file explorer or a TXT file.
 - Fetch movie details from the OMDB API.
 - View and manage your movie collection.
-- Interactive filtering based on movie genres. (Still in beta)
+- Interactive filtering based on movie genres.
 - Movie searching with movie names, genres, actor names etc. (Still in beta)
 - Simple and intuitive user interface.
 

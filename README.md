@@ -10,7 +10,7 @@ An Electron-based application to visualize and manage your movie collection. Thi
 - Fetch movie details from the OMDB API.
 - View and manage your movie collection.
 - Interactive filtering based on movie genres.
-- Movie searching with movie names, genres, actor names etc. (Still in beta)
+- Movie searching with movie names, genres, actor names etc.
 - Simple and intuitive user interface.
 
 ## Table of Contents

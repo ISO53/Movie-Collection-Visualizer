@@ -5,6 +5,8 @@ const path = require("path");
 var KEY;
 var FILTERS = new Set();
 var MOVIES = [];
+var CURR_FILTERS = [];
+var CURR_SEARCH = "";
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -19,6 +21,7 @@ readOmdbApiKeyFromFile();
 rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
 filtersDivClickListener();
+movieSearchButtonClickListener();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {
@@ -81,7 +84,17 @@ function omdbApiButtonListener() {
 
 function filtersDivClickListener() {
     document.getElementById("filter_div").addEventListener("click", () => {
-        listMoviesOnGUI({filter: getSelectedFilters()});
+        resetSearch();
+        CURR_FILTERS = getSelectedFilters();
+        listMoviesOnGUI();
+    });
+}
+
+function movieSearchButtonClickListener() {
+    document.getElementById("movie_search_button").addEventListener("click", () => {
+        resetFilters();
+        CURR_SEARCH = document.getElementById("movie_search_input").value;
+        listMoviesOnGUI();
     });
 }
 
@@ -168,23 +181,17 @@ function listFiltersOnGUI() {
     });
 }
 
-function listMoviesOnGUI(options) {
+function listMoviesOnGUI() {
     let moviesDiv = document.getElementById("movies_div");
     moviesDiv.innerHTML = "";
 
     MOVIES.forEach((movie) => {
-        if (options !== undefined) {
-            if (options.filter !== undefined && options.filter.length !== 0) {
-                // Filter, based on movie genre
-                if (
-                    movie.Genre !== undefined &&
-                    movie.Genre !== "N/A" &&
-                    options.filter.some((filterGenre) => movie.Genre.includes(filterGenre))
-                ) {
-                    listMovie(movie);
-                }
-            } else if (options.search !== undefined && options.search.length !== 0) {
-            } else {
+        if (CURR_FILTERS.length !== 0) {
+            if (movie.Genre && movie.Genre !== "N/A" && CURR_FILTERS.some((filterGenre) => movie.Genre.includes(filterGenre))) {
+                listMovie(movie);
+            }
+        } else if (CURR_SEARCH !== "") {
+            if (searchMovie(movie, CURR_SEARCH)) {
                 listMovie(movie);
             }
         } else {
@@ -339,4 +346,39 @@ function getSelectedFilters() {
     checkboxes.forEach((checkbox) => checkbox.checked && selectedFilters.push(checkbox.nextElementSibling.textContent));
 
     return selectedFilters;
+}
+
+function resetFilters() {
+    document
+        .getElementById("filter_div")
+        .querySelectorAll(".filter_box")
+        .forEach((checkbox) => (checkbox.checked = false));
+    CURR_FILTERS = [];
+}
+
+function resetSearch() {
+    document.getElementById("movie_search_input").value = "";
+    CURR_SEARCH = "";
+}
+
+function searchMovie(movieData, searchTerm) {
+    try {
+        const searchTerms = searchTerm.toLowerCase().split(" ");
+
+        return searchTerms.every((term) => {
+            return (
+                movieData.Title.toLowerCase().includes(term) ||
+                movieData.Year.includes(term) ||
+                movieData.Released.toLowerCase().includes(term) ||
+                movieData.Genre.toLowerCase().includes(term) ||
+                movieData.Director.toLowerCase().includes(term) ||
+                movieData.Actors.toLowerCase().includes(term) ||
+                movieData.Plot.toLowerCase().includes(term) ||
+                movieData.imdbID.toLowerCase().includes(term)
+            );
+        });
+    } catch (error) {
+        console.error("Error occured during movie search:", error);
+        return false;
+    }
 }

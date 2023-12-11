@@ -187,7 +187,9 @@ input[type="checkbox"] {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: transparent
+    background-color: transparent;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .movies_div {
@@ -357,6 +359,8 @@ input[type="checkbox"] {
     z-index: 10;
     width: 33.33%;
     height: auto;
+    max-width: 33.33%;
+    max-height: 80%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -365,6 +369,7 @@ input[type="checkbox"] {
     flex-direction: column;
     align-items: center;
     visibility: visible;
+    overflow: auto;
     transition: opacity 250ms ease, transform 250ms ease, visibility 250ms ease;
 }
 
@@ -466,6 +471,7 @@ input[type="checkbox"] {
 .popup_paragraph {
     color: var(--white-accent-mid);
     text-align: justify;
+    margin: 10px 0px 0px 0px;
 }
 
 .popup_buttons {
@@ -606,4 +612,92 @@ input[type="checkbox"] {
     font-weight: 300;
     color: var(--white-accent-mid);
     margin-right: 20px;
+}
+
+.movie_header {
+    text-align: left;
+    width: 100%;
+}
+
+.movie_infos_div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.movie_info_poster {
+    width: 200px;
+    height: 300px;
+    object-fit: cover;
+}
+
+.movie_right_div {
+    margin-left: 20px;
+    width: 100%;
+}
+
+.movie_info_duration {
+    font-weight: 300;
+    font-size: 16px;
+    color: var(--white-accent-mid);
+    margin: 0;
+}
+
+.movie_info_genres {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    user-select: none;
+}
+
+.movie_info_genre {
+    font-weight: 300;
+    font-size: 16px;
+    color: var(--main-color-four);
+    margin-right: 10px;
+    border: 1px solid var(--main-color-four);
+    padding: 5px;
+    border-radius: 5px;
+    transition: color 250ms ease, border 250ms ease;
+}
+
+.movie_info_genre:hover {
+    color: var(--main-color-three);
+    border: 1px solid var(--main-color-three);
+}
+
+.movie_info_additionals {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.movie_info_additional {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+    margin: 8px 0px 8px 0px;
+    border-radius: -5px;
+}
+
+.movie_info_additional_bold {
+    font-weight: 500;
+    color: var(--white-accent-light);
+    font-size: 16px;
+    margin: 0px 10px 0px 0px;
+}
+
+.movie_info_additional_normal {
+    font-weight: 300;
+    color: var(--white-accent-mid);
+    font-size: 16px;
+    margin: 0;
+}
+
+.movie_info_story_header {
+    color: var(--white-accent-light);
+    margin: 15px 0px 0px 0px;
+    width: 100%;
+    text-align: left;
 }

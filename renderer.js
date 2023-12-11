@@ -1,5 +1,5 @@
 // ******************** Declare Variables ********************
-const {ipcRenderer} = require("electron");
+const {ipcRenderer, desktopCapturer} = require("electron");
 const fs = require("fs");
 const path = require("path");
 var KEY;
@@ -278,6 +278,45 @@ function listMoviesOnGUI() {
         problemPopupDeleteMovie.addEventListener("click", () => {
             sendMessageToMain("movie", `removeWithFileName,${movie.fileName}`);
             setTimeout(readMoviesFromFile, 200);
+        });
+
+        movieDiv.addEventListener("click", () => {
+            document.getElementById("movie_header").innerText = movie.Title;
+            document.getElementById("movie_info_poster").src = movie.PosterPath;
+            document.getElementById("movie_duration").innerText = movie.Runtime;
+            document.getElementById("movie_genres").innerHTML = "";
+            movie.Genre.split(",").forEach((genre) => {
+                let genreElm = document.createElement("h3");
+                genreElm.className = "movie_info_genre";
+                genreElm.innerText = genre.trim();
+                document.getElementById("movie_genres").appendChild(genreElm);
+            });
+            document.getElementById("movie_info_additionals").innerHTML = "";
+            [
+                {content: "Director", obj: movie.Director},
+                {content: "Writer", obj: movie.Writer},
+                {content: "Actors", obj: movie.Actors},
+                {content: "Release Date", obj: movie.Released},
+                {content: "Awards", obj: movie.Awards},
+            ].forEach(addInfo => {
+                let addInfoDiv = document.createElement("movie_info_additional");
+                addInfoDiv.className = "movie_info_additional";
+                document.getElementById("movie_info_additionals").appendChild(addInfoDiv);
+
+                let addInfoBold = document.createElement("h3");
+                addInfoBold.className = "movie_info_additional_bold";
+                addInfoBold.innerText = addInfo.content;
+                addInfoDiv.appendChild(addInfoBold);
+
+                let addInfoNormal = document.createElement("h3");
+                addInfoNormal.className = "movie_info_additional_normal";
+                addInfoNormal.innerText = addInfo.obj;
+                addInfoDiv.appendChild(addInfoNormal);
+            });
+            document.getElementById("movie_story_paragraph").innerText = movie.Plot;
+
+            document.getElementById("movie_information_div").classList.remove("hide_popup");
+            document.getElementById("blur_background").classList.add("blur");
         });
     }
 }

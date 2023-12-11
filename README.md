@@ -12,6 +12,7 @@ An Electron-based application to visualize and manage your movie collection. Thi
 - Interactive filtering based on movie genres.
 - Movie searching with movie names, genres, actor names etc.
 - Simple and intuitive user interface.
+- View additional movie informations by clicking on movie poster.
 
 ## Table of Contents
 

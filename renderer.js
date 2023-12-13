@@ -131,7 +131,13 @@ function readMoviesFromFile() {
         }
 
         try {
-            const jsonContent = JSON.parse(jsonStr); // movies
+            let jsonContent; // movies
+            try {
+                jsonContent = JSON.parse(jsonStr);
+            } catch (error) {
+                console.error("There was an error parsing json file.");
+                return;
+            }
 
             setFilters(jsonContent);
             listFiltersOnGUI();
@@ -329,7 +335,13 @@ async function readOmdbApiKeyFromFile() {
                 console.log("Something went wrong trying to read JSON file.");
             }
 
-            const jsonContent = JSON.parse(jsonStr);
+            let jsonContent;
+            try {
+                jsonContent = JSON.parse(jsonStr);
+            } catch (error) {
+                console.error("There was an error parsing json file.");
+                return;
+            }
 
             if (jsonContent && jsonContent.key) {
                 KEY = jsonContent.key;

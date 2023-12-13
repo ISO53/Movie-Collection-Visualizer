@@ -215,7 +215,13 @@ async function readOmdbApiKeyFromFile() {
                 console.log("Something went wrong trying to read JSON file.");
             }
 
-            const jsonContent = JSON.parse(jsonStr);
+            let jsonContent;
+            try {
+                jsonContent = JSON.parse(jsonStr);
+            } catch (error) {
+                console.error("There was an error parsing json file.");
+                return;
+            }
 
             if (jsonContent && jsonContent.key) {
                 KEY = jsonContent.key;
@@ -271,7 +277,13 @@ function movieHandler(arg) {
         }
 
         try {
-            const jsonData = JSON.parse(data);
+            let jsonData;
+            try {
+                jsonData = JSON.parse(data);
+            } catch (error) {
+                console.error("There was an error parsing json file.");
+                return;
+            }
 
             if (opt === "remove") {
                 // Find the index of the object with the wrong movie id

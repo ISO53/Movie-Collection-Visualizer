@@ -16,15 +16,13 @@
             "output": "dist"
         },
         "files": [
-            "res/",
-            "posters/",
+            "res/img",
+            "res/posters/**/*",
             "index.css",
             "index.html",
             "main.js",
             "renderer.js",
             "package.json",
-            "logo.svg",
-            "logo.ico",
             "LICENSE"
         ],
         "win": {

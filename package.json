@@ -10,20 +10,26 @@
         "dist": "electron-builder"
     },
     "build": {
-        "appId": "com.example.myapp",
-        "productName": "MyApp",
+        "appId": "com.iso53.moviecollectionvisualizer",
+        "productName": "MovieCollectionVisualizer",
         "directories": {
             "output": "dist"
         },
         "files": [
-            "main.js",
+            "res/",
+            "posters/",
+            "index.css",
             "index.html",
+            "main.js",
             "renderer.js",
             "package.json",
-            "icon.svg"
+            "logo.svg",
+            "logo.ico",
+            "LICENSE"
         ],
         "win": {
-            "target": "portable"
+            "target": "portable",
+            "icon": "res/img/logo.ico"
         }
     },
     "repository": {
@@ -37,6 +43,7 @@
     },
     "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer#readme",
     "devDependencies": {
-        "electron": "^27.1.0"
+        "electron": "^27.1.0",
+        "electron-builder": "^24.9.1"
     }
 }

@@ -28,14 +28,14 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            // devTools: true,
+            devTools: true,
             contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
         },
     });
 
     win.loadFile("index.html");
     win.maximize();
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
 
     const menu = Menu.buildFromTemplate([
         {
@@ -50,6 +50,15 @@ function createWindow() {
             label: "Settings",
             submenu: [{label: "OMDB Api", click: () => sendMessageToRenderer("popup", "o_omdb_api_div")}],
         },
+        {
+            label: "Help",
+            submenu: [
+                {label: "First Time", click: () => sendMessageToRenderer("popup", "o_first_time_div")},
+                {label: "Want to Contribute", click: () => sendMessageToRenderer("popup", "o_want_to_contribute_div")},
+                {label: "Check Updates", click: () => sendMessageToRenderer("popup", "o_check_updates_div")},
+                {label: "About", click: () => sendMessageToRenderer("popup", "o_about_div")},
+            ],
+        }
     ]);
 
     Menu.setApplicationMenu(menu);

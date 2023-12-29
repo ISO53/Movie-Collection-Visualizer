@@ -7,9 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="index.css" />
     <title>Movie Collection</title>
 </head>
@@ -35,6 +33,17 @@
 
             <div class="sort_div">
                 <svg class="sort_icon" xmlns="http://www.w3.org/2000/svg" fill="rgb(150, 150, 150)" height="24" viewBox="0 -960 960 960" width="24"><path d="M320-440v-287L217-624l-57-56 200-200 200 200-57 56-103-103v287h-80ZM600-80 400-280l57-56 103 103v-287h80v287l103-103 57 56L600-80Z"/></svg>
+                
+                <div class="sort_dropdown" id="sort_dropdown">
+                    <span class="sort_element" id="A-Z">Sort Alphabetically (A-Z)</span>
+                    <span class="sort_element" id="Z-A">Sort Alphabetically (Z-A)</span>
+                    <span class="sort_element" id="RatingHigher">Sort by IMDB Rating (Higher to Lower)</span>
+                    <span class="sort_element" id="RatingLower">Sort by IMDB Rating (Lower to Higher)</span>
+                    <span class="sort_element" id="Newer">Sort by Release Date (Newer to Older)</span>
+                    <span class="sort_element" id="Older">Sort by Release Date (Older to Newer)</span>
+                    <span class="sort_element" id="Longer">Sort by Runtime (Longer to Shorter)</span>
+                    <span class="sort_element" id="Shorter">Sort by Runtime (Shorter to Longer)</span>
+                </div>
             </div>
 
         </div>
@@ -116,7 +125,7 @@
         
     </div>
 
-    <div class="popup movie_information_div hide_popup" id="movie_information_div">        
+    <div class="popup movie_information_div hide_popup" id="movie_information_div">
         <div class="popup_close_button">✖</div>
         <h1 class="popup_header movie_header" id="movie_header">-</h1>
         <div class="movie_infos_div">

@@ -1,5 +1,5 @@
 // ******************** Declare Variables ********************
-const {ipcRenderer, desktopCapturer} = require("electron");
+const {ipcRenderer} = require("electron");
 const fs = require("fs");
 const path = require("path");
 var KEY;
@@ -22,6 +22,7 @@ rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
 filtersDivClickListener();
 movieSearchButtonClickListener();
+sortingFilterClickListener();
 
 // ******************** Declare Functions ********************
 function sendMessageToMain(channel, message) {
@@ -94,6 +95,13 @@ function movieSearchButtonClickListener() {
     document.getElementById("movie_search_button").addEventListener("click", () => {
         resetFilters();
         CURR_SEARCH = document.getElementById("movie_search_input").value;
+        listMoviesOnGUI();
+    });
+}
+
+function sortingFilterClickListener() {
+    document.getElementById("sort_dropdown").addEventListener("click", (event) => {
+        sortMovies(event.target.id);
         listMoviesOnGUI();
     });
 }
@@ -304,7 +312,7 @@ function listMoviesOnGUI() {
                 {content: "Actors", obj: movie.Actors},
                 {content: "Release Date", obj: movie.Released},
                 {content: "Awards", obj: movie.Awards},
-            ].forEach(addInfo => {
+            ].forEach((addInfo) => {
                 let addInfoDiv = document.createElement("movie_info_additional");
                 addInfoDiv.className = "movie_info_additional";
                 document.getElementById("movie_info_additionals").appendChild(addInfoDiv);
@@ -432,4 +440,29 @@ function searchMovie(movieData, searchTerm) {
         console.error("Error occured during movie search:", error);
         return false;
     }
+}
+
+function sortMovies(sortingType) {
+    MOVIES.sort((a, b) => {
+        switch (sortingType) {
+            case "A-Z":
+                return (a.Title || "").localeCompare(b.Title || "");
+            case "Z-A":
+                return (b.Title || "").localeCompare(a.Title || "");
+            case "RatingHigher":
+                return (parseFloat(b.imdbRating) || 0) - (parseFloat(a.imdbRating) || 0);
+            case "RatingLower":
+                return (parseFloat(a.imdbRating) || 0) - (parseFloat(b.imdbRating) || 0);
+            case "Newer":
+                return (new Date(b.Released) || 0) - (new Date(a.Released) || 0);
+            case "Older":
+                return (new Date(a.Released) || 0) - (new Date(b.Released) || 0);
+            case "Longer":
+                return (parseInt(b.Runtime) || 0) - (parseInt(a.Runtime) || 0);
+            case "Shorter":
+                return (parseInt(a.Runtime) || 0) - (parseInt(b.Runtime) || 0);
+            default:
+                return (a.Title || "").localeCompare(b.Title || "");
+        }
+    });
 }

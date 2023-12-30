@@ -28,14 +28,14 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            devTools: true,
+            // devTools: true,
             contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
         },
     });
 
     win.loadFile("index.html");
     win.maximize();
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
     const menu = Menu.buildFromTemplate([
         {

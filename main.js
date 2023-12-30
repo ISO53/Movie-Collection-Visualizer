@@ -369,6 +369,7 @@ function checkUpdates() {
             }
 
             if (releaseData.tag_name !== app.getVersion()) {
+                console.log("VERSION", app.getVersion());
                 sendMessageToRenderer("update", releaseData.body);
             } else {
                 sendMessageToRenderer("update", "no");

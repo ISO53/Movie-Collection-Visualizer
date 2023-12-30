@@ -39,6 +39,10 @@ function popupHandler(arg) {
     const popupID = arg.substring(2);
 
     if (arg.startsWith("o")) {
+        if (popupID === "first_time_div") {
+            loadFirstTimeSteps();            
+        }
+
         // Open popup
         document.getElementById(popupID).classList.remove("hide_popup");
         document.getElementById("blur_background").classList.add("blur");
@@ -465,4 +469,14 @@ function sortMovies(sortingType) {
                 return (a.Title || "").localeCompare(b.Title || "");
         }
     });
+}
+
+function loadFirstTimeSteps() {
+    if (KEY !== undefined && KEY !== null) {
+        document.getElementById("step_1").classList.add("successful");
+    }
+
+    if (MOVIES !== undefined && MOVIES !== null && MOVIES.length !== 0) {
+        document.getElementById("step_2").classList.add("successful");
+    }
 }

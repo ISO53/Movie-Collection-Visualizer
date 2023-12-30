@@ -1,9 +1,9 @@
 :root {
     --background-color-dark: #101010;
     --background-color-light: #1f1f1f;
-    --white-accent-dark: rgb(50, 50, 50);
-    --white-accent-mid: rgb(150, 150, 150);
-    --white-accent-light: rgb(250, 250, 250);
+    --white-accent-dark: #323232;
+    --white-accent-mid: #969696;
+    --white-accent-light: #fafafa;
     --main-color-one: #FAF8F1;
     --main-color-two: #FAEAB1;
     --main-color-three: #E5BA73;
@@ -152,6 +152,7 @@ input[type="checkbox"] {
 }
 
 .sort_div {
+    position: relative;
     background-color: var(--background-color-light);
     border-radius: 20px;
     display: flex;
@@ -161,6 +162,52 @@ input[type="checkbox"] {
     margin-left: 15px;
     cursor: pointer;
     max-height: 50px;
+}
+
+.sort_div:hover > .sort_dropdown {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sort_dropdown {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-16px);
+
+    top: calc(100% + 16px);
+    right: 0;
+    background-color: var(--background-color-light);
+    padding: 20px;
+    border-radius: 20px;
+    position: absolute;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 5px 1px black;
+    transition: visibility 250ms ease, opacity 250ms ease, transform 250ms ease;
+    z-index: 10;
+}
+
+.sort_element {
+    width: auto;
+    text-wrap: nowrap;
+    margin: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--white-accent-dark);
+    color: var(--white-accent-mid);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color 250ms ease;
+}
+
+.sort_element:hover {
+    color: var(--white-accent-light);
+}
+
+.sort_element:last-child {
+    border: none;
+    padding: 0;
 }
 
 .sort_div:hover>.sort_icon {
@@ -700,4 +747,70 @@ input[type="checkbox"] {
     margin: 15px 0px 0px 0px;
     width: 100%;
     text-align: left;
+}
+
+.steps {
+    margin-top: 40px;
+    display: flex;
+    gap: 30px;
+    flex-direction: column;
+}
+
+.check_circle_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+}
+
+.step_logo_svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    max-width: 30px;
+    max-height: 30px;
+    background-color: var(--background-color-light);
+}
+
+.step_number {
+    position: absolute;
+    left: 20px;
+    top: -15px;
+    padding: 4px 8px 4px 8px;
+    border: 1px solid var(--white-accent-mid);
+    border-radius: 20px;
+    color: var(--white-accent-light);
+    background-color: var(--background-color-light);
+    font-size: 0.8rem;
+    user-select: none;
+}
+
+.step {
+    position: relative;
+    border-radius: 20px;
+    border: 1px solid var(--white-accent-mid);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+}
+
+.step_paragraph {
+    color: var(--white-accent-mid);
+    text-align: justify;
+    margin: 10px;
+    user-select: none;
+}
+
+.successful {
+    border-color: rgb(0, 200, 0);
+    pointer-events: none;
+}
+
+.step.successful .step_number {
+    border-color: rgb(0, 200, 0);
+}
+
+.step.successful .check_circle_div svg:nth-child(2) {
+    display: none;
 }

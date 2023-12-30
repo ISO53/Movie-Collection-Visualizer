@@ -72,7 +72,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
    This will create a build of the application for your platform.
 
 ## Contributing
-   Contributions are welcome! Fork the repository and create a pull request with your changes.
+   Your contributions are valued! Before opening an issue, please review [our guideline](https://github.com/ISO53/Movie-Collection-Visualizer/blob/master/CONTRIBUTING.md) on how to contribute. We appreciate your cooperation in making our project better.
    
 ## Attribution
    Movie data provided by [OMDb API](https://www.omdbapi.com/). This data is licensed under [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc/4.0).

@@ -12,6 +12,7 @@ var CURR_SEARCH = "";
 getMessageFromMain("popup", popupHandler);
 getMessageFromMain("movie-db-status", updateMovieDbStatus);
 getMessageFromMain("movies", movieHandler);
+getMessageFromMain("update", updateHandler);
 popupCloseButtonListener();
 importFromFileSystemButtonListener();
 importFromTXTButtonListener();
@@ -39,8 +40,12 @@ function popupHandler(arg) {
     const popupID = arg.substring(2);
 
     if (arg.startsWith("o")) {
-        if (popupID === "first_time_div") {
-            loadFirstTimeSteps();            
+        switch (popupID) {
+            case "first_time_div":
+                loadFirstTimeSteps();
+                break;
+            default:
+                break;
         }
 
         // Open popup
@@ -56,6 +61,23 @@ function popupHandler(arg) {
 function movieHandler(arg) {
     if (arg == "refresh") {
         readMoviesFromFile();
+    }
+}
+
+function updateHandler(arg) {
+    const versionStatusElm = document.getElementById("last_version_or_not");
+    switch (arg) {
+        case "error":
+            versionStatusElm.innerText = "Couldn't fetch updates. Try again later.";
+            break;
+        case "no":
+            versionStatusElm.innerText = "Looks like you are already running the latest version. No need to update.";
+            break;
+        default: // There is an update
+            versionStatusElm.innerText = "An update is available. Below you can see the changes implemented in this update.";
+            document.getElementById("new_features_paragraph").innerHTML = arg;
+            document.getElementById("new_features").classList.remove("no_display");
+            break;
     }
 }
 

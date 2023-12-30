@@ -1,5 +1,5 @@
 // ******************** Declare Variables ********************
-const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
+const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require("electron");
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -55,10 +55,10 @@ function createWindow() {
             submenu: [
                 {label: "First Time", click: () => sendMessageToRenderer("popup", "o_first_time_div")},
                 {label: "Want to Contribute", click: () => sendMessageToRenderer("popup", "o_want_to_contribute_div")},
-                {label: "Check Updates", click: () => sendMessageToRenderer("popup", "o_check_updates_div")},
+                {label: "Check Updates", click: () => checkUpdates() && sendMessageToRenderer("popup", "o_check_updates_div")},
                 {label: "About", click: () => sendMessageToRenderer("popup", "o_about_div")},
             ],
-        }
+        },
     ]);
 
     Menu.setApplicationMenu(menu);
@@ -351,4 +351,32 @@ function movieHandler(arg) {
             console.error("Error parsing JSON:", parseError.message);
         }
     });
+}
+
+function checkUpdates() {
+    fetch("https://api.github.com/repos/iso53/Movie-Collection-Visualizer/releases/latest")
+        .then((response) => {
+            if (!response.ok) {
+                return null;
+            }
+            return response.json();
+        })
+        .then((releaseData) => {
+            if (releaseData === null) {
+                console.log(`Failed to fetch latest release. Status: ${response.status}`);
+                sendMessageToRenderer("update", "error");
+                return;
+            }
+
+            if (releaseData.tag_name !== app.getVersion()) {
+                sendMessageToRenderer("update", releaseData.body);
+            } else {
+                sendMessageToRenderer("update", "no");
+            }
+        })
+        .catch((error) => {
+            console.error("Error checking for updates:", error.message);
+        });
+
+    return true;
 }

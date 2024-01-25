@@ -722,7 +722,7 @@ input[type="checkbox"] {
 .movie_info_additional {
     display: flex;
     justify-content: left;
-    align-items: center;
+    align-items: top;
     width: 100%;
     margin: 8px 0px 8px 0px;
     border-radius: -5px;

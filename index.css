@@ -16,6 +16,7 @@ body {
     background-color: var(--background-color-dark);
     width: 100vw;
     height: 100vh;
+    user-select: none;
 }
 
 .background {
@@ -79,7 +80,6 @@ body {
     color: var(--main-color-one);
     cursor: pointer;
     transition: transform 500ms ease;
-    user-select: none;
 }
 
 .search_button:hover {
@@ -134,7 +134,6 @@ input[type="checkbox"] {
 
 .filter_text {
     color: var(--white-accent-mid);
-    user-select: none;
     transition: color 250ms ease, border-color 250ms ease;
     font-weight: 500;
     text-wrap: nowrap;
@@ -174,7 +173,6 @@ input[type="checkbox"] {
     visibility: hidden;
     opacity: 0;
     transform: translateY(-16px);
-
     top: calc(100% + 16px);
     right: 0;
     background-color: var(--background-color-light);
@@ -272,7 +270,6 @@ input[type="checkbox"] {
     color: var(--white-accent-light);
     font-size: 12px;
     cursor: pointer;
-    user-select: none;
     margin: 0;
     padding: 0;
     transition: transform 250ms ease;
@@ -426,7 +423,6 @@ input[type="checkbox"] {
     right: 20px;
     color: var(--white-accent-light);
     cursor: pointer;
-    user-select: none;
     font-size: 20px;
     width: 40px;
     height: 40px;
@@ -693,8 +689,6 @@ input[type="checkbox"] {
 .movie_info_genres {
     display: flex;
     flex-direction: row;
-    margin: 0;
-    user-select: none;
 }
 
 .movie_info_genre {
@@ -781,8 +775,6 @@ input[type="checkbox"] {
     border-radius: 20px;
     color: var(--white-accent-light);
     background-color: var(--background-color-light);
-    font-size: 0.8rem;
-    user-select: none;
 }
 
 .step {
@@ -798,8 +790,6 @@ input[type="checkbox"] {
 .step_paragraph {
     color: var(--white-accent-mid);
     text-align: justify;
-    margin: 10px;
-    user-select: none;
 }
 
 .successful {

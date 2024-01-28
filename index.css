@@ -689,6 +689,7 @@ input[type="checkbox"] {
 .movie_info_genres {
     display: flex;
     flex-direction: row;
+    margin: 0;  
 }
 
 .movie_info_genre {
@@ -775,6 +776,7 @@ input[type="checkbox"] {
     border-radius: 20px;
     color: var(--white-accent-light);
     background-color: var(--background-color-light);
+    font-size: 0.8rem; 
 }
 
 .step {
@@ -790,6 +792,7 @@ input[type="checkbox"] {
 .step_paragraph {
     color: var(--white-accent-mid);
     text-align: justify;
+    margin: 10px; 
 }
 
 .successful {
@@ -822,4 +825,62 @@ input[type="checkbox"] {
 
 .no_display {
     display: none;
+}
+
+.import_movies_options_div {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    justify-content: space-between;
+}
+
+.import_movies_options_div > :last-child {
+    margin: 0;
+}
+
+.import_movies_option_div {
+    border: 1px solid var(--white-accent-dark);
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: color 250ms ease, border-color 250ms ease;
+}
+
+.import_movies_option_div:hover {
+    border-color: var(--white-accent-mid);
+    color: var(--white-accent-mid);
+}
+
+.import_movies_option_div:hover > .import_movies_option_paragraph {
+    color: var(--white-accent-light);
+}
+
+.import_movies_option_paragraph {
+    color: var(--white-accent-mid);
+    font-size: 0.8rem;
+    text-align: justify;
+    margin: 0;
+}
+
+.movie_import_option_header {
+    font-size: 0.9rem;
+    text-align: left;
+    color: var(--white-accent-light);
+    margin: 0 0 10px 0;
+}
+
+.import_movie_option_svg {
+    width: 50px;
+    height: 100%;
+    margin: 0 20px 0 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

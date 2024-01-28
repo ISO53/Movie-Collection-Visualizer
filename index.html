@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="index.css" />
-    <title>Movie Collection</title>
+    <title>Movie Collection Visualizer</title>
 </head>
 
 <body>
@@ -72,12 +72,38 @@
             <svg class="popup_logo" xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
         </div>
         <h1 class="popup_header">Import Your Movies</h1>
-        <p class="popup_paragraph">In order to seamlessly integrate your movie collection into our application, we kindly request that you provide the list of movie names. This information can be shared through a file such as TXT. Alternatively, if your movies are stored at a specific location, please specify the source so that we can efficiently read and import the movie names.</p>
         
-        <div class="popup_buttons">
-            <button class="popup_button" id="import_from_file_system_button">Import From File Explorer</button>
-            <button class="popup_button" id="import_from_txt_button">Import From TXT</button>
+        <div class="import_movies_options_div">
+            <div class="import_movies_option_div" id="import_movies_options_dir">
+                <div>
+                    <svg class="import_movie_option_svg" xmlns="http://www.w3.org/2000/svg" fill="#fafafa" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Z"/></svg>
+                </div>
+                <div>
+                    <h2 class="movie_import_option_header">Import From Folder Names</h2>
+                    <p class="import_movies_option_paragraph">Retrieve your movie names by searching through your collection folder. The folder names should be the movie titles.</p>
+                </div>
+            </div>
+            <div class="import_movies_option_div" id="import_movies_options_tor">
+                <div>
+                    <svg class="import_movie_option_svg" xmlns="http://www.w3.org/2000/svg" fill="#fafafa" height="24" viewBox="0 -960 960 960" width="24"><path d="m160-800 80 160h120l-80-160h80l80 160h120l-80-160h80l80 160h120l-80-160h120q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800Zm0 240v320h640v-320H160Zm0 0v320-320Z"/></svg>
+                </div>
+                <div>
+                    <h2 class="movie_import_option_header">Import From Media Names</h2>
+                    <p class="import_movies_option_paragraph">Retrieve movie titles from file names with extensions such as .mp4, .mkv, etc. We can extract movie names from torrent file names!</p>
+                </div>
+            </div>
+            <div class="import_movies_option_div" id="import_movies_options_txt">
+                <div>
+                    <svg class="import_movie_option_svg" xmlns="http://www.w3.org/2000/svg" fill="#fafafa" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h440l200 200v440q0 33-23.5 56.5T760-120H200Zm0-80h560v-400H600v-160H200v560Zm80-80h400v-80H280v80Zm0-320h200v-80H280v80Zm0 160h400v-80H280v80Zm-80-320v160-160 560-560Z"/></svg>
+                </div>
+                <div>
+                    <h2 class="movie_import_option_header">Import From TXT File</h2>
+                    <p class="import_movies_option_paragraph">If you possess a list of movie names stored in a .txt file, we can retrieve movie titles from it.</p>
+                </div>
+            </div>
         </div>
+
+        
     </div>
 
     <div class="popup create_movies_library_div hide_popup" id="create_movies_library_div">

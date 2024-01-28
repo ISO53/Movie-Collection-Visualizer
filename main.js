@@ -3,6 +3,7 @@ const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require("electron");
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
+const ptn = require("parse-torrent-name");
 
 var win;
 var KEY;
@@ -77,38 +78,60 @@ function getMessageFromRenderer(channel, handler) {
 }
 
 function openFileSystem(arg) {
-    if (arg === "dir") {
-        dialog
-            .showOpenDialog(win, {
-                title: "Select Folder",
-                properties: ["openDirectory"],
-            })
-            .then((result) => {
-                if (!result.canceled) {
-                    const selectedFolder = result.filePaths[0];
-                    const movies = getFolderNames(selectedFolder);
-                    sendMessageToRenderer("popup", "c_import_movies_div");
-                    sendMessageToRenderer("popup", "o_create_movies_library_div");
-                    writeFoldersToJson(movies);
-                }
-            })
-            .catch(console.error);
-    } else {
-        dialog
-            .showOpenDialog(win, {
-                title: "Open TXT File",
-                filters: [{name: "TXT Files", extensions: ["txt"]}],
-                properties: ["openFile"],
-            })
-            .then((result) => {
-                if (!result.canceled) {
-                    const selectedTxtFile = result.filePaths[0];
-                    sendMessageToRenderer("popup", "c_import_movies_div");
-                    sendMessageToRenderer("popup", "o_create_movies_library_div");
-                    readAndParseTxt(selectedTxtFile).then(writeFoldersToJson).catch(console.error);
-                }
-            })
-            .catch(console.error);
+    switch (arg) {
+        case "dir":
+            dialog
+                .showOpenDialog(win, {
+                    title: "Select Folder",
+                    properties: ["openDirectory"],
+                })
+                .then((result) => {
+                    if (!result.canceled) {
+                        const selectedFolder = result.filePaths[0];
+                        const movies = getFolderNames(selectedFolder);
+                        sendMessageToRenderer("popup", "c_import_movies_div");
+                        sendMessageToRenderer("popup", "o_create_movies_library_div");
+                        writeFoldersToJson(movies);
+                    }
+                })
+                .catch(console.error);
+            break;
+        case "txt":
+            dialog
+                .showOpenDialog(win, {
+                    title: "Open TXT File",
+                    filters: [{name: "TXT Files", extensions: ["txt"]}],
+                    properties: ["openFile"],
+                })
+                .then((result) => {
+                    if (!result.canceled) {
+                        const selectedTxtFile = result.filePaths[0];
+                        sendMessageToRenderer("popup", "c_import_movies_div");
+                        sendMessageToRenderer("popup", "o_create_movies_library_div");
+                        readAndParseTxt(selectedTxtFile).then(writeFoldersToJson).catch(console.error);
+                    }
+                })
+                .catch(console.error);
+            break;
+        case "tor":
+            dialog
+                .showOpenDialog(win, {
+                    title: "Select Folder",
+                    properties: ["openDirectory"],
+                })
+                .then((result) => {
+                    if (!result.canceled) {
+                        const selectedFolder = result.filePaths[0];
+                        const movies =  getVideoFileNames(selectedFolder).map(torrentMovieName => ptn(torrentMovieName).title);
+                        sendMessageToRenderer("popup", "c_import_movies_div");
+                        sendMessageToRenderer("popup", "o_create_movies_library_div");
+                        writeFoldersToJson(movies);
+                    }
+                })
+                .catch(console.error);
+            break;
+        default:
+            break;
     }
 }
 
@@ -132,6 +155,34 @@ function getFolderNames(folderPath) {
 
     // Convert the Set to an array before returning
     return Array.from(folderNamesSet);
+}
+
+function getVideoFileNames(folderPath) {
+    const videoFileNamesSet = new Set();
+    const videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv'];
+
+    function traverseFolder(currentPath) {
+        const files = fs.readdirSync(currentPath);
+
+        files.forEach((file) => {
+            const filePath = path.join(currentPath, file);
+
+            if (fs.statSync(filePath).isDirectory()) {
+                traverseFolder(filePath);
+            } else {
+                const ext = path.extname(file).toLowerCase();
+
+                if (videoExtensions.includes(ext)) {
+                    videoFileNamesSet.add(file);
+                }
+            }
+        });
+    }
+
+    traverseFolder(folderPath);
+
+    // Convert the Set to an array before returning
+    return Array.from(videoFileNamesSet);
 }
 
 function readAndParseTxt(filePath) {

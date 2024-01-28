@@ -14,8 +14,7 @@ getMessageFromMain("movie-db-status", updateMovieDbStatus);
 getMessageFromMain("movies", movieHandler);
 getMessageFromMain("update", updateHandler);
 popupCloseButtonListener();
-importFromFileSystemButtonListener();
-importFromTXTButtonListener();
+importMoviesOptionsListener();
 omdbApiButtonListener();
 readMoviesFromFile();
 readOmdbApiKeyFromFile();
@@ -90,16 +89,17 @@ function popupCloseButtonListener() {
     });
 }
 
-function importFromFileSystemButtonListener() {
-    document.getElementById("import_from_file_system_button").addEventListener("click", () => {
-        sendMessageToMain("open-file-system", "dir");
-    });
-}
-
-function importFromTXTButtonListener() {
-    document.getElementById("import_from_txt_button").addEventListener("click", () => {
-        sendMessageToMain("open-file-system", "txt");
-    });
+function importMoviesOptionsListener() {
+    let options = [
+        document.getElementById("import_movies_options_dir"),
+        document.getElementById("import_movies_options_txt"),
+        document.getElementById("import_movies_options_tor"),
+    ];
+    options.forEach((option) =>
+        option.addEventListener("click", () => {
+            sendMessageToMain("open-file-system", option.id.replace("import_movies_options_", ""));
+        })
+    );
 }
 
 function omdbApiButtonListener() {

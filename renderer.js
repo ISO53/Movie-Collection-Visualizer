@@ -487,6 +487,8 @@ function sortMovies(sortingType) {
                 return (parseInt(b.Runtime) || 0) - (parseInt(a.Runtime) || 0);
             case "Shorter":
                 return (parseInt(a.Runtime) || 0) - (parseInt(b.Runtime) || 0);
+            case "Shuffle":
+                return Math.floor(Math.random() * 3) - 1;
             default:
                 return (a.Title || "").localeCompare(b.Title || "");
         }

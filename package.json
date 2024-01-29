@@ -45,6 +45,7 @@
         "electron-builder": "^24.9.1"
     },
     "dependencies": {
+        "marked": "^11.2.0",
         "parse-torrent-name": "^0.5.4"
     }
 }

@@ -821,6 +821,8 @@ input[type="checkbox"] {
     padding: 0 30px 0 30px;
     border-left: 1px solid var(--main-color-four);
     border-right: 1px solid var(--main-color-four);
+    max-height: 300px;
+    overflow: auto;
 }
 
 .no_display {

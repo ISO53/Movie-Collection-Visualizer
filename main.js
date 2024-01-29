@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 const ptn = require("parse-torrent-name");
+const { marked } = require('marked');
 
 var win;
 var KEY;
@@ -421,7 +422,8 @@ function checkUpdates() {
 
             if (releaseData.tag_name !== app.getVersion()) {
                 console.log("VERSION", app.getVersion());
-                sendMessageToRenderer("update", releaseData.body);
+                let releaseDataFormattedbody = marked.parse(releaseData.body);
+                sendMessageToRenderer("update", releaseDataFormattedbody);
             } else {
                 sendMessageToRenderer("update", "no");
             }

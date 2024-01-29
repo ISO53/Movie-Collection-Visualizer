@@ -146,9 +146,19 @@ function getFolderNames(folderPath) {
             const filePath = path.join(currentPath, file);
 
             if (fs.statSync(filePath).isDirectory()) {
-                folderNamesSet.add(file);
+                const subDirectories = fs.readdirSync(filePath)
+                    .filter(subFile => fs.statSync(`${filePath}/${subFile}`).isDirectory());
+            
+                if (subDirectories.length === 0) {
+                    folderNamesSet.add(file);
+                }
                 traverseFolder(filePath);
             }
+
+            // if (fs.statSync(filePath).isDirectory()) {
+            //     folderNamesSet.add(file);
+            //     traverseFolder(filePath);
+            // }
         });
     }
 

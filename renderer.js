@@ -320,7 +320,7 @@ function listMoviesOnGUI() {
             setTimeout(readMoviesFromFile, 200);
         });
 
-        movieDiv.addEventListener("click", () => {
+        posterAndRatingDiv.addEventListener("click", () => {
             document.getElementById("movie_header").innerText = movie.Title;
             document.getElementById("movie_info_poster").src = movie.PosterPath;
             document.getElementById("movie_duration").innerText = movie.Runtime;

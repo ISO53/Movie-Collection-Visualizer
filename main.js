@@ -146,9 +146,10 @@ function getFolderNames(folderPath) {
             const filePath = path.join(currentPath, file);
 
             if (fs.statSync(filePath).isDirectory()) {
-                const subDirectories = fs.readdirSync(filePath)
-                    .filter(subFile => fs.statSync(`${filePath}/${subFile}`).isDirectory());
-            
+                const subDirectories = fs
+                    .readdirSync(filePath)
+                    .filter((subFile) => fs.statSync(`${filePath}/${subFile}`).isDirectory());
+
                 if (subDirectories.length === 0) {
                     folderNamesSet.add(file);
                 }

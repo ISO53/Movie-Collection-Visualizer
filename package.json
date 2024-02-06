@@ -17,7 +17,7 @@
         },
         "files": [
             "res/img",
-            "res/posters/**/*",
+            "res/posters",
             "index.css",
             "index.html",
             "main.js",
@@ -39,7 +39,7 @@
     "bugs": {
         "url": "https://github.com/ISO53/Movie-Collection-Visualizer/issues"
     },
-    "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer#readme",
+    "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer",
     "devDependencies": {
         "electron": "^27.1.0",
         "electron-builder": "^24.9.1"

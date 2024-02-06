@@ -171,7 +171,7 @@ function getFolderNames(folderPath) {
 
 function getVideoFileNames(folderPath) {
     const videoFileNamesSet = new Set();
-    const videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv'];
+    const videoExtensions = [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv"];
 
     function traverseFolder(currentPath) {
         const files = fs.readdirSync(currentPath);

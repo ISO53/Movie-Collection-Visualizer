@@ -15,6 +15,7 @@ app.whenReady().then(createWindow).then(startApp);
 // ******************** Declare Functions ********************
 function startApp() {
     app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
+    createJsonFiles();
     getMessageFromRenderer("open-file-system", openFileSystem);
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
     getMessageFromRenderer("movie", movieHandler);
@@ -444,4 +445,18 @@ function checkUpdates() {
         });
 
     return true;
+}
+
+function createJsonFiles() {
+    // Create an empty db.json file if it doesn't exist
+    const dbJsonPath = "res/db.json";
+    if (!fs.existsSync(dbJsonPath)) {
+        fs.writeFileSync(dbJsonPath, "{}", "utf-8");
+    }
+
+    // Create an empty key.json file if it doesn't exist
+    const keyJsonPath = "res/key.json";
+    if (!fs.existsSync(keyJsonPath)) {
+        fs.writeFileSync(keyJsonPath, "{}", "utf-8");
+    }
 }

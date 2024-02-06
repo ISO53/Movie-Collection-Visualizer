@@ -242,7 +242,13 @@ async function writeFoldersToJson(movieNames) {
         }
     }
 
+    let totalTime = 0; // Total time spent on fetching
+    let averageTime = 0; // Average fetching time
+
     for (let i = 0; i < movieNames.length; i++) {
+        // start fetch time
+        const startTime = new Date();
+
         const movieDetails = await fetchMovieDetails(movieNames[i]);
 
         if (movieDetails) {
@@ -258,7 +264,28 @@ async function writeFoldersToJson(movieNames) {
             movieDetailsArray.push(movieDetails);
         }
 
-        sendMessageToRenderer("movie-db-status", `l${i + 1}/${movieNames.length}`);
+        // end fetch time
+        const endTime = new Date();
+
+        // calculate time difference
+        const timeDiff = (endTime - startTime) / 1000;
+        totalTime += timeDiff;
+        averageTime = totalTime / (i + 1);
+
+        // Calculate estimated time remaining
+        const remainingTime = averageTime * (movieNames.length - (i + 1));
+
+        sendMessageToRenderer(
+            "movie-db-status",
+            "l" +
+                JSON.stringify({
+                    progress: `${i + 1}/${movieNames.length}`,
+                    remainingTime: remainingTime.toFixed(0),
+                })
+        );
+
+        const progressPercent = (i + 1) / movieNames.length;
+        win.setProgressBar(progressPercent < 1 ? progressPercent : -1);
     }
 
     sendMessageToRenderer("movie-db-status", "a");

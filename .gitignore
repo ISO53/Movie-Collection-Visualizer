@@ -41,6 +41,6 @@ node_modules/
 
 ### some res folders for this project ###
 dist/
-res/posters
+res/posters/**
 db.json
 key.json

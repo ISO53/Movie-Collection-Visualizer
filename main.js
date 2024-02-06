@@ -1,10 +1,10 @@
 // ******************** Declare Variables ********************
-const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require("electron");
+const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 const ptn = require("parse-torrent-name");
-const { marked } = require('marked');
+const {marked} = require("marked");
 
 var win;
 var KEY;

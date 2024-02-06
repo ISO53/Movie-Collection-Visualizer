@@ -134,13 +134,26 @@ function sortingFilterClickListener() {
 
 function updateMovieDbStatus(status) {
     const statusElm = document.getElementById("db_status");
+    const progressElm = document.getElementById("db_remaining");
+
     if (status.startsWith("l")) {
-        // Loading
+        // Extract status
         const extractedStatus = status.substring(1);
-        const parts = extractedStatus.split("/");
+
+        // Parse to json
+        const jsonifiedStatus = JSON.parse(extractedStatus);
+
+        // Remaining
+        const remainingTime = jsonifiedStatus.remainingTime;
+        progressElm.innerHTML = `Time remaining: ${formatTime(remainingTime)}`;
+
+        // Loading
+        const progress = jsonifiedStatus.progress;
+        const parts = progress.split("/");
         const firstNumber = parseInt(parts[0], 10);
         const secondNumber = parseInt(parts[1], 10);
 
+        // Show loading animation
         statusElm.innerHTML = `${firstNumber} out of ${secondNumber} completed.`;
         document.getElementById("loaded_amount_div").style.width = (firstNumber / secondNumber) * 100 + "%";
     } else if (status.startsWith("a")) {
@@ -149,9 +162,26 @@ function updateMovieDbStatus(status) {
     } else if (status.startsWith("d")) {
         // Done
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
+        progressElm.innerHTML = "";
         readMoviesFromFile();
     } else {
         console.log("something went wrong", status);
+    }
+
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+
+        const formattedTime = [
+            hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}` : "",
+            minutes > 0 ? `${minutes} minute${minutes > 1 ? "s" : ""}` : "",
+            remainingSeconds > 0 ? `${remainingSeconds} second${remainingSeconds > 1 ? "s" : ""}` : "",
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        return formattedTime;
     }
 }
 

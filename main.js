@@ -123,7 +123,7 @@ function openFileSystem(arg) {
                 .then((result) => {
                     if (!result.canceled) {
                         const selectedFolder = result.filePaths[0];
-                        const movies =  getVideoFileNames(selectedFolder).map(torrentMovieName => ptn(torrentMovieName).title);
+                        const movies = getVideoFileNames(selectedFolder).map(torrentMovieName => ptn(torrentMovieName).title);
                         sendMessageToRenderer("popup", "c_import_movies_div");
                         sendMessageToRenderer("popup", "o_create_movies_library_div");
                         writeFoldersToJson(movies);

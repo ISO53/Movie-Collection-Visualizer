@@ -176,7 +176,7 @@ input[type="checkbox"] {
     top: calc(100% + 16px);
     right: 0;
     background-color: var(--background-color-light);
-    padding: 20px;
+    padding: 12px 20px 10px 20px;
     border-radius: 20px;
     position: absolute;
     cursor: default;
@@ -188,24 +188,62 @@ input[type="checkbox"] {
 }
 
 .sort_element {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
     width: auto;
     text-wrap: nowrap;
-    margin: 8px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--white-accent-dark);
-    color: var(--white-accent-mid);
+    margin: 12px;
     cursor: pointer;
+}
+
+.sort_element:hover > .sort_element_logo {
+    fill: var(--white-accent-light);
+}
+
+.sort_element:hover > .sort_element_text {
+    color: var(--white-accent-light);
+}
+
+.sort_element_logo {
+    margin-right: 16px;
+    transition: fill 250ms ease;
+}
+
+.sort_element_text {
+    margin: 0;
+    color: var(--white-accent-mid);
     font-size: 0.9rem;
     transition: color 250ms ease;
+    font-weight: 400;
+    margin-right: 20px;
+}
+
+.sort_element_hidden {
+    visibility: hidden;
+}
+
+.sort_element_increasing {
+    transform: rotate(180deg);
+}
+
+.sort_element_sorting_type {
+    margin-left: auto;
+    transition: transform 250ms ease;
+}
+
+.divider {
+    width: 100%;
+    height: 0px;
+    border-bottom: 1px solid var(--white-accent-dark);
+    background-color: transparent;
+    display: flex;
+    justify-self: right;
 }
 
 .sort_element:hover {
     color: var(--white-accent-light);
-}
-
-.sort_element:last-child {
-    border: none;
-    padding: 0;
 }
 
 .sort_div:hover>.sort_icon {

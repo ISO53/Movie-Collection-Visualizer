@@ -126,10 +126,39 @@ function movieSearchButtonClickListener() {
 }
 
 function sortingFilterClickListener() {
-    document.getElementById("sort_dropdown").addEventListener("click", (event) => {
-        sortMovies(event.target.id);
-        listMoviesOnGUI();
+    const elements = [
+        document.getElementById("alphabetically"),
+        document.getElementById("imdb_rating"),
+        document.getElementById("release_date"),
+        document.getElementById("duration"),
+        document.getElementById("shuffle"),
+    ];
+
+    elements.forEach((element) => {
+        element.addEventListener("click", () => {
+            if (!element.children[2].classList.contains("sort_element_hidden")) {
+                element.children[2].classList.toggle("sort_element_increasing");
+            }
+
+            resetSelected(element);
+
+            let sortingType = element.id;
+            let increasingOrDecreasing = "";
+            if (sortingType !== "shuffle") {
+                increasingOrDecreasing = element.children[2].classList.contains("sort_element_increasing") ? "_increasing" : "_decreasing";
+            }
+            sortMovies(sortingType + increasingOrDecreasing);
+            console.log(sortingType + increasingOrDecreasing);
+            listMoviesOnGUI();
+        });
     });
+
+    function resetSelected(elm) {
+        elements.forEach(element => {
+            element.children[2].classList.add("sort_element_hidden");
+        });
+        elm.children[2].classList.remove("sort_element_hidden");
+    }
 }
 
 function updateMovieDbStatus(status) {
@@ -501,23 +530,23 @@ function searchMovie(movieData, searchTerm) {
 function sortMovies(sortingType) {
     MOVIES.sort((a, b) => {
         switch (sortingType) {
-            case "A-Z":
+            case "alphabetically_decreasing":
                 return (a.Title || "").localeCompare(b.Title || "");
-            case "Z-A":
+            case "alphabetically_increasing":
                 return (b.Title || "").localeCompare(a.Title || "");
-            case "RatingHigher":
+            case "imdb_rating_decreasing":
                 return (parseFloat(b.imdbRating) || 0) - (parseFloat(a.imdbRating) || 0);
-            case "RatingLower":
+            case "imdb_rating_increasing":
                 return (parseFloat(a.imdbRating) || 0) - (parseFloat(b.imdbRating) || 0);
-            case "Newer":
+            case "release_date_decreasing":
                 return (new Date(b.Released) || 0) - (new Date(a.Released) || 0);
-            case "Older":
+            case "release_date_increasing":
                 return (new Date(a.Released) || 0) - (new Date(b.Released) || 0);
-            case "Longer":
+            case "duration_decreasing":
                 return (parseInt(b.Runtime) || 0) - (parseInt(a.Runtime) || 0);
-            case "Shorter":
+            case "duration_increasing":
                 return (parseInt(a.Runtime) || 0) - (parseInt(b.Runtime) || 0);
-            case "Shuffle":
+            case "shuffle":
                 return Math.floor(Math.random() * 3) - 1;
             default:
                 return (a.Title || "").localeCompare(b.Title || "");

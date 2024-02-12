@@ -21,6 +21,7 @@ function startApp() {
     getMessageFromRenderer("open-file-system", openFileSystem);
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
     getMessageFromRenderer("movie", movieHandler);
+    getMessageFromRenderer("read-file", readFileHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
 }
@@ -499,4 +500,31 @@ function createJsonFiles() {
             console.error("Error writing file:", error.message);
         }
     }
+}
+
+function readFileHandler(arg) {
+    const jsonArg = JSON.parse(arg);
+    let filePath;
+    let responseType;
+
+    switch (jsonArg.type) {
+        case "movies":
+            filePath = path.join(USER_DATA_PATH, "res", "db.json");
+            responseType = "movies";
+            break;
+        case "omdb-api-key":
+            filePath = path.join(USER_DATA_PATH, "res", "key.json");
+            responseType = "omdb-api-key";
+            break;
+        default:
+            break;
+    }
+
+    fs.readFile(filePath, "utf-8", (err, jsonStr) => {
+        if (err) {
+            console.error("Error reading JSON file:", err.message);
+        } else {
+            sendMessageToRenderer("read-file", JSON.stringify({type: responseType, data: jsonStr}));
+        }
+    });
 }

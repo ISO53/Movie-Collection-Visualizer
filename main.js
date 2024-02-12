@@ -1,10 +1,12 @@
 // ******************** Declare Variables ********************
 const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const readline = require("readline");
 const ptn = require("parse-torrent-name");
 const {marked} = require("marked");
+
+const USER_DATA_PATH = app.getPath("userData");
 
 var win;
 var KEY;
@@ -223,7 +225,7 @@ function readAndParseTxt(filePath) {
 
 async function writeFoldersToJson(movieNames) {
     const movieDetailsArray = [];
-    const jsonFilePath = path.join(__dirname, "res", "db.json");
+    const jsonFilePath = path.join(USER_DATA_PATH, "res", "db.json");
 
     async function fetchMovieDetails(movieName) {
         const apiUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`;
@@ -255,7 +257,7 @@ async function writeFoldersToJson(movieNames) {
             // Add downloaded poster path to movie data
             if (movieDetails.Poster && movieDetails.Poster != "N/A") {
                 downloadImage(movieDetails.Poster, movieDetails.Title);
-                movieDetails.PosterPath = path.join(__dirname, "res", "posters", `${movieDetails.Title}.jpg`);
+                movieDetails.PosterPath = path.join(app.getAppPath(), "res", "posters", `${movieDetails.Title}.jpg`);
             }
 
             // Add file name for movie to movie data
@@ -302,14 +304,14 @@ async function writeFoldersToJson(movieNames) {
 
 function setOmdbApiKey(key) {
     KEY = key;
-    const jsonFilePath = path.join(__dirname, "res", "key.json");
+    const jsonFilePath = path.join(USER_DATA_PATH, "res", "key.json");
     fs.writeFileSync(jsonFilePath, JSON.stringify({key: key}), "utf-8");
     sendMessageToRenderer("popup", "c_omdb_api_div");
 }
 
 async function readOmdbApiKeyFromFile() {
     try {
-        const filePath = path.join(__dirname, "res", "key.json");
+        const filePath = path.join(USER_DATA_PATH, "res", "key.json");
         fs.readFile(filePath, "utf-8", (err, jsonStr) => {
             if (err) {
                 console.log("Something went wrong trying to read JSON file.");
@@ -337,7 +339,7 @@ async function readOmdbApiKeyFromFile() {
 async function downloadImage(url, fileName) {
     try {
         const response = await fetch(url);
-        const folderPath = path.join(__dirname, "res", "posters");
+        const folderPath = path.join(USER_DATA_PATH, "res", "posters");
 
         // Ensure the folder exists
         if (!fs.existsSync(folderPath)) {
@@ -370,7 +372,7 @@ async function downloadImage(url, fileName) {
 function movieHandler(arg) {
     const [opt, imdbID] = arg.split(",");
 
-    fs.readFile(path.join(__dirname, "res", "db.json"), "utf-8", (err, data) => {
+    fs.readFile(path.join(USER_DATA_PATH, "res", "db.json"), "utf-8", (err, data) => {
         if (err) {
             console.error("Error reading JSON file:", err.message);
             return;
@@ -397,7 +399,7 @@ function movieHandler(arg) {
                 }
 
                 // Write modified json to file
-                fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                 console.log("Update successful. JSON file has been modified.");
             } else if (opt === "add") {
                 fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${KEY}`)
@@ -410,13 +412,13 @@ function movieHandler(arg) {
                     .then((data) => {
                         // Download poster image for the movie
                         downloadImage(data.Poster, data.Title);
-                        data.PosterPath = path.join(__dirname, "res", "posters", `${data.Title}.jpg`);
+                        data.PosterPath = path.join(USER_DATA_PATH, "res", "posters", `${data.Title}.jpg`);
 
                         // Modify the data object
                         jsonData.push(data);
 
                         // Write modified json to file
-                        fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                        fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                         console.log("Update successful. JSON file has been modified.");
                     })
                     .catch((error) => {
@@ -435,7 +437,7 @@ function movieHandler(arg) {
                 }
 
                 // Write modified json to file
-                fs.writeFileSync(path.join(__dirname, "res", "db.json"), JSON.stringify(jsonData, null, 2));
+                fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                 console.log("Update successful. JSON file has been modified.");
             }
         } catch (parseError) {
@@ -475,15 +477,31 @@ function checkUpdates() {
 }
 
 function createJsonFiles() {
+    // res
+    fs.ensureDirSync(path.dirname(USER_DATA_PATH));
+
+    // res/posters
+    fs.ensureDirSync(path.dirname(path.join(USER_DATA_PATH, "posters")));
+
     // Create an empty db.json file if it doesn't exist
     const dbJsonPath = "res/db.json";
-    if (!fs.existsSync(dbJsonPath)) {
-        fs.writeFileSync(dbJsonPath, "{}", "utf-8");
+    if (!fs.existsSync(path.join(USER_DATA_PATH, dbJsonPath))) {
+        try {
+            fs.writeFileSync(path.join(USER_DATA_PATH, dbJsonPath), "{}", "utf-8");
+            console.log("res/db.json successfully written to ", path.join(USER_DATA_PATH, dbJsonPath));
+        } catch (error) {
+            console.error("Error writing file:", error.message);
+        }
     }
 
     // Create an empty key.json file if it doesn't exist
     const keyJsonPath = "res/key.json";
-    if (!fs.existsSync(keyJsonPath)) {
-        fs.writeFileSync(keyJsonPath, "{}", "utf-8");
+    if (!fs.existsSync(path.join(USER_DATA_PATH, keyJsonPath))) {
+        try {
+            fs.writeFileSync(path.join(USER_DATA_PATH, keyJsonPath), "{}", "utf-8");
+            console.log(keyJsonPath, " successfully written to ", path.join(USER_DATA_PATH, keyJsonPath));
+        } catch (error) {
+            console.error("Error writing file:", error.message);
+        }
     }
 }

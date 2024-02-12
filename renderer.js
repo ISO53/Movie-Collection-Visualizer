@@ -13,6 +13,7 @@ getMessageFromMain("popup", popupHandler);
 getMessageFromMain("movie-db-status", updateMovieDbStatus);
 getMessageFromMain("movies", movieHandler);
 getMessageFromMain("update", updateHandler);
+getMessageFromMain("read-file", readFileHandler);
 popupCloseButtonListener();
 importMoviesOptionsListener();
 omdbApiButtonListener();
@@ -215,32 +216,12 @@ function updateMovieDbStatus(status) {
 }
 
 function readMoviesFromFile() {
-    const filePath = path.join(__dirname, "res", "db.json");
-
-    fs.readFile(filePath, "utf-8", (err, jsonStr) => {
-        if (err) {
-            console.error("Error reading JSON file:", err.message);
-            return callback(null); // Pass null to the callback to indicate an error
-        }
-
-        try {
-            let jsonContent; // movies
-            try {
-                jsonContent = JSON.parse(jsonStr);
-            } catch (error) {
-                console.error("There was an error parsing json file.");
-                return;
-            }
-
-            setFilters(jsonContent);
-            listFiltersOnGUI();
-            setMovies(jsonContent);
-            listMoviesOnGUI();
-        } catch (parseError) {
-            console.error("Error parsing JSON:", parseError.message);
-            listMoviesOnGUI(); // Pass null to the callback to indicate a parsing error
-        }
-    });
+    sendMessageToMain(
+        "read-file",
+        JSON.stringify({
+            type: "movies",
+        })
+    );
 }
 
 function setFilters(movies) {
@@ -421,30 +402,12 @@ function listMoviesOnGUI() {
 }
 
 async function readOmdbApiKeyFromFile() {
-    try {
-        const filePath = path.join(__dirname, "res", "key.json");
-        fs.readFile(filePath, "utf-8", (err, jsonStr) => {
-            if (err) {
-                console.log("Something went wrong trying to read JSON file.");
-            }
-
-            let jsonContent;
-            try {
-                jsonContent = JSON.parse(jsonStr);
-            } catch (error) {
-                console.error("There was an error parsing json file.");
-                return;
-            }
-
-            if (jsonContent && jsonContent.key) {
-                KEY = jsonContent.key;
-            } else {
-                console.error("Invalid JSON file format or missing key.");
-            }
-        });
-    } catch (error) {
-        console.error("Error reading JSON file:", error.message);
-    }
+    sendMessageToMain(
+        "read-file",
+        JSON.stringify({
+            type: "omdb-api-key",
+        })
+    );
 }
 
 function rightMovieSearchButtonListener() {
@@ -561,5 +524,40 @@ function loadFirstTimeSteps() {
 
     if (MOVIES !== undefined && MOVIES !== null && MOVIES.length !== 0) {
         document.getElementById("step_2").classList.add("successful");
+    }
+}
+
+function readFileHandler(arg) {
+    const jsonArg = JSON.parse(arg);
+
+    switch (jsonArg.type) {
+        case "movies":
+            try {
+                let movies = JSON.parse(jsonArg.data);
+                setFilters(movies);
+                listFiltersOnGUI();
+                setMovies(movies);
+                listMoviesOnGUI();
+            } catch (error) {
+                console.error("There was an error parsing the JSON file that contains movie information.", error.message);
+                listMoviesOnGUI();
+            }
+            break;
+        case "omdb-api-key":
+            try {
+                let jsonContent = JSON.parse(jsonArg.data);
+
+                if (jsonContent && jsonContent.key) {
+                    KEY = jsonContent.key;
+                } else {
+                    console.error("Invalid JSON file format or missing key.");
+                }
+            } catch (error) {
+                console.error("There was an error parsing the JSON file that contains api key.", error.message);
+                return;
+            }
+            break;
+        default:
+            break;
     }
 }

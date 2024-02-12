@@ -1,6 +1,5 @@
 // ******************** Declare Variables ********************
 const {ipcRenderer} = require("electron");
-const fs = require("fs");
 const path = require("path");
 var KEY;
 var FILTERS = new Set();

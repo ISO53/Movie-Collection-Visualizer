@@ -146,7 +146,9 @@ function sortingFilterClickListener() {
             let sortingType = element.id;
             let increasingOrDecreasing = "";
             if (sortingType !== "shuffle") {
-                increasingOrDecreasing = element.children[2].classList.contains("sort_element_increasing") ? "_increasing" : "_decreasing";
+                increasingOrDecreasing = element.children[2].classList.contains("sort_element_increasing")
+                    ? "_increasing"
+                    : "_decreasing";
             }
             sortMovies(sortingType + increasingOrDecreasing);
             console.log(sortingType + increasingOrDecreasing);
@@ -155,7 +157,7 @@ function sortingFilterClickListener() {
     });
 
     function resetSelected(elm) {
-        elements.forEach(element => {
+        elements.forEach((element) => {
             element.children[2].classList.add("sort_element_hidden");
         });
         elm.children[2].classList.remove("sort_element_hidden");

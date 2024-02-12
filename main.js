@@ -158,11 +158,6 @@ function getFolderNames(folderPath) {
                 }
                 traverseFolder(filePath);
             }
-
-            // if (fs.statSync(filePath).isDirectory()) {
-            //     folderNamesSet.add(file);
-            //     traverseFolder(filePath);
-            // }
         });
     }
 

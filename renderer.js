@@ -563,4 +563,53 @@ function readFileHandler(arg) {
     }
 }
 
+function createAlertMessage(type, message, duration) {
+    if (type !== "warning" && type !== "success" && type !== "info") {
+        console.error("Alert message type is not valid! Given -> ", type);
+        return;
+    }
+
+    // Main div for adding alert messages
+    const mainMessagesDiv = document.getElementById("alert_messages");
+
+    // Alert message to display
+    const alertMessageDiv = createAlertMessageDomElement(type, message);
+    mainMessagesDiv.prepend(alertMessageDiv);
+    setTimeout(() => alertMessageDiv.classList.remove("alert_slide_right"), 250);
+
+    // Remove the alert message after the specified duration
+    setTimeout(() => {
+        alertMessageDiv.classList.add("alert_slide_right");
+        setTimeout(() => mainMessagesDiv.removeChild(alertMessageDiv), 250);
+    }, duration);
+
+    function createAlertMessageDomElement(type, message) {
+        const alertMessageDiv = document.createElement("div");
+        alertMessageDiv.className = "alert_message";
+        alertMessageDiv.classList.add(type + "_color");
+        alertMessageDiv.classList.add("alert_slide_right");
+
+        const alertLogo = document.createElement("img");
+        alertLogo.className = "alert_logo";
+        alertLogo.src = path.join(__dirname, "res", "img", `${type}.svg`);
+        alertMessageDiv.appendChild(alertLogo);
+
+        const alertText = document.createElement("p");
+        alertText.className = "alert_text";
+        alertText.classList.add("truncated_alert");
+        alertText.textContent = message;
+        alertMessageDiv.appendChild(alertText);
+        alertMessageDiv.onclick = () => alertText.classList.toggle("truncated_alert");
+
+        const alertCloseButton = document.createElement("div");
+        alertCloseButton.className = "alert_close_button";
+        alertCloseButton.textContent = "✖";
+        alertMessageDiv.appendChild(alertCloseButton);
+        alertCloseButton.onclick = () => {
+            alertMessageDiv.classList.add("alert_slide_right");
+            setTimeout(() => document.getElementById("alert_messages").removeChild(alertMessageDiv), 250);
+        };
+
+        return alertMessageDiv;
+    }
 }

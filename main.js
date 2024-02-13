@@ -22,6 +22,7 @@ function startApp() {
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
     getMessageFromRenderer("movie", movieHandler);
     getMessageFromRenderer("read-file", readFileHandler);
+    getMessageFromRenderer("path", pathHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
 }
@@ -253,7 +254,7 @@ async function writeFoldersToJson(movieNames) {
             // Add downloaded poster path to movie data
             if (movieDetails.Poster && movieDetails.Poster != "N/A") {
                 downloadImage(movieDetails.Poster, movieDetails.Title);
-                movieDetails.PosterPath = path.join(app.getAppPath(), "res", "posters", `${movieDetails.Title}.jpg`);
+                movieDetails.PosterPath = path.join(USER_DATA_PATH, "res", "posters", `${movieDetails.Title}.jpg`);
             }
 
             // Add file name for movie to movie data
@@ -527,4 +528,10 @@ function readFileHandler(arg) {
             sendMessageToRenderer("read-file", JSON.stringify({type: responseType, data: jsonStr}));
         }
     });
+}
+
+function pathHandler(arg) {
+    if (arg === "get-user-path") {
+        sendMessageToRenderer("path", USER_DATA_PATH);
+    }
 }

@@ -1,6 +1,6 @@
 {
     "name": "movie-collection-visualizer",
-    "version": "v1.2.0",
+    "version": "v1.2.2",
     "description": "Organize and visualize your movie collection effortlessly.",
     "main": "main.js",
     "scripts": {
@@ -17,7 +17,6 @@
         },
         "files": [
             "res/img",
-            "res/posters",
             "index.css",
             "index.html",
             "main.js",

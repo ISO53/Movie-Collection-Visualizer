@@ -22,7 +22,6 @@ function startApp() {
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
     getMessageFromRenderer("movie", movieHandler);
     getMessageFromRenderer("read-file", readFileHandler);
-    getMessageFromRenderer("path", pathHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
 }
@@ -528,10 +527,4 @@ function readFileHandler(arg) {
             sendMessageToRenderer("read-file", JSON.stringify({type: responseType, data: jsonStr}));
         }
     });
-}
-
-function pathHandler(arg) {
-    if (arg === "get-user-path") {
-        sendMessageToRenderer("path", USER_DATA_PATH);
-    }
 }

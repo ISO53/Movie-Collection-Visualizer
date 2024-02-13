@@ -6,6 +6,7 @@ var FILTERS = new Set();
 var MOVIES = [];
 var CURR_FILTERS = [];
 var CURR_SEARCH = "";
+var USER_DATA_PATH;
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -13,6 +14,8 @@ getMessageFromMain("movie-db-status", updateMovieDbStatus);
 getMessageFromMain("movies", movieHandler);
 getMessageFromMain("update", updateHandler);
 getMessageFromMain("read-file", readFileHandler);
+getMessageFromMain("path", pathHandler)
+sendMessageToMain("path", "get-user-path");
 popupCloseButtonListener();
 importMoviesOptionsListener();
 omdbApiButtonListener();
@@ -290,7 +293,8 @@ function listMoviesOnGUI() {
 
         var posterImg = document.createElement("img");
         posterImg.className = "movie_poster";
-        posterImg.src = !movie.PosterPath ? path.join(__dirname, "res", "img", "not_available.png") : movie.PosterPath;
+        posterImg.src = !movie.PosterPath ? path.join(USER_DATA_PATH, "res", "img", "not_available.png") : movie.PosterPath;
+        
 
         var ratingH2 = document.createElement("h2");
         ratingH2.className = "movie_rating";
@@ -414,7 +418,7 @@ async function readOmdbApiKeyFromFile() {
 function rightMovieSearchButtonListener() {
     document.getElementById("right_movie_search_button").addEventListener("click", () => {
         let movieName = document.getElementById("right_movie_search_input").value;
-        document.getElementById("right_movie_poster").src = path.join(__dirname, "res", "img", "loading.svg");
+        document.getElementById("right_movie_poster").src = path.join(USER_DATA_PATH, "res", "img", "loading.svg");
 
         fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`)
             .then((response) => {
@@ -561,4 +565,8 @@ function readFileHandler(arg) {
         default:
             break;
     }
+}
+
+function pathHandler(arg) {
+    USER_DATA_PATH = arg;
 }

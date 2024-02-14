@@ -1,0 +1,124 @@
+:root {
+    --background-color-dark: #101010;
+    --background-color-light: #1f1f1f;
+    --white-accent-dark: #323232;
+    --white-accent-mid: #969696;
+    --white-accent-light: #fafafa;
+    --main-color-one: #FAF8F1;
+    --main-color-two: #FAEAB1;
+    --main-color-three: #E5BA73;
+    --main-color-four: #ec8200;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth
+}
+
+.background {
+    color: #ffffff;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.top_bar {
+    position: fixed;
+    width: 90%;
+    padding: 0 5% 0 5%;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.top_bar a {
+    color: var(--white-accent-light);
+    text-decoration: none;
+    margin: 30px;
+    font-size: 0.9rem;
+    transition: color 250ms ease;
+}
+
+.top_bar a:hover {
+    color: var(--main-color-three);
+}
+
+#app_name {
+    margin-right: auto;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+}
+
+.app_logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    height: 100vh;
+    padding: 0 5% 0 5%;
+    background: radial-gradient(circle at center left, var(--background-color-dark), var(--background-color-light));
+}
+
+.part {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 5% 0 5%;
+    text-align: center;
+}
+
+.part h1 {
+    font-size: 3rem;
+    text-align: left;
+    color: var(--white-accent-light);
+}
+
+.part p {
+    color: var(--white-accent-mid);
+    font-size: 1.2rem;
+}
+
+.part a {
+    padding: 20px 100px 20px 100px;
+    border-radius: 50px;
+    border: 1px solid var(--main-color-three);
+    text-decoration: none;
+    color: var(--main-color-three);
+    margin-top: 20px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    transition: color 250ms ease, background-color 250ms ease;
+}
+
+.part a:hover {
+    background-color: var(--main-color-three);
+    color: var(--background-color-dark);
+}
+
+.text_left {
+    text-align: left;
+}
+
+.part img {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

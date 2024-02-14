@@ -7,13 +7,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto+Mono:wght@600&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="index.css" />
     <title>Movie Collection Visualizer</title>
 </head>
 
 <body>
-    <h1>Movie Collection Visualizer Temp Site</h1>
+    <nav class="top_bar">
+        <a href="#introduction" id="app_name">
+            <svg class="app_logo" viewBox="0 0 100 100" width="64" height="64">
+                <defs>
+                    <linearGradient id="bottom-to-top" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" style="stop-color:#E5BA73" />
+                        <stop offset="100%" style="stop-color:#FAF8F1" />
+                    </linearGradient>
+                </defs>
+
+                <defs>
+                    <linearGradient id="top-to-bottom" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" style="stop-color:#FAF8F1" />
+                        <stop offset="100%" style="stop-color:#E5BA73" />
+                    </linearGradient>
+                </defs>
+
+                <circle cx="50" cy="50" r="45" stroke="url(#bottom-to-top)" stroke-width="10" fill="none" />
+                <circle cx="50" cy="50" r="45" stroke="url(#bottom-to-top)" stroke-width="10" fill="#1f1f1f" />
+                <polygon points="65,50 43,65 43,35" stroke-linejoin="round" stroke-width="16"
+                    stroke="url(#top-to-bottom)" />
+            </svg>Movie Collection Visualizer</a>
+        <a href="#introduction">HOME</a>
+        <a href="#download">DOWNLOAD</a>
+        <a href="#source">SOURCE</a>
+        <a href="#docs">DOCS</a>
+    </nav>
+    <div class="background">
+        <section class="section" id="introduction">
+            <div class="part text_left">
+                <h1>Transform Your Movie Collection into a Visually Appealing Library</h1>
+                <p>Immerse yourself with a visually appealing movie collection application, designed to import your movies for seamless searching, sorting, and so much more...</p>
+            </div>
+            <div class="part">
+                <img class="svg" src="res/movie.svg" alt="">
+            </div>
+        </section>
+
+        <section class="section" id="download">
+            <div class="part">
+                <h1>Organize and Discover</h1>
+                <p>Say goodbye to cluttered OS file explorer and hello to a personalized viewing experience. Download our free Movie Collection Visualizer and transform the way you interact with your movies. Import your personal library, browse and search your movies; filter by genre, director, actors; look at movie details and much more.</p>
+                <a href="https://github.com/ISO53/Movie-Collection-Visualizer/releases/latest/download/MovieCollectionVisualizer.exe" download="MovieCollectionVisualizer.exe">DOWNLOAD</a>
+            </div>
+        </section>
+
+        <section class="section" id="source">
+            <div class="part text_left">
+                <h1>Dive into the Code and Contribute</h1>
+                <p>Excited to explore the inner workings of the Movie Collection Visualizer? You're in luck! We believe in transparent collaboration and empowered communities, so we've made the entire source code openly available on GitHub. Dive deep, tinker, contribute, and share your love for movies with the world.</p>
+                <a href="https://github.com/ISO53/Movie-Collection-Visualizer">EXPLORE IT ON GITHUB</a>
+            </div>
+            <div class="part">
+                <img class="svg" src="res/coding.svg" alt="">
+            </div>
+        </section>
+
+        <section class="section" id="docs">
+            <div class="part">
+                <h1>Documentation is Coming Very Soon</h1>
+            </div>
+        </section>
+    </div>
 </body>
 
 </html>

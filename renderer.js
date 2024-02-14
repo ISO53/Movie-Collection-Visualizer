@@ -13,6 +13,7 @@ getMessageFromMain("movie-db-status", updateMovieDbStatus);
 getMessageFromMain("movies", movieHandler);
 getMessageFromMain("update", updateHandler);
 getMessageFromMain("read-file", readFileHandler);
+getMessageFromMain("alert-message", alertMessageHandler)
 popupCloseButtonListener();
 importMoviesOptionsListener();
 omdbApiButtonListener();
@@ -612,4 +613,9 @@ function createAlertMessage(type, message, duration) {
 
         return alertMessageDiv;
     }
+}
+
+function alertMessageHandler(arg) {
+    const jsonArg = JSON.parse(arg);
+    createAlertMessage(jsonArg.type, jsonArg.message, jsonArg.duration);
 }

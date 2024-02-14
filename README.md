@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-GNU-black.svg?style=round-square)](LICENSE)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ISO53/Movie-Collection-Visualizer?style=round-square&color=black)
 
-An Electron-based application to visualize and manage your movie collection. This project allows users to import movie information from the file explorer or a TXT file, fetch details from the OMDB API, and view and manage their movie collection with a user-friendly interface.
+An Electron-based application to visualize and manage your movie collection. This project allows users to import movie information from the file explorer or a TXT file, fetch details from the OMDB API, and view and manage their movie collection with a user-friendly interface. Check out the [website](https://iso53.github.io/Movie-Collection-Visualizer)!
 
 ![App GUI](https://raw.githubusercontent.com/ISO53/Movie-Collection-Visualizer/master/gui%20ss%20final-min.png)
 

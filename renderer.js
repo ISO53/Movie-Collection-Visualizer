@@ -520,12 +520,18 @@ function sortMovies(sortingType) {
 }
 
 function loadFirstTimeSteps() {
+    const step1Elm = document.getElementById("step_1");
+    const step2Elm = document.getElementById("step_2");
+
+    step1Elm.classList.remove("successful");
+    step2Elm.classList.remove("successful");
+
     if (KEY !== undefined && KEY !== null) {
-        document.getElementById("step_1").classList.add("successful");
+        step1Elm.classList.add("successful");
     }
 
     if (MOVIES !== undefined && MOVIES !== null && MOVIES.length !== 0) {
-        document.getElementById("step_2").classList.add("successful");
+        step2Elm.classList.add("successful");
     }
 }
 

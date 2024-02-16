@@ -9,7 +9,7 @@ var CURR_SEARCH = "";
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
-getMessageFromMain("movie-db-status", updateMovieDbStatus);
+getMessageFromMain("movie-db-status", movieDbStatusHandler);
 getMessageFromMain("movies", movieHandler);
 getMessageFromMain("update", updateHandler);
 getMessageFromMain("read-file", readFileHandler);
@@ -164,7 +164,7 @@ function sortingFilterClickListener() {
     }
 }
 
-function updateMovieDbStatus(status) {
+function movieDbStatusHandler(status) {
     const statusElm = document.getElementById("db_status");
     const progressElm = document.getElementById("db_remaining");
 

@@ -116,6 +116,11 @@ function filtersDivClickListener() {
         CURR_FILTERS = getSelectedFilters();
         listMoviesOnGUI();
     });
+
+    function resetSearch() {
+        document.getElementById("movie_search_input").value = "";
+        CURR_SEARCH = "";
+    }
 }
 
 function movieSearchButtonClickListener() {
@@ -124,6 +129,14 @@ function movieSearchButtonClickListener() {
         CURR_SEARCH = document.getElementById("movie_search_input").value;
         listMoviesOnGUI();
     });
+
+    function resetFilters() {
+        document
+            .getElementById("filter_div")
+            .querySelectorAll(".filter_box")
+            .forEach((checkbox) => (checkbox.checked = false));
+        CURR_FILTERS = [];
+    }
 }
 
 function sortingFilterClickListener() {
@@ -455,19 +468,6 @@ function getSelectedFilters() {
     checkboxes.forEach((checkbox) => checkbox.checked && selectedFilters.push(checkbox.nextElementSibling.textContent));
 
     return selectedFilters;
-}
-
-function resetFilters() {
-    document
-        .getElementById("filter_div")
-        .querySelectorAll(".filter_box")
-        .forEach((checkbox) => (checkbox.checked = false));
-    CURR_FILTERS = [];
-}
-
-function resetSearch() {
-    document.getElementById("movie_search_input").value = "";
-    CURR_SEARCH = "";
 }
 
 function searchMovie(movieData, searchTerm) {

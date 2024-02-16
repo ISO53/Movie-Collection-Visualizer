@@ -206,6 +206,7 @@ function movieDbStatusHandler(status) {
         statusElm.innerHTML = "We're nearing completion. Please hold for the final steps.";
     } else if (status.startsWith("d")) {
         // Done
+        createAlertMessage("success", "Movie database has been created successfully.", 2500);
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
         progressElm.innerHTML = "";
         readMoviesFromFile();
@@ -433,6 +434,11 @@ function rightMovieSearchButtonListener() {
         fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${KEY}`)
             .then((response) => {
                 if (!response.ok) {
+                    createAlertMessage(
+                        "warning",
+                        "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem.",
+                        7500
+                    );
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
@@ -444,6 +450,11 @@ function rightMovieSearchButtonListener() {
             })
             .catch((error) => {
                 console.error("Fetch error:", error);
+                createAlertMessage(
+                    "warning",
+                    "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem.",
+                    7500
+                );
             });
     });
 }
@@ -488,6 +499,7 @@ function searchMovie(movieData, searchTerm) {
         });
     } catch (error) {
         console.error("Error occured during movie search:", error);
+        createAlertMessage("info", "Error occured during movie search.", 5000);
         return false;
     }
 }
@@ -546,8 +558,10 @@ function readFileHandler(arg) {
                 listFiltersOnGUI();
                 setMovies(movies);
                 listMoviesOnGUI();
+                createAlertMessage("success", "Movies imported successfully.", 2500);
             } catch (error) {
                 console.error("There was an error parsing the JSON file that contains movie information.", error.message);
+                createAlertMessage("info", "Error creating movie database. Movies probably hasn't been fetched yet.", 5000);
                 listMoviesOnGUI();
             }
             break;
@@ -557,11 +571,14 @@ function readFileHandler(arg) {
 
                 if (jsonContent && jsonContent.key) {
                     KEY = jsonContent.key;
+                    createAlertMessage("success", "OMDB API key setted successfully.", 2500);
                 } else {
                     console.error("Invalid JSON file format or missing key.");
+                    createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.", 5000);
                 }
             } catch (error) {
                 console.error("There was an error parsing the JSON file that contains api key.", error.message);
+                createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.", 5000);
                 return;
             }
             break;
@@ -624,3 +641,4 @@ function createAlertMessage(type, message, duration) {
 function alertMessageHandler(arg) {
     const jsonArg = JSON.parse(arg);
     createAlertMessage(jsonArg.type, jsonArg.message, jsonArg.duration);
+}

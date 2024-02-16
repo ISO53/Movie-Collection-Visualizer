@@ -492,10 +492,10 @@ function checkUpdates() {
 
 function createJsonFiles() {
     // res
-    fs.ensureDirSync(path.dirname(USER_DATA_PATH));
+    fs.ensureDirSync(path.dirname(path.join(USER_DATA_PATH, "res")));
 
     // res/posters
-    fs.ensureDirSync(path.dirname(path.join(USER_DATA_PATH, "posters")));
+    fs.ensureDirSync(path.dirname(path.join(USER_DATA_PATH, "res", "posters")));
 
     // Create an empty db.json file if it doesn't exist
     const dbJsonPath = "res/db.json";

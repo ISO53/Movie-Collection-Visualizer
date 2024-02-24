@@ -6,7 +6,8 @@ const readline = require("readline");
 const ptn = require("parse-torrent-name");
 const {marked} = require("marked");
 
-const USER_DATA_PATH = app.getPath("userData");
+const USER_DATA_PATH = app.getPath("userData"); // For production
+// const USER_DATA_PATH = path.join(app.getPath('appData'), "movie-collection-visualizer"); // For developing
 
 var win;
 var KEY;

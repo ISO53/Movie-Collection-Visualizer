@@ -262,13 +262,33 @@
         <div class="new_features no_display" id="new_features">
             <p class="new_features_paragraph" id="new_features_paragraph"></p>
             <button class="popup_button" id="import_from_file_system_button" onclick="window.open('https://github.com/ISO53/Movie-Collection-Visualizer/releases/latest', '_blank');">Download Latest Update</button>
+            <button class="popup_button" id="import_from_file_system_button"
+                onclick="window.open('https://github.com/ISO53/Movie-Collection-Visualizer/releases/latest', '_blank');">Download
+                Latest Update</button>
         </div>
     </div>
-        
+
+    <div class="popup movie_stats_div hide_popup" id="movie_stats_div">
+        <div class="popup_close_button">✖</div>
+
+        <h1 class="popup_header">Your Movie Statistics</h1>
+        <div class="pie_charts_div">
+            <h2>Movie Counts Based on Years</h2>
+            <canvas class="chart" id="year_chart" width="400" height="400"></canvas>
+            <h2>Movie Counts Based on Genres</h2>
+            <canvas class="chart" id="genre_chart" width="400" height="400"></canvas>
+            <h2>Movie Counts Based on Directors</h2>
+            <canvas class="chart" id="director_chart" width="400" height="400"></canvas>
+            <h2>Movie Counts Based on Actors</h2>
+            <canvas class="chart" id="actor_chart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
     <div class="blur_background" id="blur_background"></div>
 
     <div class="alert_messages" id="alert_messages"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="renderer.js"></script>
 </body>
 

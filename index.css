@@ -1012,3 +1012,20 @@ input[type="checkbox"] {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
+
+.pie_charts_div {
+    width: 100%;
+}
+
+.pie_charts_div h2 {
+    color: var(--white-accent-mid);
+    text-align: left;
+}
+
+.pie_charts_div canvas {
+    margin: 20px 20px 50px 20px;
+}
+
+.pie_charts_div canvas:last-child {
+    margin: 20px;
+}

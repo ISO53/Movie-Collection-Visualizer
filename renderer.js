@@ -6,6 +6,7 @@ var FILTERS = new Set();
 var MOVIES = [];
 var CURR_FILTERS = [];
 var CURR_SEARCH = "";
+var CHARTS_LOADED = false;
 
 // ************************ JS Starts ************************
 getMessageFromMain("popup", popupHandler);
@@ -43,6 +44,11 @@ function popupHandler(arg) {
         switch (popupID) {
             case "first_time_div":
                 loadFirstTimeSteps();
+                break;
+            case "movie_stats_div":
+                if (!CHARTS_LOADED) {
+                    generateCharts();
+                }
                 break;
             default:
                 break;
@@ -641,4 +647,141 @@ function createAlertMessage(type, message, duration) {
 function alertMessageHandler(arg) {
     const jsonArg = JSON.parse(arg);
     createAlertMessage(jsonArg.type, jsonArg.message, jsonArg.duration);
+}
+
+function generateCharts() {
+    CHARTS_LOADED = true;
+
+    // Extract years information
+    const yearCountMap = {};
+    MOVIES.forEach((movie) => {
+        const decade = getDecade(movie.Year);
+        yearCountMap[decade] = (yearCountMap[decade] || 0) + 1;
+    });
+
+    // Extract genres information
+    const genreCountMap = {};
+    MOVIES.forEach((movie) => {
+        movie.Genre.split(",")
+            .map((genre) => genre.trim())
+            .forEach((genre) => (genreCountMap[genre] = (genreCountMap[genre] || 0) + 1));
+    });
+
+    // Extract directors information
+    const directorCountMap = {};
+    MOVIES.forEach((movie) => {
+        movie.Director.split(",")
+            .map((director) => director.trim())
+            .forEach((director) => (directorCountMap[director] = (directorCountMap[director] || 0) + 1));
+    });
+
+    // Extract actors information
+    const actorCountMap = {};
+    MOVIES.forEach((movie) => {
+        movie.Actors.split(",")
+            .map((actor) => actor.trim())
+            .forEach((actor) => (actorCountMap[actor] = (actorCountMap[actor] || 0) + 1));
+    });
+
+    // Limit and sort the data
+    const limitedYearCount = limitAndSort(yearCountMap, 5);
+    const limitedGenreCount = limitAndSort(genreCountMap, 10);
+    const limitedDirectorCount = limitAndSort(directorCountMap, 15);
+    const limitedActorCount = limitAndSort(actorCountMap, 20);
+
+    // Create pie charts
+    createPieChart("pie", "year_chart", Object.keys(limitedYearCount), Object.values(limitedYearCount));
+    createPieChart("pie", "genre_chart", Object.keys(limitedGenreCount), Object.values(limitedGenreCount));
+    createPieChart("bar", "director_chart", Object.keys(limitedDirectorCount), Object.values(limitedDirectorCount));
+    createPieChart("bar", "actor_chart", Object.keys(limitedActorCount), Object.values(limitedActorCount));
+
+    // Function to create a pie chart
+    function createPieChart(type, canvasId, labels, data) {
+        new Chart(document.getElementById(canvasId).getContext("2d"), {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        data: data,
+                        backgroundColor: generateRandomColors(data.length),
+                        borderWidth: 0,
+                    },
+                ],
+            },
+            options: {
+                indexAxis: "y",
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+            },
+        });
+    }
+
+    // Function to get the decade from a year
+    function getDecade(year) {
+        return `${Math.floor(year / 10) * 10}-${Math.floor(year / 10) * 10 + 9}`;
+    }
+
+    // Function to limit and sort an object by its values
+    function limitAndSort(obj, limit) {
+        return Object.fromEntries(
+            Object.entries(obj)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, limit)
+        );
+    }
+
+    // Function to create random colors
+    function generateRandomColors(numberOfColors) {
+        const randomColors = [];
+
+        for (let i = 0; i < numberOfColors; i++) {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = Math.random() * 0.5 + 0.4; // Adjusting saturation for diversity
+            const value = Math.random() * 0.5 + 0.5; // Adjusting value for diversity
+
+            // Convert HSV to RGB
+            const chroma = value * saturation;
+            const huePrime = hue / 60;
+            const secondLargestComponent = chroma * (1 - Math.abs((huePrime % 2) - 1));
+            const m = value - chroma;
+
+            let red = 0,
+                green = 0,
+                blue = 0;
+
+            if (huePrime >= 0 && huePrime < 1) {
+                red = chroma;
+                green = secondLargestComponent;
+            } else if (huePrime >= 1 && huePrime < 2) {
+                red = secondLargestComponent;
+                green = chroma;
+            } else if (huePrime >= 2 && huePrime < 3) {
+                green = chroma;
+                blue = secondLargestComponent;
+            } else if (huePrime >= 3 && huePrime < 4) {
+                green = secondLargestComponent;
+                blue = chroma;
+            } else if (huePrime >= 4 && huePrime < 5) {
+                red = secondLargestComponent;
+                blue = chroma;
+            } else if (huePrime >= 5 && huePrime <= 6) {
+                red = chroma;
+                blue = secondLargestComponent;
+            }
+
+            red = Math.round((red + m) * 255);
+            green = Math.round((green + m) * 255);
+            blue = Math.round((blue + m) * 255);
+
+            // Convert RGB to hex
+            const hexColor = `#${((1 << 24) | (red << 16) | (green << 8) | blue).toString(16).slice(1)}`;
+            randomColors.push(hexColor);
+        }
+
+        return randomColors;
+    }
 }

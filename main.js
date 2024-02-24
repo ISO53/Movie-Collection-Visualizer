@@ -57,6 +57,10 @@ function createWindow() {
             submenu: [{label: "OMDB Api", click: () => sendMessageToRenderer("popup", "o_omdb_api_div")}],
         },
         {
+            label: "Movie",
+            submenu: [{label: "Movie Statistics", click: () => sendMessageToRenderer("popup", "o_movie_stats_div")}],
+        },
+        {
             label: "Help",
             submenu: [
                 {label: "First Time", click: () => sendMessageToRenderer("popup", "o_first_time_div")},

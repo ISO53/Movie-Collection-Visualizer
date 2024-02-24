@@ -439,10 +439,10 @@ input[type="checkbox"] {
     border-radius: 20px;
     border: 1px solid var(--white-accent-dark);
     z-index: 10;
-    width: 33.33%;
+    width: 40%;
     min-width: 350px;
     height: auto;
-    max-width: 33.33%;
+    max-width: 40%;
     max-height: 80%;
     top: 50%;
     left: 50%;

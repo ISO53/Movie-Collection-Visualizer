@@ -726,6 +726,7 @@ input[type="checkbox"] {
 }
 
 .movie_info_genres {
+    text-wrap: nowrap;
     display: flex;
     flex-direction: row;
     margin: 0;

@@ -23,7 +23,7 @@ readOmdbApiKeyFromFile();
 rightMovieSearchButtonListener();
 chooseRightMovieButtonListener();
 filtersDivClickListener();
-movieSearchButtonClickListener();
+movieSearchButtonListener();
 sortingFilterClickListener();
 
 // ******************** Declare Functions ********************
@@ -129,11 +129,22 @@ function filtersDivClickListener() {
     }
 }
 
-function movieSearchButtonClickListener() {
-    document.getElementById("movie_search_button").addEventListener("click", () => {
+function movieSearchButtonListener() {
+    const movieSearchButton = document.getElementById("movie_search_button");
+    const movieSearchInput = document.getElementById("movie_search_input");
+
+    movieSearchButton.addEventListener("click", () => {
         resetFilters();
-        CURR_SEARCH = document.getElementById("movie_search_input").value;
+        CURR_SEARCH = movieSearchInput.value;
         listMoviesOnGUI();
+    });
+
+    movieSearchInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            resetFilters();
+            CURR_SEARCH = movieSearchInput.value;
+            listMoviesOnGUI();
+        }
     });
 
     function resetFilters() {

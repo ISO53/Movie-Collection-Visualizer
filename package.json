@@ -38,7 +38,8 @@
             "uninstallerIcon": "res/img/logo.ico",
             "installerHeaderIcon": "res/img/logo.ico",
             "createDesktopShortcut": "always",
-            "createStartMenuShortcut": true
+            "createStartMenuShortcut": true,
+            "include": "uninstaller.nsh"
         }
     },
     "repository": {

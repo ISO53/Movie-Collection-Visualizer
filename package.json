@@ -13,7 +13,7 @@
         "appId": "com.iso53.moviecollectionvisualizer",
         "productName": "MovieCollectionVisualizer",
         "directories": {
-            "output": "dist"
+            "output": "build"
         },
         "files": [
             "res/img",
@@ -24,9 +24,42 @@
             "package.json",
             "LICENSE"
         ],
+        "dmg": {
+            "contents": [
+                {
+                    "x": 410,
+                    "y": 150,
+                    "type": "link",
+                    "path": "/Applications"
+                },
+                {
+                    "x": 130,
+                    "y": 150,
+                    "type": "file"
+                }
+            ]
+        },
+        "mac": {
+            "icon": "build/icons/icon.icns"
+        },
         "win": {
-            "target": "portable",
-            "icon": "res/img/logo.ico"
+            "icon": "res/img/logo.ico",
+            "target": [
+                "nsis"
+            ]
+        },
+        "linux": {
+            "icon": "build/icons"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowElevation": true,
+            "allowToChangeInstallationDirectory": true,
+            "installerIcon": "res/img/logo.ico",
+            "uninstallerIcon": "res/img/logo.ico",
+            "installerHeaderIcon": "res/img/logo.ico",
+            "createDesktopShortcut": "always",
+            "createStartMenuShortcut": true
         }
     },
     "repository": {
@@ -41,7 +74,8 @@
     "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer",
     "devDependencies": {
         "electron": "^27.1.0",
-        "electron-builder": "^24.9.1"
+        "electron-builder": "^24.13.3",
+        "electron-winstaller": "^5.2.2"
     },
     "dependencies": {
         "fs-extra": "^11.2.0",

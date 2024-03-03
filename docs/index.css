@@ -53,12 +53,12 @@ html {
     flex-direction: row;
     justify-content: right;
     align-items: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     transition: backdrop-filter 250ms ease, box-shadow 250ms ease;
 }
 
 .darken {
-    backdrop-filter: blur(10px) brightness(25%);
+    background-color: rgba(0, 0, 0, 0.85);
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
 }
 

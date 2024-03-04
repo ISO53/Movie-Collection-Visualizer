@@ -933,6 +933,7 @@ input[type="checkbox"] {
     right: 0;
     width: 400px;
     overflow: hidden;
+    z-index: 6;
 }
 
 .alert_message {
@@ -947,7 +948,6 @@ input[type="checkbox"] {
     background-color: var(--background-color-light);
     border: 1px solid;
     border-radius: 20px;
-    z-index: 50;
     transition: transform 250ms ease, opacity 250ms ease;
 }
 

@@ -105,7 +105,7 @@ function openFileSystem(arg) {
                     }
                 })
                 .catch((error) => {
-                    createAlertMessage("warning", "Error reading directories: " + error.message, 7500);
+                    createAlertMessage("warning", "Error reading directories: " + error.message);
                 });
             break;
         case "txt":
@@ -124,7 +124,7 @@ function openFileSystem(arg) {
                     }
                 })
                 .catch((error) => {
-                    createAlertMessage("warning", "Error reading txt: " + error.message, 7500);
+                    createAlertMessage("warning", "Error reading txt: " + error.message);
                 });
             break;
         case "tor":
@@ -143,7 +143,7 @@ function openFileSystem(arg) {
                     }
                 })
                 .catch((error) => {
-                    createAlertMessage("warning", "Error reading media files: " + error.message, 7500);
+                    createAlertMessage("warning", "Error reading media files: " + error.message);
                 });
             break;
         default:
@@ -225,7 +225,7 @@ function readAndParseTxt(filePath) {
         });
 
         rl.on("error", (err) => {
-            createAlertMessage("warning", "Error reading txt: " + err.message, 7500);
+            createAlertMessage("warning", "Error reading txt: " + err.message);
             reject(err);
         });
     });
@@ -242,7 +242,7 @@ async function writeFoldersToJson(movieNames) {
             const response = await fetch(apiUrl);
 
             if (!response.ok) {
-                createAlertMessage("warning", `Error fetching details for ${movieName}: ${response.statusText}`, 7500);
+                createAlertMessage("warning", `Error fetching details for ${movieName}: ${response.statusText}`);
                 throw new Error(`Error fetching details for ${movieName}: ${response.statusText}`);
             }
 
@@ -308,7 +308,7 @@ async function writeFoldersToJson(movieNames) {
         });
     } catch (error) {
         console.error("Error writing to JSON file:", error.message);
-        createAlertMessage("warning", "Error writing to JSON file:", error.message, 7500);
+        createAlertMessage("warning", "Error writing to JSON file:", error.message);
     }
 }
 
@@ -324,7 +324,7 @@ async function readOmdbApiKeyFromFile() {
     fs.readFile(filePath, "utf-8", (err, jsonStr) => {
         if (err) {
             console.log("Something went wrong trying to read JSON file.");
-            createAlertMessage("warning", "Error while reading file: " + err.message, 7500);
+            createAlertMessage("warning", "Error while reading file: " + err.message);
         }
 
         let jsonContent;
@@ -332,7 +332,7 @@ async function readOmdbApiKeyFromFile() {
             jsonContent = JSON.parse(jsonStr);
         } catch (error) {
             console.error("There was an error parsing json file.");
-            createAlertMessage("warning", "Error while parsing json: " + error.message, 7500);
+            createAlertMessage("warning", "Error while parsing json: " + error.message);
             return;
         }
 
@@ -340,7 +340,7 @@ async function readOmdbApiKeyFromFile() {
             KEY = jsonContent.key;
         } else {
             console.error("Invalid JSON file format or missing key.");
-            createAlertMessage("warning", "Invalid JSON file format or missing key.", 7500);
+            createAlertMessage("warning", "Invalid JSON file format or missing key.");
         }
     });
 }
@@ -375,7 +375,7 @@ async function downloadImage(url, fileName) {
         console.log(`Image downloaded and saved.`);
     } catch (error) {
         console.error("Error downloading image:", error.message);
-        createAlertMessage("warning", "Error downloading image: " + error.message, 7500);
+        createAlertMessage("warning", "Error downloading image: " + error.message);
     }
 }
 
@@ -385,7 +385,7 @@ function movieHandler(arg) {
     fs.readFile(path.join(USER_DATA_PATH, "res", "db.json"), "utf-8", (err, data) => {
         if (err) {
             console.error("Error reading JSON file:", err.message);
-            createAlertMessage("warning", "Error while reading movie db: " + err.message, 7500);
+            createAlertMessage("warning", "Error while reading movie db: " + err.message);
             return;
         }
 
@@ -395,7 +395,7 @@ function movieHandler(arg) {
                 jsonData = JSON.parse(data);
             } catch (error) {
                 console.error("There was an error parsing json file.");
-                createAlertMessage("warning", "Error while parsing json: " + err.message, 7500);
+                createAlertMessage("warning", "Error while parsing json: " + err.message);
                 return;
             }
 
@@ -413,12 +413,12 @@ function movieHandler(arg) {
                 // Write modified json to file
                 fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                 console.log("Update successful. JSON file has been modified.");
-                createAlertMessage("success", "Movie has been removed.", 5000);
+                createAlertMessage("success", "Movie has been removed.");
             } else if (opt === "add") {
                 fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${KEY}`)
                     .then((response) => {
                         if (!response.ok) {
-                            createAlertMessage("warning", `HTTP error! Status: ${response.status}`, 7500);
+                            createAlertMessage("warning", `HTTP error! Status: ${response.status}`);
                             throw new Error(`HTTP error! Status: ${response.status}`);
                         }
                         return response.json();
@@ -434,11 +434,11 @@ function movieHandler(arg) {
                         // Write modified json to file
                         fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                         console.log("Update successful. JSON file has been modified.");
-                        createAlertMessage("success", "Movie has been added.", 5000);
+                        createAlertMessage("success", "Movie has been added.");
                     })
                     .catch((error) => {
                         console.error("Error fetching movie details:", error);
-                        createAlertMessage("warning", "Error fetching movie details: " + error.message, 7500);
+                        createAlertMessage("warning", "Error fetching movie details: " + error.message);
                     });
             } else if (opt === "removeWithFileName") {
                 // Here imdbID variable is actually filename
@@ -455,11 +455,11 @@ function movieHandler(arg) {
                 // Write modified json to file
                 fs.writeFileSync(path.join(USER_DATA_PATH, "res", "db.json"), JSON.stringify(jsonData, null, 2));
                 console.log("Update successful. JSON file has been modified.");
-                createAlertMessage("success", "Movie has been removed.", 5000);
+                createAlertMessage("success", "Movie has been removed.");
             }
         } catch (parseError) {
             console.error("Error parsing JSON:", parseError.message);
-            createAlertMessage("warning", "Error while parsing json: " + parseError.message, 7500);
+            createAlertMessage("warning", "Error while parsing json: " + parseError.message);
         }
     });
 }
@@ -480,9 +480,9 @@ function checkUpdates() {
             }
 
             if (releaseData.tag_name !== app.getVersion()) {
-                console.log("VERSION", app.getVersion());
                 let releaseDataFormattedbody = marked.parse(releaseData.body);
                 sendMessageToRenderer("update", releaseDataFormattedbody);
+                createAlertMessage("info", "There is a new update available!");
             } else {
                 sendMessageToRenderer("update", "no");
             }
@@ -548,13 +548,13 @@ function readFileHandler(arg) {
     fs.readFile(filePath, "utf-8", (err, jsonStr) => {
         if (err) {
             console.error("Error in readFileHandler:", err.message);
-            createAlertMessage("warning", "Error while reading file: " + err.message, 7500);
+            createAlertMessage("warning", "Error while reading file: " + err.message);
         } else {
             sendMessageToRenderer("read-file", JSON.stringify({type: responseType, data: jsonStr}));
         }
     });
 }
 
-function createAlertMessage(type, message, duration) {
-    sendMessageToRenderer("alert-message", JSON.stringify({type, message, duration}));
+function createAlertMessage(type, message) {
+    sendMessageToRenderer("alert-message", JSON.stringify({type, message}));
 }

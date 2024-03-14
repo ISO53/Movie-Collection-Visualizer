@@ -223,7 +223,7 @@ function movieDbStatusHandler(status) {
         statusElm.innerHTML = "We're nearing completion. Please hold for the final steps.";
     } else if (status.startsWith("d")) {
         // Done
-        createAlertMessage("success", "Movie database has been created successfully.", 2500);
+        createAlertMessage("success", "Movie database has been created successfully.");
         statusElm.innerHTML = "The database has been successfully created. You may now close this window.";
         progressElm.innerHTML = "";
         readMoviesFromFile();
@@ -453,8 +453,7 @@ function rightMovieSearchButtonListener() {
                 if (!response.ok) {
                     createAlertMessage(
                         "warning",
-                        "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem.",
-                        7500
+                        "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem."
                     );
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -469,8 +468,7 @@ function rightMovieSearchButtonListener() {
                 console.error("Fetch error:", error);
                 createAlertMessage(
                     "warning",
-                    "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem.",
-                    7500
+                    "HTTP error during fetching movie details. Could be due to internet connection issues or OMDB key problem."
                 );
             });
     });
@@ -516,7 +514,7 @@ function searchMovie(movieData, searchTerm) {
         });
     } catch (error) {
         console.error("Error occured during movie search:", error);
-        createAlertMessage("info", "Error occured during movie search.", 5000);
+        createAlertMessage("info", "Error occured during movie search.");
         return false;
     }
 }
@@ -575,10 +573,10 @@ function readFileHandler(arg) {
                 listFiltersOnGUI();
                 setMovies(movies);
                 listMoviesOnGUI();
-                createAlertMessage("success", "Movies imported successfully.", 2500);
+                createAlertMessage("success", "Movies imported successfully.");
             } catch (error) {
                 console.error("There was an error parsing the JSON file that contains movie information.", error.message);
-                createAlertMessage("info", "Error creating movie database. Movies probably hasn't been fetched yet.", 5000);
+                createAlertMessage("info", "Error creating movie database. Movies probably hasn't been fetched yet.");
                 listMoviesOnGUI();
             }
             break;
@@ -588,14 +586,14 @@ function readFileHandler(arg) {
 
                 if (jsonContent && jsonContent.key) {
                     KEY = jsonContent.key;
-                    createAlertMessage("success", "OMDB API key setted successfully.", 2500);
+                    createAlertMessage("success", "OMDB API key setted successfully.");
                 } else {
                     console.error("Invalid JSON file format or missing key.");
-                    createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.", 5000);
+                    createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.");
                 }
             } catch (error) {
                 console.error("There was an error parsing the JSON file that contains api key.", error.message);
-                createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.", 5000);
+                createAlertMessage("info", "Error getting OMDB key. The key probably hasn't been setted yet.");
                 return;
             }
             break;
@@ -604,11 +602,16 @@ function readFileHandler(arg) {
     }
 }
 
-function createAlertMessage(type, message, duration) {
+function createAlertMessage(type, message) {
     if (type !== "warning" && type !== "success" && type !== "info") {
         console.error("Alert message type is not valid! Given -> ", type);
         return;
     }
+
+    const averageWordLength = 4.7;
+    const averageWPMS = 0.3;
+    const extraTime = 5000;
+    const duration = (message.length / 4.7) * averageWPMS + extraTime;
 
     // Main div for adding alert messages
     const mainMessagesDiv = document.getElementById("alert_messages");
@@ -657,7 +660,7 @@ function createAlertMessage(type, message, duration) {
 
 function alertMessageHandler(arg) {
     const jsonArg = JSON.parse(arg);
-    createAlertMessage(jsonArg.type, jsonArg.message, jsonArg.duration);
+    createAlertMessage(jsonArg.type, jsonArg.message);
 }
 
 function generateCharts() {

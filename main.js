@@ -25,6 +25,7 @@ function startApp() {
     getMessageFromRenderer("read-file", readFileHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
+    checkUpdates();
 }
 
 function createWindow() {

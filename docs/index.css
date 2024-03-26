@@ -135,6 +135,21 @@ html {
     transition: color 250ms ease, background-color 250ms ease;
 }
 
+.part .filled {
+    border: 1px solid var(--main-color-three);
+    color: var(--background-color-dark);
+    background-color: var(--main-color-three);
+}
+
+.part .filled:hover {
+    background-color: var(--background-color-dark);
+    color: var(--main-color-three);
+}
+
+.part .short {
+    padding: 20px 50px 20px 50px;
+}
+
 .part a:hover {
     background-color: var(--main-color-three);
     color: var(--background-color-dark);
@@ -243,6 +258,10 @@ html {
     .part a {
         padding: 10px 50px 10px 50px;
         font-size: 0.8rem;
+    }
+
+    .part .short {
+        padding: 10px 20px 10px 20px;
     }
 
     .slide p {

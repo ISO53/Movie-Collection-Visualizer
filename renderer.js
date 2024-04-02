@@ -300,7 +300,7 @@ function listMoviesOnGUI() {
 
     MOVIES.forEach((movie) => {
         if (CURR_FILTERS.length !== 0) {
-            if (movie.Genre && movie.Genre !== "N/A" && CURR_FILTERS.some((filterGenre) => movie.Genre.includes(filterGenre))) {
+            if (movie.Genre && movie.Genre !== "N/A" && CURR_FILTERS.every((filterGenre) => movie.Genre.includes(filterGenre))) {
                 listMovie(movie);
             }
         } else if (CURR_SEARCH !== "") {

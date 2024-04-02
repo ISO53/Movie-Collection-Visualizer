@@ -484,7 +484,7 @@ function checkUpdates() {
             if (releaseData.tag_name !== app.getVersion()) {
                 let releaseDataFormattedbody = marked.parse(releaseData.body);
                 sendMessageToRenderer("update", releaseDataFormattedbody);
-                createAlertMessage("info", "There is a new update available!");
+                createAlertMessage("info", "There is a new update available! Check the updates section on top left.");
             } else {
                 sendMessageToRenderer("update", "no");
             }

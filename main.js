@@ -1,5 +1,5 @@
 // ******************** Declare Variables ********************
-const {app, BrowserWindow, Menu, ipcMain, dialog} = require("electron");
+const {app, BrowserWindow, Menu, ipcMain, dialog, shell} = require("electron");
 const fs = require("fs-extra");
 const path = require("path");
 const readline = require("readline");
@@ -23,6 +23,7 @@ function startApp() {
     getMessageFromRenderer("omdb-api-key", setOmdbApiKey);
     getMessageFromRenderer("movie", movieHandler);
     getMessageFromRenderer("read-file", readFileHandler);
+    getMessageFromRenderer("open-browser", openBrowserHandler);
     readOmdbApiKeyFromFile();
     sendMessageToRenderer("movie-db-status", "d");
     checkUpdates();
@@ -558,4 +559,9 @@ function readFileHandler(arg) {
 
 function createAlertMessage(type, message) {
     sendMessageToRenderer("alert-message", JSON.stringify({type, message}));
+}
+
+function openBrowserHandler(arg) {
+    const jsonArg = JSON.parse(arg);
+    shell.openExternal(jsonArg.link);
 }

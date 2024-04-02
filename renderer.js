@@ -799,3 +799,12 @@ function generateCharts() {
         return randomColors;
     }
 }
+
+function openBrowser(link) {
+    sendMessageToMain(
+        "open-browser",
+        JSON.stringify({
+            link: link,
+        })
+    );
+}

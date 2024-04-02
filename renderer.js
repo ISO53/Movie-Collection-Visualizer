@@ -611,7 +611,7 @@ function createAlertMessage(type, message) {
     const averageWordLength = 4.7;
     const averageWPMS = 0.3;
     const extraTime = 5000;
-    const duration = (message.length / 4.7) * averageWPMS + extraTime;
+    const duration = (message.length / averageWordLength) * averageWPMS + extraTime;
 
     // Main div for adding alert messages
     const mainMessagesDiv = document.getElementById("alert_messages");

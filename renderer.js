@@ -704,8 +704,8 @@ function generateCharts() {
     const limitedActorCount = limitAndSort(actorCountMap, 20);
 
     // Create pie charts
-    createPieChart("pie", "year_chart", Object.keys(limitedYearCount), Object.values(limitedYearCount));
-    createPieChart("pie", "genre_chart", Object.keys(limitedGenreCount), Object.values(limitedGenreCount));
+    createPieChart("bar", "year_chart", Object.keys(limitedYearCount), Object.values(limitedYearCount));
+    createPieChart("bar", "genre_chart", Object.keys(limitedGenreCount), Object.values(limitedGenreCount));
     createPieChart("bar", "director_chart", Object.keys(limitedDirectorCount), Object.values(limitedDirectorCount));
     createPieChart("bar", "actor_chart", Object.keys(limitedActorCount), Object.values(limitedActorCount));
 

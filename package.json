@@ -1,65 +1,37 @@
 {
-    "name": "movie-collection-visualizer",
-    "version": "v1.3.0",
-    "description": "Organize and visualize your movie collection effortlessly.",
-    "main": "main.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "electron main.js",
-        "pack": "electron-builder --dir",
-        "dist": "electron-builder"
-    },
-    "build": {
-        "appId": "com.iso53.moviecollectionvisualizer",
-        "productName": "MovieCollectionVisualizer",
-        "directories": {
-            "output": "build"
-        },
-        "files": [
-            "res/img",
-            "index.css",
-            "index.html",
-            "main.js",
-            "renderer.js",
-            "package.json",
-            "LICENSE"
-        ],
-        "win": {
-            "icon": "res/img/logo.ico",
-            "target": [
-                "nsis"
-            ]
-        },
-        "nsis": {
-            "oneClick": false,
-            "allowElevation": true,
-            "allowToChangeInstallationDirectory": true,
-            "installerIcon": "res/img/logo.ico",
-            "uninstallerIcon": "res/img/logo.ico",
-            "installerHeaderIcon": "res/img/logo.ico",
-            "createDesktopShortcut": "always",
-            "createStartMenuShortcut": true,
-            "include": "uninstaller.nsh"
-        }
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/ISO53/Movie-Collection-Visualizer.git"
-    },
-    "author": "ISO53",
-    "license": "GPL-3.0-or-later",
-    "bugs": {
-        "url": "https://github.com/ISO53/Movie-Collection-Visualizer/issues"
-    },
-    "homepage": "https://github.com/ISO53/Movie-Collection-Visualizer",
-    "devDependencies": {
-        "electron": "^27.1.0",
-        "electron-builder": "^24.13.3",
-        "electron-winstaller": "^5.2.2"
-    },
-    "dependencies": {
-        "fs-extra": "^11.2.0",
-        "marked": "^11.2.0",
-        "parse-torrent-name": "^0.5.4"
-    }
+  "name": "movie-collection-visualizer",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:build": "tauri build"
+  },
+  "overrides": {
+    "dompurify": "^3.3.2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "chart.js": "^4.4.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1",
+    "lucide-vue-next": "^0.475.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.0",
+    "vue-chartjs": "^5.3.0",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/node": "^20.0.0",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vue-tsc": "^2.0.0"
+  }
 }

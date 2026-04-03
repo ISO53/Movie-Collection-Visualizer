@@ -1,0 +1,14 @@
+{
+  "identifier": "default",
+  "description": "Default permissions for the app",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:webview:allow-internal-toggle-devtools",
+    "shell:default",
+    "dialog:default",
+    "fs:default",
+    "opener:default",
+    "opener:allow-reveal-item-in-dir"
+  ]
+}

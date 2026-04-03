@@ -1,0 +1,70 @@
+:root {
+  --bg-dark: #101010;
+  --bg-light: #1f1f1f;
+  --accent-one: #FAF8F1;
+  --accent-two: #FAEAB1;
+  --accent-three: #E5BA73;
+  --accent-four: #ec8200;
+  --muted-dark: #323232;
+  --muted-mid: #969696;
+  --muted-light: #fafafa;
+  --text-main: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--muted-dark) transparent !important;
+}
+
+html, body {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--muted-dark) transparent !important;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow: hidden;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  background-color: transparent !important;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--muted-dark) !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--bg-dark) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-mid) !important;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  border-radius: 4px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}

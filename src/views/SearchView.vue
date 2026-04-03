@@ -1,0 +1,106 @@
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { useMovieStore } from '../stores/movies'
+import { SortOption } from '../types/movie'
+import SearchBar from '../components/search/SearchBar.vue'
+import FilterBar from '../components/search/FilterBar.vue'
+import SortDropdown from '../components/search/SortDropdown.vue'
+import MovieGrid from '../components/search/MovieGrid.vue'
+
+const props = defineProps<{
+  prefilterGenre?: string
+}>()
+
+const movieStore = useMovieStore()
+
+const query = ref('')
+const selectedGenres = ref<string[]>([])
+const sortOption = ref<SortOption>('added_desc')
+
+onMounted(() => {
+  if (props.prefilterGenre) {
+    selectedGenres.value = [props.prefilterGenre]
+  }
+})
+
+watch(() => props.prefilterGenre, (newVal) => {
+  if (newVal) {
+    selectedGenres.value = [newVal]
+    query.value = ''
+  }
+})
+
+function onSearch(q: string) {
+  query.value = q
+  if (q.trim() !== '') {
+    selectedGenres.value = [] // clear genres on manual text search as per requirement
+  }
+}
+
+function onToggleGenre(genre: string) {
+  if (selectedGenres.value.includes(genre)) {
+    selectedGenres.value = selectedGenres.value.filter(g => g !== genre)
+  } else {
+    selectedGenres.value.push(genre)
+    query.value = '' // clear search on clicking genre chip
+  }
+}
+</script>
+
+<template>
+  <div class="search-container">
+    <div class="top-section">
+      <div class="search-sort-row">
+        <SearchBar :value="query" @update="onSearch" class="search-bar-flex" />
+        <SortDropdown v-model="sortOption" />
+      </div>
+      <FilterBar 
+        :genres="movieStore.allGenres" 
+        :selected="selectedGenres" 
+        @toggle="onToggleGenre" 
+      />
+    </div>
+    
+    <div class="grid-section">
+      <MovieGrid 
+        :query="query" 
+        :genres="selectedGenres" 
+        :sort="sortOption" 
+      />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.search-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.top-section {
+  padding: 32px 40px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: var(--bg-dark);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-sort-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-bar-flex {
+  flex: 1;
+}
+
+.grid-section {
+  flex: 1;
+  padding: 0 40px 40px 40px;
+}
+</style>

@@ -27,12 +27,8 @@ const setSlide = (index) => {
         
         <div class="window-content">
           <div class="carousel-container">
-            <div class="fallback-frame">
-              App Screenshot <br/> (Placeholder - waiting for replacement at src/assets/screenshot-{{ currentSlide + 1 }}.png)
-            </div>
-            <!-- The actual image will overlay if it exists -->
             <transition name="fade" mode="out-in">
-              <img :key="currentSlide" :src="slides[currentSlide].image" :alt="slides[currentSlide].label" class="app-screenshot" onerror="this.style.opacity='0'" />
+              <img :key="currentSlide" :src="slides[currentSlide].image" :alt="slides[currentSlide].label" class="app-screenshot" />
             </transition>
           </div>
         </div>
@@ -120,20 +116,6 @@ const setSlide = (index) => {
   position: relative;
 }
 
-.fallback-frame {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  text-align: center;
-  font-weight: 500;
-  background-color: #222;
-  border: 2px dashed rgba(255,255,255,0.1);
-  padding: 2rem;
-  z-index: 1;
-}
 
 .app-screenshot {
   position: absolute;

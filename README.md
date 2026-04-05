@@ -6,7 +6,11 @@
 
 A modern Tauri-based application to visualize and manage your movie collection. This project allows users to index movie files from their local directories, fetch high-quality metadata from the OMDb API, and manage their collection with a premium, card-based interface.
 
-![App GUI](https://raw.githubusercontent.com/ISO53/Movie-Collection-Visualizer/master/gui%20ss%20final-min.png)
+| | |
+|---|---|
+| ![Collection Statistics](https://github.com/user-attachments/assets/ed4ae2ec-d068-4de7-8462-766d77091638) | ![Statistics Dashboard](https://github.com/user-attachments/assets/85eac6ca-4eb5-4471-8e1e-894cc19e2a44) |
+| ![Cast & Crew](https://github.com/user-attachments/assets/94777421-9d82-433a-8b05-c4c00ea16f0e) | ![Movie Search](https://github.com/user-attachments/assets/2fbfdc27-8477-4e6e-8960-1cdf6d5b1c9a) |
+
 
 ## Features
 

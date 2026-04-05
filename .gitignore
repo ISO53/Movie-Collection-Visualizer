@@ -44,3 +44,7 @@ dist/
 res/posters/**
 db.json
 key.json
+
+### Test files ###
+test
+src-tauri/src/bin

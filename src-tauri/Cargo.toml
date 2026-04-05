@@ -24,3 +24,7 @@ chrono = "0.4"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
+
+[[bin]]
+name = "csv_generator"
+path = "src/bin/csv_generator.rs"

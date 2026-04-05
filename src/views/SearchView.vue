@@ -7,11 +7,14 @@ import FilterBar from '../components/search/FilterBar.vue'
 import SortDropdown from '../components/search/SortDropdown.vue'
 import MovieGrid from '../components/search/MovieGrid.vue'
 
+import { useRoute } from 'vue-router'
+
 const props = defineProps<{
   prefilterGenre?: string
 }>()
 
 const movieStore = useMovieStore()
+const route = useRoute()
 
 const query = ref('')
 const selectedGenres = ref<string[]>([])
@@ -20,6 +23,9 @@ const sortOption = ref<SortOption>('added_desc')
 onMounted(() => {
   if (props.prefilterGenre) {
     selectedGenres.value = [props.prefilterGenre]
+  }
+  if (route.query.q) {
+    query.value = route.query.q as string
   }
 })
 

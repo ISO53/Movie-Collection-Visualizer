@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { invoke } from '@tauri-apps/api/core'
 import { Movie, SortOption } from '../types/movie'
-import { parseImdbRating, parseYear } from '../lib/utils'
+import { parseImdbRating, parseYear, parseRuntime } from '../lib/utils'
 
 export const useMovieStore = defineStore('movies', () => {
   const movies = ref<Movie[]>([])
@@ -61,8 +61,8 @@ export const useMovieStore = defineStore('movies', () => {
       case 'rating_asc': return list.sort((a, b) => parseImdbRating(a.imdbRating) - parseImdbRating(b.imdbRating))
       case 'release_desc': return list.sort((a, b) => parseYear(b.year) - parseYear(a.year))
       case 'release_asc': return list.sort((a, b) => parseYear(a.year) - parseYear(b.year))
-      case 'runtime_desc': return list.sort((a, b) => parseInt(b.runtime || '0') - parseInt(a.runtime || '0'))
-      case 'runtime_asc': return list.sort((a, b) => parseInt(a.runtime || '0') - parseInt(b.runtime || '0'))
+      case 'runtime_desc': return list.sort((a, b) => parseRuntime(b.runtime) - parseRuntime(a.runtime))
+      case 'runtime_asc': return list.sort((a, b) => parseRuntime(a.runtime) - parseRuntime(b.runtime))
       case 'added_desc': return list.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime())
       case 'added_asc': return list.sort((a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime())
       case 'shuffle': return list.sort(() => Math.random() - 0.5)

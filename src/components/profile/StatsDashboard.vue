@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useMovieStore } from '../../stores/movies'
-import { formatTotalRuntime, generateCsvContent } from '../../lib/utils'
+import { formatTotalRuntime, generateCsvContent, parseRuntime } from '../../lib/utils'
 import { Download } from 'lucide-vue-next'
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend
@@ -23,13 +23,7 @@ const averageRating = computed(() => {
 })
 
 const totalRuntime = computed(() => {
-  const mins = movieStore.movies.reduce((acc, m) => {
-    if (m.runtime && m.runtime !== 'N/A') {
-      const parsed = parseInt(m.runtime)
-      if (!isNaN(parsed)) return acc + parsed
-    }
-    return acc
-  }, 0)
+  const mins = movieStore.movies.reduce((acc, m) => acc + parseRuntime(m.runtime), 0)
   return formatTotalRuntime(mins)
 })
 

@@ -1,9 +1,15 @@
 import { Movie } from '../types/movie'
 
+export function parseRuntime(runtimeStr?: string): number {
+  if (!runtimeStr || runtimeStr === 'N/A') return 0
+  const parsed = parseInt(runtimeStr, 10)
+  return isNaN(parsed) ? 0 : parsed
+}
+
 export function formatRuntime(runtimeStr?: string): string {
   if (!runtimeStr || runtimeStr === 'N/A') return 'N/A'
-  const min = parseInt(runtimeStr, 10)
-  if (isNaN(min)) return runtimeStr
+  const min = parseRuntime(runtimeStr)
+  if (min === 0) return runtimeStr
   const h = Math.floor(min / 60)
   const m = min % 60
   if (h > 0) {

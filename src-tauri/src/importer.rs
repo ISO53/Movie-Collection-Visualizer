@@ -30,6 +30,9 @@ pub fn scan_directory(path: &Path) -> ScanResult {
                                 let parsed = parse_movie_title(file_name);
                                 if !parsed.is_empty() {
                                     entries.push((parsed, p.to_string_lossy().to_string()));
+                                } else {
+                                    #[cfg(debug_assertions)]
+                                    println!("[Scan Warning] Could not parse movie title from filename: '{}'", file_name);
                                 }
                             }
                         }
@@ -87,7 +90,9 @@ pub async fn run_import(
             Ok(res) => {
                 let poster_path = if res.poster != "N/A" && !res.poster.is_empty() {
                     let p = posters_dir.join(format!("{}.jpg", res.imdb_id));
-                    if download_poster(&res.poster, &p).await.is_err() {
+                    if let Err(err) = download_poster(&res.poster, &p).await {
+                        #[cfg(debug_assertions)]
+                        println!("[Import] Failed to download poster for '{}': {:?}", res.title, err);
                         None
                     } else {
                         Some(p.to_string_lossy().to_string())
@@ -127,11 +132,21 @@ pub async fn run_import(
 
                 {
                     if let Ok(conn) = state.0.lock() {
-                        if db::insert_movie(&conn, &movie).is_err() {
+                        if let Err(err) = db::insert_movie(&conn, &movie) {
+                            #[cfg(debug_assertions)]
+                            println!("[Import Db Error] Failed to insert '{}' (file: {}): {:?}", movie.title, movie.file_name, err);
                             failed += 1;
                         } else {
+                            #[cfg(debug_assertions)]
+                            println!("[Import Success] Inserted '{}'", movie.title);
                             imported += 1;
                         }
+                    } else {
+                        #[cfg(debug_assertions)]
+                        println!("[Import Lock Error] Failed to acquire DB lock for '{}'", movie.title);
+                        // Depending on design, you might still want to increment fail count, 
+                        // but it seems the original didn't explicitly fail it. Let's fail it.
+                        failed += 1;
                     }
                 }
 
@@ -139,6 +154,8 @@ pub async fn run_import(
             Err(e) => {
                 match e {
                     OmdbError::RateLimited => {
+                        #[cfg(debug_assertions)]
+                        println!("[Import OMDb Error] Rate limit reached while fetching '{}'", title);
                         rate_limited = true;
                         {
                             if let Ok(conn) = state.0.lock() {
@@ -149,6 +166,8 @@ pub async fn run_import(
                         break;
                     }
                     _ => {
+                        #[cfg(debug_assertions)]
+                        println!("[Import OMDb Error] Failed to fetch data for '{}': {:?}", title, e);
                         failed += 1;
                     }
                 }

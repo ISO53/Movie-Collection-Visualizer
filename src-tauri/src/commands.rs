@@ -205,3 +205,69 @@ pub async fn open_external(url: String, app_handle: AppHandle) -> Result<(), Str
     use tauri_plugin_opener::OpenerExt;
     app_handle.opener().open_url(url, None::<String>).map_err(|e| format!("{:?}", e))
 }
+
+#[tauri::command]
+pub async fn get_failed_imports(state: State<'_, crate::DbState>) -> Result<Vec<(String, String)>, String> {
+    let conn = state.0.lock().map_err(|e| e.to_string())?;
+    db::get_all_failed_imports(&conn).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn resolve_failed_import(file_name: String, imdb_id: String, state: State<'_, crate::DbState>, app_handle: AppHandle) -> Result<(), String> {
+    let api_key = {
+        let conn = state.0.lock().unwrap();
+        db::get_setting(&conn, "omdb_api_key").unwrap_or_default().unwrap_or_default()
+    };
+    if api_key.is_empty() { return Err("no_api_key".into()); }
+    
+    let res = omdb::fetch_by_id(&imdb_id, &api_key).await.map_err(|e| e.to_string())?;
+    
+    let app_data_dir = app_handle.path().app_data_dir().unwrap();
+    let posters_dir = app_data_dir.join("posters");
+    std::fs::create_dir_all(&posters_dir).ok();
+
+    let poster_path = if res.poster != "N/A" && !res.poster.is_empty() {
+        let p = posters_dir.join(format!("{}.jpg", res.imdb_id));
+        if omdb::download_poster(&res.poster, &p).await.is_err() {
+            None
+        } else {
+            Some(p.to_string_lossy().to_string())
+        }
+    } else {
+        None
+    };
+
+    let ratings_json = serde_json::to_string(&res.ratings).unwrap_or_default();
+    let movie = Movie {
+        id: 0,
+        imdb_id: res.imdb_id,
+        file_name,
+        title: res.title,
+        year: Some(res.year),
+        rated: Some(res.rated),
+        released: Some(res.released),
+        runtime: Some(res.runtime),
+        genre: Some(res.genre),
+        director: Some(res.director),
+        writer: Some(res.writer),
+        actors: Some(res.actors),
+        plot: Some(res.plot),
+        language: Some(res.language),
+        country: Some(res.country),
+        awards: Some(res.awards),
+        poster_url: Some(res.poster),
+        poster_path,
+        metascore: Some(res.metascore),
+        imdb_rating: Some(res.imdb_rating),
+        imdb_votes: Some(res.imdb_votes),
+        box_office: Some(res.box_office),
+        ratings_json: Some(ratings_json),
+        added_at: "".to_string(),
+    };
+
+    let conn = state.0.lock().map_err(|e| e.to_string())?;
+    db::insert_movie(&conn, &movie).map_err(|e| e.to_string())?;
+    db::delete_failed_import_by_file_name(&conn, &movie.file_name).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}

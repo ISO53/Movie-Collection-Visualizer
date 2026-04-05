@@ -14,6 +14,7 @@ import MovieDetailDialog from './components/dialogs/MovieDetailDialog.vue'
 import WrongMovieDialog from './components/dialogs/WrongMovieDialog.vue'
 import FirstTimeDialog from './components/dialogs/FirstTimeDialog.vue'
 import AboutDialog from './components/dialogs/AboutDialog.vue'
+import FixFailedImportsDialog from './components/dialogs/FixFailedImportsDialog.vue'
 
 const settingsStore = useSettingsStore()
 const movieStore = useMovieStore()
@@ -35,6 +36,12 @@ onMounted(async () => {
     dialogStore.openFirstTimeDialog()
   } else if (!settingsStore.firstTimeCompleted) {
     dialogStore.openFirstTimeDialog()
+  } else {
+    // Check for failed imports to show fix dialog
+    const failures = await dialogStore.fetchFailedImports()
+    if (failures.length > 0) {
+      dialogStore.openFixFailedImports(failures)
+    }
   }
 })
 </script>
@@ -53,6 +60,7 @@ onMounted(async () => {
     <WrongMovieDialog />
     <FirstTimeDialog />
     <AboutDialog />
+    <FixFailedImportsDialog />
   </div>
 </template>
 

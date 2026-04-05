@@ -5,11 +5,17 @@ export interface ImportProgress {
   elapsedSecs: number
 }
 
+export interface FailedImport {
+  fileName: string
+  parsedTitle: string
+}
+
 export interface ImportComplete {
   totalImported: number
   failed: number
   rateLimited: boolean
   cancelled: boolean
+  failedItems: FailedImport[]
 }
 
 export interface WatchedDirSyncResult {

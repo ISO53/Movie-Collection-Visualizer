@@ -68,6 +68,7 @@ pub async fn run_import(
     let total = jobs.len() as u32;
     let mut imported = 0;
     let mut failed = 0;
+    let mut failed_items = Vec::new(); // NEW
     let mut rate_limited = false;
     let mut cancelled = false;
     let start_time = std::time::Instant::now();
@@ -137,6 +138,9 @@ pub async fn run_import(
                             println!("[Import Db Error] Failed to insert '{}' (file: {}): {:?}", movie.title, movie.file_name, err);
                             failed += 1;
                         } else {
+                            // If it was in failed_imports, remove it now that it succeeded
+                            let _ = db::delete_failed_import_by_file_name(&conn, &movie.file_name);
+                            
                             #[cfg(debug_assertions)]
                             println!("[Import Success] Inserted '{}'", movie.title);
                             imported += 1;
@@ -168,6 +172,17 @@ pub async fn run_import(
                     _ => {
                         #[cfg(debug_assertions)]
                         println!("[Import OMDb Error] Failed to fetch data for '{}': {:?}", title, e);
+                        
+                        if let OmdbError::NotFound = e {
+                             if let Ok(conn) = state.0.lock() {
+                                 let _ = db::insert_failed_import(&conn, path, title, &format!("{:?}", e));
+                                 failed_items.push(crate::models::FailedImport {
+                                     file_name: path.clone(),
+                                     parsed_title: title.clone(),
+                                 });
+                             }
+                        }
+                        
                         failed += 1;
                     }
                 }
@@ -188,6 +203,7 @@ pub async fn run_import(
         failed,
         rate_limited,
         cancelled,
+        failed_items,
     };
     
     let _ = app_handle.emit("import-complete", result.clone());
@@ -202,13 +218,14 @@ pub async fn sync_watched_directory(
     
     let state: State<crate::DbState> = app_handle.state();
     
-    let (api_key, existing_paths, all_movies, limit_reached_on) = {
+    let (api_key, existing_paths, failed_paths, all_movies, limit_reached_on) = {
         let conn_guard = state.0.lock().unwrap();
         let key = db::get_setting(&conn_guard, "omdb_api_key").unwrap_or_default().unwrap_or_default();
         let existing = db::get_movie_file_names(&conn_guard).unwrap_or_default();
+        let failed = db::get_failed_import_file_names(&conn_guard).unwrap_or_default();
         let all = db::get_all_movies(&conn_guard).unwrap_or_default();
         let limit = db::get_setting(&conn_guard, "api_limit_reached_on").unwrap_or_default().unwrap_or_default();
-        (key, existing, all, limit)
+        (key, existing, failed, all, limit)
     };
     
     if api_key.is_empty() { return; }
@@ -244,7 +261,8 @@ pub async fn sync_watched_directory(
     
     let new_entries: Vec<(String, String)> = detected_entries.into_iter().filter(|(_, p)| {
         let existing_lower: HashSet<String> = existing_paths.iter().map(|s| s.to_lowercase()).collect();
-        !existing_lower.contains(&p.to_lowercase())
+        let failed_lower: HashSet<String> = failed_paths.iter().map(|s| s.to_lowercase()).collect();
+        !existing_lower.contains(&p.to_lowercase()) && !failed_lower.contains(&p.to_lowercase())
     }).collect();
     
     if !new_entries.is_empty() {

@@ -109,11 +109,19 @@ pub struct ImportProgress {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct FailedImport {
+    pub file_name: String,
+    pub parsed_title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ImportComplete {
     pub total_imported: u32,
     pub failed: u32,
     pub rate_limited: bool,
     pub cancelled: bool,
+    pub failed_items: Vec<FailedImport>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

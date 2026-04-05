@@ -44,6 +44,17 @@ pub fn init(app_data_dir: &Path) -> Result<Connection> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS failed_imports (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            file_name       TEXT UNIQUE NOT NULL,
+            parsed_title    TEXT NOT NULL,
+            error           TEXT NOT NULL,
+            last_attempt    TEXT NOT NULL DEFAULT (datetime('now'))
+        )",
+        [],
+    )?;
+
     Ok(conn)
 }
 
@@ -155,4 +166,39 @@ pub fn set_setting(conn: &Connection, key: &str, value: &str) -> Result<()> {
         params![key, value],
     )?;
     Ok(())
+}
+
+pub fn insert_failed_import(conn: &Connection, file_name: &str, parsed_title: &str, error: &str) -> Result<()> {
+    conn.execute(
+        "INSERT OR REPLACE INTO failed_imports (file_name, parsed_title, error, last_attempt) VALUES (?1, ?2, ?3, datetime('now'))",
+        params![file_name, parsed_title, error],
+    )?;
+    Ok(())
+}
+
+pub fn delete_failed_import_by_file_name(conn: &Connection, file_name: &str) -> Result<()> {
+    conn.execute("DELETE FROM failed_imports WHERE file_name = ?1", params![file_name])?;
+    Ok(())
+}
+
+pub fn get_failed_import_file_names(conn: &Connection) -> Result<Vec<String>> {
+    let mut stmt = conn.prepare("SELECT file_name FROM failed_imports")?;
+    let rows = stmt.query_map([], |row| row.get(0))?;
+    let mut names = Vec::new();
+    for name in rows {
+        names.push(name?);
+    }
+    Ok(names)
+}
+
+pub fn get_all_failed_imports(conn: &Connection) -> Result<Vec<(String, String)>> {
+    let mut stmt = conn.prepare("SELECT file_name, parsed_title FROM failed_imports")?;
+    let rows = stmt.query_map([], |row| {
+        Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+    })?;
+    let mut items = Vec::new();
+    for item in rows {
+        items.push(item?);
+    }
+    Ok(items)
 }

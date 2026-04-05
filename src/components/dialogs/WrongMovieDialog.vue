@@ -57,7 +57,8 @@ async function selectMovie(imdbId: string) {
 
 dialogStore.$subscribe((_mutation, state) => {
   if (state.wrongMovieData && !hasSearched.value) {
-    const filename = state.wrongMovieData.fileName
+    const fullPath = state.wrongMovieData.fileName
+    const filename = fullPath.split(/[\\/]/).pop() || fullPath
     const withoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename
     searchQuery.value = withoutExt
   }
@@ -136,7 +137,10 @@ function close() {
 
 h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
 .desc { color: var(--muted-mid); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
-.mono { font-family: monospace; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: var(--muted-light); }
+.mono { 
+  font-family: monospace; background: rgba(255,255,255,0.1); padding: 2px 6px; 
+  border-radius: 4px; color: var(--muted-light); word-break: break-all;
+}
 
 .search-row { display: flex; gap: 12px; margin-bottom: 24px; }
 input {

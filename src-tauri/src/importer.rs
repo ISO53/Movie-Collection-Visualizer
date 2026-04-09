@@ -91,9 +91,9 @@ pub async fn run_import(
             Ok(res) => {
                 let poster_path = if res.poster != "N/A" && !res.poster.is_empty() {
                     let p = posters_dir.join(format!("{}.jpg", res.imdb_id));
-                    if let Err(err) = download_poster(&res.poster, &p).await {
+                    if let Err(_err) = download_poster(&res.poster, &p).await {
                         #[cfg(debug_assertions)]
-                        println!("[Import] Failed to download poster for '{}': {:?}", res.title, err);
+                        println!("[Import] Failed to download poster for '{}': {:?}", res.title, _err);
                         None
                     } else {
                         Some(p.to_string_lossy().to_string())
@@ -134,9 +134,9 @@ pub async fn run_import(
 
                 {
                     if let Ok(conn) = state.0.lock() {
-                        if let Err(err) = db::insert_movie(&conn, &movie) {
+                        if let Err(_err) = db::insert_movie(&conn, &movie) {
                             #[cfg(debug_assertions)]
-                            println!("[Import Db Error] Failed to insert '{}' (file: {}): {:?}", movie.title, movie.file_name, err);
+                            println!("[Import Db Error] Failed to insert '{}' (file: {}): {:?}", movie.title, movie.file_name, _err);
                             failed += 1;
                         } else {
                             // If it was in failed_imports, remove it now that it succeeded

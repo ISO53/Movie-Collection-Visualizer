@@ -7,13 +7,15 @@ import { Download, Repeat } from 'lucide-vue-next'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs'
 import {
-  Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, BarElement, PointElement, LineElement, Filler, Title, Tooltip, Legend
+  Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, BarElement, PointElement, LineElement, 
+  BarController, LineController, RadarController, Filler, Title, Tooltip, Legend
 } from 'chart.js'
 import { Bar, Radar } from 'vue-chartjs'
 import MovieRowCard from '../home/MovieRowCard.vue'
 
 ChartJS.register(
-  CategoryScale, LinearScale, RadialLinearScale, BarElement, PointElement, LineElement, Filler, Title, Tooltip, Legend
+  CategoryScale, LinearScale, RadialLinearScale, BarElement, PointElement, LineElement, 
+  BarController, LineController, RadarController, Filler, Title, Tooltip, Legend
 )
 
 const movieStore = useMovieStore()

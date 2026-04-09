@@ -27,6 +27,12 @@ onMounted(() => {
   if (route.query.q) {
     query.value = route.query.q as string
   }
+  if (route.query.director) {
+    query.value = route.query.director as string
+  }
+  if (route.query.genre) {
+    selectedGenres.value = [route.query.genre as string]
+  }
 })
 
 watch(() => props.prefilterGenre, (newVal) => {
@@ -35,6 +41,22 @@ watch(() => props.prefilterGenre, (newVal) => {
     query.value = ''
   }
 })
+
+watch(() => route.query, (newQuery) => {
+  if (newQuery.q) {
+    query.value = newQuery.q as string
+  } else if (newQuery.director) {
+    query.value = newQuery.director as string
+  } else {
+    query.value = ''
+  }
+
+  if (newQuery.genre) {
+    selectedGenres.value = [newQuery.genre as string]
+  } else if (!props.prefilterGenre) {
+    selectedGenres.value = []
+  }
+}, { deep: true })
 
 function onSearch(q: string) {
   query.value = q

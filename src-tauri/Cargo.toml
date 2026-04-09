@@ -1,6 +1,6 @@
 [package]
 name = "movie-collection-visualizer"
-version = "2.0.0"
+version = "2.2.0"
 description = "Movie Collection Visualizer"
 authors = ["you"]
 edition = "2021"

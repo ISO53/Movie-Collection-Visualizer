@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { useMovieStore } from '../../stores/movies'
 import { formatTotalRuntime, generateCsvContent, parseRuntime } from '../../lib/utils'
 import { Download, Repeat } from 'lucide-vue-next'
+import { save } from '@tauri-apps/plugin-dialog'
+import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs'
 import {
   Chart as ChartJS, CategoryScale, LinearScale, RadialLinearScale, BarElement, PointElement, LineElement, Filler, Title, Tooltip, Legend
 } from 'chart.js'
@@ -296,18 +298,17 @@ const rarestGems = computed(() => {
 
 const isExportOpen = ref(false)
 
-function exportCsv() {
+async function exportCsv() {
   const csv = generateCsvContent(movieStore.movies)
-  const blob = new Blob([csv], { type: 'text/csv' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `Movie_Collection_${new Date().toISOString().split('T')[0]}.csv`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-  isExportOpen.value = false
+  const filePath = await save({
+    filters: [{ name: 'CSV', extensions: ['csv'] }],
+    defaultPath: `Movie_Collection_${new Date().toISOString().split('T')[0]}.csv`
+  })
+
+  if (filePath) {
+    await writeTextFile(filePath, csv)
+    isExportOpen.value = false
+  }
 }
 
 async function exportPdf() {
@@ -337,8 +338,16 @@ async function exportPdf() {
       headStyles: { fillColor: [236, 130, 0], textColor: [0, 0, 0], fontStyle: 'bold' }
     })
 
-  doc.save(`Movie_Collection_${new Date().toISOString().split('T')[0]}.pdf`)
-  isExportOpen.value = false
+  const filePath = await save({
+    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    defaultPath: `Movie_Collection_${new Date().toISOString().split('T')[0]}.pdf`
+  })
+
+  if (filePath) {
+    const pdfOutput = doc.output('arraybuffer')
+    await writeFile(filePath, new Uint8Array(pdfOutput))
+    isExportOpen.value = false
+  }
 }
 </script>
 

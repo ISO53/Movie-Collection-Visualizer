@@ -10,6 +10,8 @@
     "shell:default",
     "dialog:default",
     "fs:default",
+    "fs:allow-write-text-file",
+    "fs:allow-write-file",
     "opener:default",
     "opener:allow-reveal-item-in-dir"
   ]

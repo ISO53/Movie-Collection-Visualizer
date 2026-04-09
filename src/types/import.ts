@@ -3,6 +3,7 @@ export interface ImportProgress {
   total: number
   currentTitle: string
   elapsedSecs: number
+  importType: string
 }
 
 export interface FailedImport {

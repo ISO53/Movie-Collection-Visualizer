@@ -18,6 +18,7 @@ export const useImportStore = defineStore('import', () => {
   const newCount = ref(0)
   const showSummary = ref(false)
   const rateLimited = ref(false)
+  const importType = ref('local')
   
   let unlistenProgress: UnlistenFn | null = null
   let unlistenComplete: UnlistenFn | null = null
@@ -36,6 +37,7 @@ export const useImportStore = defineStore('import', () => {
       total.value = e.payload.total
       currentTitle.value = e.payload.currentTitle
       elapsedSecs.value = e.payload.elapsedSecs
+      importType.value = e.payload.importType
     })
 
     unlistenComplete = await listen<ImportComplete>('import-complete', async e => {
@@ -94,7 +96,7 @@ export const useImportStore = defineStore('import', () => {
 
   return { 
     isImporting, current, total, currentTitle, elapsedSecs, lastResult, 
-    newCount, showSummary, rateLimited,
+    newCount, showSummary, rateLimited, importType,
     setupListeners, cancelImport, dismissSummary 
   }
 })

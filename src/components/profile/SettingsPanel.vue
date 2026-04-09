@@ -3,10 +3,13 @@ import { ref, onMounted } from 'vue'
 import { invoke } from '@tauri-apps/api/core'
 import { useSettingsStore } from '../../stores/settings'
 import { useToastStore } from '../../stores/toast'
+import { useImportStore } from '../../stores/import'
 import { FolderOpen, X, RefreshCw, Github } from 'lucide-vue-next'
+import { open } from '@tauri-apps/plugin-dialog'
 
 const settingsStore = useSettingsStore()
 const toastStore = useToastStore()
+const importStore = useImportStore()
 
 const localKey = ref('')
 const appVersion = ref('')
@@ -72,6 +75,26 @@ async function clearDatabase() {
     } catch (e: any) {
       toastStore.show('warning', 'Failed to clear database: ' + e)
     }
+  }
+}
+
+async function importImdb() {
+  try {
+    const selected = await open({
+      multiple: false,
+      filters: [{
+        name: 'CSV Documents',
+        extensions: ['csv']
+      }]
+    })
+
+    if (selected) {
+      toastStore.show('info', 'Starting IMDb import...')
+      await invoke('import_imdb_csv', { filePath: selected })
+      // importStore handles the status bar update via events
+    }
+  } catch (e: any) {
+    toastStore.show('warning', 'Import failed: ' + e)
   }
 }
 </script>
@@ -165,6 +188,33 @@ async function clearDatabase() {
           <button class="action-btn primary large" @click="chooseDir">
             <FolderOpen :size="18" />
             Select Collection Folder
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMDb Import Card -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="icon-wrapper ghost">
+          <span class="imdb-logo-text">IMDb</span>
+        </div>
+        <div class="card-title-group">
+          <h3>Import movies from IMDb</h3>
+          <p>Import your movies from an IMDb watchlist export CSV.</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="importer-content">
+          <p class="import-description">
+            Export your watchlist from IMDb as a CSV file and select it here. 
+            We'll automatically fetch metadata and posters for all movies.
+          </p>
+          <button class="action-btn outline full-width" @click="importImdb" :disabled="importStore.isImporting">
+            <RefreshCw :size="16" v-if="importStore.isImporting" class="rotating" />
+            <FolderOpen :size="16" v-else />
+            {{ importStore.isImporting ? 'Importing...' : 'Select IMDb CSV' }}
           </button>
         </div>
       </div>
@@ -545,4 +595,26 @@ async function clearDatabase() {
 
 .mt-4 { margin-top: 16px; }
 .mt-2 { margin-top: 8px; }
+
+/* IMDb Section Styling */
+.imdb-logo-text {
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: -0.2px;
+  color: var(--muted-mid);
+}
+
+.importer-content {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.import-description {
+  font-size: 13px;
+  color: var(--muted-mid);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
 </style>

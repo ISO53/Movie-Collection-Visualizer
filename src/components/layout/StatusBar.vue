@@ -67,7 +67,9 @@ function handleCancelLeave() { isCancelHovered.value = false }
         </div>
         <span class="status-text">
           <template v-if="importStore.isImporting">
-            Importing: <span class="highlight">{{ importStore.currentTitle || 'Preparing...' }}</span>
+            <span v-if="importStore.importType === 'imdb'">Importing from IMDb: </span>
+            <span v-else>Importing: </span>
+            <span class="highlight">{{ importStore.currentTitle || 'Preparing...' }}</span>
           </template>
           <template v-else-if="importStore.rateLimited">
             API Rate Limit Reached

@@ -27,6 +27,7 @@ pub struct Movie {
     pub box_office: Option<String>,
     pub ratings_json: Option<String>,
     pub added_at: String,
+    pub import_source: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -105,6 +106,7 @@ pub struct ImportProgress {
     pub total: u32,
     pub current_title: String,
     pub elapsed_secs: f64,
+    pub import_type: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

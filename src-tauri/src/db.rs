@@ -31,10 +31,14 @@ pub fn init(app_data_dir: &Path) -> Result<Connection> {
             imdb_votes      TEXT,
             box_office      TEXT,
             ratings_json    TEXT,
-            added_at        TEXT NOT NULL DEFAULT (datetime('now'))
+            added_at        TEXT NOT NULL DEFAULT (datetime('now')),
+            import_source   TEXT NOT NULL DEFAULT 'local'
         )",
         [],
     )?;
+
+    // Migration: add import_source column if it doesn't exist yet
+    let _ = conn.execute("ALTER TABLE movies ADD COLUMN import_source TEXT NOT NULL DEFAULT 'local'", []);
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS settings (
@@ -59,7 +63,7 @@ pub fn init(app_data_dir: &Path) -> Result<Connection> {
 }
 
 pub fn get_all_movies(conn: &Connection) -> Result<Vec<Movie>> {
-    let mut stmt = conn.prepare("SELECT id, imdb_id, file_name, title, year, rated, released, runtime, genre, director, writer, actors, plot, language, country, awards, poster_url, poster_path, metascore, imdb_rating, imdb_votes, box_office, ratings_json, added_at FROM movies")?;
+    let mut stmt = conn.prepare("SELECT id, imdb_id, file_name, title, year, rated, released, runtime, genre, director, writer, actors, plot, language, country, awards, poster_url, poster_path, metascore, imdb_rating, imdb_votes, box_office, ratings_json, added_at, import_source FROM movies")?;
     let movie_iter = stmt.query_map([], |row| {
         Ok(Movie {
             id: row.get(0)?,
@@ -86,6 +90,7 @@ pub fn get_all_movies(conn: &Connection) -> Result<Vec<Movie>> {
             box_office: row.get(21)?,
             ratings_json: row.get(22)?,
             added_at: row.get(23)?,
+            import_source: row.get(24)?,
         })
     })?;
 
@@ -98,9 +103,9 @@ pub fn get_all_movies(conn: &Connection) -> Result<Vec<Movie>> {
 
 pub fn insert_movie(conn: &Connection, movie: &Movie) -> Result<()> {
     conn.execute(
-        "INSERT INTO movies (imdb_id, file_name, title, year, rated, released, runtime, genre, director, writer, actors, plot, language, country, awards, poster_url, poster_path, metascore, imdb_rating, imdb_votes, box_office, ratings_json)
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22)
-        ON CONFLICT(imdb_id) DO UPDATE SET file_name=excluded.file_name",
+        "INSERT INTO movies (imdb_id, file_name, title, year, rated, released, runtime, genre, director, writer, actors, plot, language, country, awards, poster_url, poster_path, metascore, imdb_rating, imdb_votes, box_office, ratings_json, import_source)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23)
+        ON CONFLICT(imdb_id) DO UPDATE SET file_name=excluded.file_name, import_source=excluded.import_source",
         params![
             movie.imdb_id,
             movie.file_name,
@@ -124,6 +129,7 @@ pub fn insert_movie(conn: &Connection, movie: &Movie) -> Result<()> {
             movie.imdb_votes,
             movie.box_office,
             movie.ratings_json,
+            movie.import_source,
         ],
     )?;
     Ok(())

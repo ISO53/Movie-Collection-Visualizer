@@ -23,6 +23,7 @@ export interface Movie {
   boxOffice?: string
   ratingsJson?: string
   addedAt: string
+  importSource: string
 }
 
 export interface OmdbSearchResult {

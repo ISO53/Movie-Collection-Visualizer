@@ -59,7 +59,8 @@ pub fn run() {
             commands::show_in_explorer,
             commands::open_external,
             commands::get_failed_imports,
-            commands::resolve_failed_import
+            commands::resolve_failed_import,
+            commands::import_imdb_csv
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

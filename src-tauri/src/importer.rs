@@ -129,6 +129,7 @@ pub async fn run_import(
                     box_office: Some(res.box_office),
                     ratings_json: Some(ratings_json),
                     added_at: "".to_string(),
+                    import_source: "local".to_string(),
                 };
 
                 {
@@ -195,6 +196,7 @@ pub async fn run_import(
             total,
             current_title: title.clone(),
             elapsed_secs,
+            import_type: "local".to_string(),
         });
     }
 
@@ -242,7 +244,7 @@ pub async fn sync_watched_directory(
     let scan = scan_directory(Path::new(dir));
     let detected_entries = detect_titles(&scan);
     
-    let removed_count = 0;
+    let _removed_count = 0;
     
     let new_entries: Vec<(String, String)> = detected_entries.into_iter().filter(|(_, p)| {
         let existing_lower: HashSet<String> = existing_paths.iter().map(|s| s.to_lowercase()).collect();

@@ -122,8 +122,14 @@ async function showInExplorer() {
               <span class="d-value">{{ movie.awards }}</span>
             </div>
             <div class="detail-cell span-2" v-if="movie.fileName">
-              <span class="d-label">File</span>
-              <span class="d-value monospace path-text" :title="movie.fileName" @click="showInExplorer">{{ movie.fileName }}</span>
+              <span class="d-label">{{ movie.importSource === 'imdb' ? 'IMDb Link' : 'File' }}</span>
+              <span 
+                class="d-value monospace path-text" 
+                :title="movie.fileName" 
+                @click="movie.importSource === 'imdb' ? invoke('open_external', { url: movie.fileName }) : showInExplorer()"
+              >
+                {{ movie.fileName }}
+              </span>
             </div>
           </div>
 

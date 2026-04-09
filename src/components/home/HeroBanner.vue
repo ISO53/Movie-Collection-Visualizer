@@ -15,7 +15,7 @@ const router = useRouter()
 const randomMovie = ref<any>(null)
 
 function pickRandom() {
-  const candidates = movieStore.topRated.filter(m => m.posterPath || (m.posterUrl && m.posterUrl !== 'N/A'))
+  const candidates = movieStore.movies.filter(m => m.posterPath || (m.posterUrl && m.posterUrl !== 'N/A'))
   if (candidates.length > 0) {
     const idx = Math.floor(Math.random() * candidates.length)
     randomMovie.value = candidates[idx]

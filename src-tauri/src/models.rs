@@ -128,7 +128,6 @@ pub struct ImportComplete {
 #[serde(rename_all = "camelCase")]
 pub struct WatchedDirSyncResult {
     pub new_count: u32,
-    pub removed_count: u32,
     pub rate_limited: bool,
 }
 

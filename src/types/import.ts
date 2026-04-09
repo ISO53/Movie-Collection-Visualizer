@@ -20,6 +20,5 @@ export interface ImportComplete {
 
 export interface WatchedDirSyncResult {
   newCount: number
-  removedCount: number
   rateLimited: boolean
 }

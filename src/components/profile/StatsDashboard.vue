@@ -54,7 +54,7 @@ const decadeDataMixed = computed((): any => {
         const decade = Math.floor(y / 10) * 10
         const current = stats.get(decade) || { count: 0, ratingSum: 0, ratingCount: 0 }
         current.count++
-        
+
         if (m.imdbRating && m.imdbRating !== 'N/A') {
           const r = parseFloat(m.imdbRating)
           if (!isNaN(r)) {
@@ -66,7 +66,7 @@ const decadeDataMixed = computed((): any => {
       }
     }
   })
-  
+
   const sortedKeys = Array.from(stats.keys()).sort()
   return {
     labels: sortedKeys.map(k => `${k}s`),
@@ -130,13 +130,13 @@ function getTopRatedItems(field: 'director' | 'actors' | 'genre' | 'writer', lim
       })
     }
   })
-  
+
   const entries = Array.from(ratings.entries())
     .filter(([_, data]) => data.count >= minMovies) // Increased min requirement
     .map(([name, data]) => ({ name, avg: data.sum / data.count }))
     .sort((a, b) => b.avg - a.avg)
     .slice(0, limit)
-    
+
   return {
     labels: entries.map(e => e.name),
     datasets: [{
@@ -170,7 +170,7 @@ function getLollipopData(field: 'director' | 'actors' | 'writer', sortMode: 'cou
       })
     }
   })
-  
+
   const entries = Array.from(stats.entries())
     .map(([name, s]) => ({
       name,
@@ -184,7 +184,7 @@ function getLollipopData(field: 'director' | 'actors' | 'writer', sortMode: 'cou
   } else {
     entries.sort((a, b) => b.avgRating - a.avgRating || b.count - a.count)
   }
-  
+
   return entries.slice(0, limit)
 }
 
@@ -225,7 +225,7 @@ const radarOptions = computed(() => {
   const data = topRatedGenresRadar.value.datasets[0].data as number[]
   let chartMin = 0
   let chartMax = 10
-  
+
   if (data.length > 0) {
     const minVal = Math.min(...data)
     const maxVal = Math.max(...data)
@@ -242,13 +242,13 @@ const radarOptions = computed(() => {
         angleLines: { color: 'rgba(255,255,255,0.1)' },
         grid: { color: 'rgba(255,255,255,0.2)' },
         pointLabels: { color: '#E5BA73', font: { size: 12, weight: 600 } },
-        ticks: { 
-          display: true, 
-          color: 'rgba(255,255,255,0.4)', 
-          backdropColor: 'transparent', 
-          min: chartMin, 
-          max: chartMax, 
-          stepSize: 1 
+        ticks: {
+          display: true,
+          color: 'rgba(255,255,255,0.4)',
+          backdropColor: 'transparent',
+          min: chartMin,
+          max: chartMax,
+          stepSize: 1
         }
       }
     }
@@ -261,7 +261,7 @@ const mixedChartOptions = {
   interaction: { mode: 'index' as const, intersect: false },
   plugins: { legend: { display: true, labels: { color: 'rgba(255,255,255,0.6)' } } },
   scales: {
-    y: { 
+    y: {
       type: 'linear' as const, display: true, position: 'left' as const,
       grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.6)' }
     },
@@ -313,30 +313,30 @@ function exportCsv() {
 async function exportPdf() {
   const { jsPDF } = await import('jspdf')
   await import('jspdf-autotable')
-  
+
   const doc = new jsPDF('landscape')
   doc.setFillColor(16, 16, 16)
   doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F')
   doc.setTextColor(255, 255, 255)
-  
+
   doc.setFontSize(20)
   doc.text(`Movie Collection — ${new Date().toLocaleDateString()}`, 14, 22)
   doc.setFontSize(12)
   doc.text(`Total Movies: ${totalMovies.value}  |  Average Rating: ${averageRating.value}  |  Total Runtime: ${totalRuntime.value}`, 14, 32)
-  
+
   const body = movieStore.movies.map(m => [
     m.title, m.year || '', m.genre || '', m.imdbRating || '', m.director || '', m.runtime || ''
   ])
-  
-  ;(doc as any).autoTable({
-    startY: 40,
-    head: [['Title', 'Year', 'Genre', 'IMDB Rating', 'Director', 'Runtime']],
-    body,
-    theme: 'plain',
-    styles: { fillColor: [31, 31, 31], textColor: [255, 255, 255], lineColor: [50, 50, 50], lineWidth: 0.1 },
-    headStyles: { fillColor: [236, 130, 0], textColor: [0, 0, 0], fontStyle: 'bold' }
-  })
-  
+
+    ; (doc as any).autoTable({
+      startY: 40,
+      head: [['Title', 'Year', 'Genre', 'IMDB Rating', 'Director', 'Runtime']],
+      body,
+      theme: 'plain',
+      styles: { fillColor: [31, 31, 31], textColor: [255, 255, 255], lineColor: [50, 50, 50], lineWidth: 0.1 },
+      headStyles: { fillColor: [236, 130, 0], textColor: [0, 0, 0], fontStyle: 'bold' }
+    })
+
   doc.save(`Movie_Collection_${new Date().toISOString().split('T')[0]}.pdf`)
   isExportOpen.value = false
 }
@@ -357,7 +357,7 @@ async function exportPdf() {
         </div>
       </div>
     </div>
-    
+
     <div class="metrics-grid">
       <div class="metric-card">
         <span class="metric-label">Total Movies</span>
@@ -376,29 +376,35 @@ async function exportPdf() {
         <span class="metric-value">{{ uniqueDirectors }}</span>
       </div>
     </div>
-    
+
     <!-- Time & Trends Section -->
     <h2 class="section-heading">Time & Trends</h2>
     <div class="charts-row single">
       <div class="chart-card">
         <h3 class="chart-title">Movies By Decade vs Average Rating</h3>
-        <div class="chart-wrapper"><Bar :data="decadeDataMixed" :options="mixedChartOptions" /></div>
+        <div class="chart-wrapper">
+          <Bar :data="decadeDataMixed" :options="mixedChartOptions" />
+        </div>
       </div>
     </div>
-    
+
     <!-- Genres Section -->
     <h2 class="section-heading">Thematic Breakdown</h2>
     <div class="charts-row genres-layout">
       <div class="chart-card frequent-genres">
         <h3 class="chart-title">Most Frequent Genres</h3>
-        <div class="chart-wrapper"><Bar :data="genreData" :options="hzChartOptions" /></div>
+        <div class="chart-wrapper">
+          <Bar :data="genreData" :options="hzChartOptions" />
+        </div>
       </div>
       <div class="chart-card rated-genres">
         <h3 class="chart-title">Highest Rated Genres</h3>
-        <div class="chart-wrapper square"><Radar :data="topRatedGenresRadar" :options="radarOptions" /></div>
+        <div class="chart-wrapper square">
+          <Radar :data="topRatedGenresRadar" :options="radarOptions" />
+        </div>
       </div>
     </div>
-    
+
     <!-- Cast & Crew Section -->
     <h2 class="section-heading">Cast & Crew Analytics</h2>
     <div class="charts-row three-col">
@@ -406,17 +412,20 @@ async function exportPdf() {
       <div class="chart-card">
         <div class="card-header-actions">
           <h3 class="chart-title">Top Directors</h3>
-          <button class="sort-toggle-btn" @click="directorSort = directorSort === 'count' ? 'rating' : 'count'" :title="'Sort by ' + (directorSort === 'count' ? 'Rating' : 'Count')">
+          <button class="sort-toggle-btn" @click="directorSort = directorSort === 'count' ? 'rating' : 'count'"
+            :title="'Sort by ' + (directorSort === 'count' ? 'Rating' : 'Count')">
             <Repeat :size="12" /> {{ directorSort === 'count' ? 'Mode: Count' : 'Mode: Rating' }}
           </button>
         </div>
         <div class="lollipop-container">
           <div v-for="d in lollipopDirectors" :key="d.name" class="lollipop-item" @click="goToPerson(d.name)">
             <div class="loll-track">
-              <div class="loll-bar" :style="{ width: (d.count / Math.max(...lollipopDirectors.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-bar"
+                :style="{ width: (d.count / Math.max(...lollipopDirectors.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-name-in">{{ d.name }} <span class="loll-count-in">({{ d.count }})</span></span>
               </div>
-              <div class="loll-dot" :style="{ backgroundColor: getRatingColor(d.avgRating), left: (d.count / Math.max(...lollipopDirectors.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-dot"
+                :style="{ backgroundColor: getRatingColor(d.avgRating), left: (d.count / Math.max(...lollipopDirectors.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-rating">{{ d.avgRating.toFixed(1) }}</span>
               </div>
             </div>
@@ -428,17 +437,20 @@ async function exportPdf() {
       <div class="chart-card">
         <div class="card-header-actions">
           <h3 class="chart-title">Top Actors</h3>
-          <button class="sort-toggle-btn" @click="actorSort = actorSort === 'count' ? 'rating' : 'count'" :title="'Sort by ' + (actorSort === 'count' ? 'Rating' : 'Count')">
+          <button class="sort-toggle-btn" @click="actorSort = actorSort === 'count' ? 'rating' : 'count'"
+            :title="'Sort by ' + (actorSort === 'count' ? 'Rating' : 'Count')">
             <Repeat :size="12" /> {{ actorSort === 'count' ? 'Mode: Count' : 'Mode: Rating' }}
           </button>
         </div>
         <div class="lollipop-container">
           <div v-for="a in lollipopActors" :key="a.name" class="lollipop-item" @click="goToPerson(a.name)">
             <div class="loll-track">
-              <div class="loll-bar" :style="{ width: (a.count / Math.max(...lollipopActors.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-bar"
+                :style="{ width: (a.count / Math.max(...lollipopActors.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-name-in">{{ a.name }} <span class="loll-count-in">({{ a.count }})</span></span>
               </div>
-              <div class="loll-dot" :style="{ backgroundColor: getRatingColor(a.avgRating), left: (a.count / Math.max(...lollipopActors.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-dot"
+                :style="{ backgroundColor: getRatingColor(a.avgRating), left: (a.count / Math.max(...lollipopActors.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-rating">{{ a.avgRating.toFixed(1) }}</span>
               </div>
             </div>
@@ -450,17 +462,20 @@ async function exportPdf() {
       <div class="chart-card">
         <div class="card-header-actions">
           <h3 class="chart-title">Top Writers</h3>
-          <button class="sort-toggle-btn" @click="writerSort = writerSort === 'count' ? 'rating' : 'count'" :title="'Sort by ' + (writerSort === 'count' ? 'Rating' : 'Count')">
+          <button class="sort-toggle-btn" @click="writerSort = writerSort === 'count' ? 'rating' : 'count'"
+            :title="'Sort by ' + (writerSort === 'count' ? 'Rating' : 'Count')">
             <Repeat :size="12" /> {{ writerSort === 'count' ? 'Mode: Count' : 'Mode: Rating' }}
           </button>
         </div>
         <div class="lollipop-container">
           <div v-for="w in lollipopWriters" :key="w.name" class="lollipop-item" @click="goToPerson(w.name)">
             <div class="loll-track">
-              <div class="loll-bar" :style="{ width: (w.count / Math.max(...lollipopWriters.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-bar"
+                :style="{ width: (w.count / Math.max(...lollipopWriters.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-name-in">{{ w.name }} <span class="loll-count-in">({{ w.count }})</span></span>
               </div>
-              <div class="loll-dot" :style="{ backgroundColor: getRatingColor(w.avgRating), left: (w.count / Math.max(...lollipopWriters.map(x => x.count)) * 90) + '%' }">
+              <div class="loll-dot"
+                :style="{ backgroundColor: getRatingColor(w.avgRating), left: (w.count / Math.max(...lollipopWriters.map(x => x.count)) * 90) + '%' }">
                 <span class="loll-rating">{{ w.avgRating.toFixed(1) }}</span>
               </div>
             </div>
@@ -468,7 +483,7 @@ async function exportPdf() {
         </div>
       </div>
     </div>
-    
+
     <div v-if="rarestGems.length > 0" class="gems-section">
       <h3 class="gems-title">Your Rarest Gems</h3>
       <div class="cards-scroll">
@@ -502,20 +517,42 @@ async function exportPdf() {
   border-radius: 4px;
 }
 
-.dropdown-wrapper { position: relative; }
-.overlay { position: fixed; inset: 0; z-index: 100; }
+.dropdown-wrapper {
+  position: relative;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
 .dropdown-menu {
-  position: absolute; top: calc(100% + 8px); right: 0;
-  background-color: var(--bg-light); border: 1px solid var(--muted-dark);
-  border-radius: 8px; padding: 4px; min-width: 150px; z-index: 101;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--bg-light);
+  border: 1px solid var(--muted-dark);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 150px;
+  z-index: 101;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
+
 .dropdown-item {
-  width: 100%; text-align: left; padding: 8px 12px; background: transparent;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
   border: none;
-  color: var(--text-main); font-size: 14px;
+  color: var(--text-main);
+  font-size: 14px;
 }
-.dropdown-item:hover { background-color: rgba(255,255,255,0.1); }
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
 .metrics-grid {
   display: grid;
@@ -532,8 +569,16 @@ async function exportPdf() {
   gap: 8px;
 }
 
-.metric-label { font-size: 12px; color: var(--muted-mid); }
-.metric-value { font-size: 32px; font-weight: 700; color: white; }
+.metric-label {
+  font-size: 12px;
+  color: var(--muted-mid);
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+}
 
 .section-heading {
   font-size: 20px;
@@ -541,70 +586,224 @@ async function exportPdf() {
   color: white;
   margin: 16px 0 0 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
-.charts-row.single { grid-template-columns: 1fr; }
-.charts-row.genres-layout { grid-template-columns: 1fr minmax(300px, 400px); }
-.charts-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
-@media (max-width: 1200px) { .charts-row.three-col { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 1000px) { .charts-row, .charts-row.genres-layout, .charts-row.three-col { grid-template-columns: 1fr; } }
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.charts-row.single {
+  grid-template-columns: 1fr;
+}
+
+.charts-row.genres-layout {
+  grid-template-columns: 1fr minmax(300px, 400px);
+}
+
+.charts-row.three-col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 1200px) {
+  .charts-row.three-col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 1000px) {
+
+  .charts-row,
+  .charts-row.genres-layout,
+  .charts-row.three-col {
+    grid-template-columns: 1fr;
+  }
+}
 
 .lollipop-container {
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
+
 .lollipop-item {
-  display: flex; flex-direction: column; width: 100%; cursor: pointer; transition: opacity 0.2s;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
-.lollipop-item:hover { opacity: 0.8; }
-.lollipop-item:hover .loll-bar { background: rgba(255,255,255,0.12); }
-.loll-track { height: 24px; position: relative; width: 100%; display: flex; align-items: center; }
+
+.lollipop-item:hover {
+  opacity: 0.8;
+}
+
+.lollipop-item:hover .loll-bar {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.loll-track {
+  height: 24px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .loll-bar {
-  height: 24px; background: rgba(255,255,255,0.06); border-radius: 4px;
-  transition: width 0.5s ease; position: relative; display: flex; align-items: center;
-  padding-left: 10px; overflow: hidden; min-width: 40px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  overflow: hidden;
+  min-width: 40px;
 }
+
 .loll-name-in {
-  font-size: 11px; color: var(--text-main); white-space: nowrap; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  font-size: 11px;
+  color: var(--text-main);
+  white-space: nowrap;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
-.loll-count-in { font-size: 10px; color: var(--muted-mid); margin-left: 4px; font-weight: 400; }
+
+.loll-count-in {
+  font-size: 10px;
+  color: var(--muted-mid);
+  margin-left: 4px;
+  font-weight: 400;
+}
+
 .loll-dot {
-  position: absolute; transform: translateY(-50%) translateX(-50%); top: 50%;
-  width: 32px; height: 18px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2;
+  position: absolute;
+  transform: translateY(-50%) translateX(-50%);
+  top: 50%;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
 }
-.loll-rating { font-size: 11px; color: #000; font-weight: 800; }
+
+.loll-rating {
+  font-size: 11px;
+  color: #000;
+  font-weight: 800;
+}
 
 .chart-card {
-  background-color: var(--bg-light); border-radius: 12px; padding: 20px;
-  height: 100%; display: flex; flex-direction: column; overflow: hidden;
+  background-color: var(--bg-light);
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+
 .card-header-actions {
-  display: flex; justify-content: space-between; align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 20px;
 }
-.chart-title { font-size: 16px; font-weight: 600; margin: 0; color: var(--muted-mid); }
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--muted-mid);
+}
+
 .sort-toggle-btn {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  color: var(--muted-mid); font-size: 11px; padding: 4px 8px; border-radius: 4px;
-  cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted-mid);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
 }
-.sort-toggle-btn:hover { background: rgba(255,255,255,0.1); color: var(--accent-four); }
 
-.rated-genres { aspect-ratio: 1 / 1; max-width: 400px; width: 100%; justify-self: end; }
-.chart-wrapper { flex: 1; min-height: 280px; position: relative; }
-@media (max-width: 1000px) { 
-  .charts-row.genres-layout { grid-template-columns: 1fr; } 
-  .rated-genres { width: 100%; max-width: 100%; aspect-ratio: auto; } 
+.sort-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-four);
 }
 
-.gems-section { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
-.gems-title { font-size: 20px; font-weight: 600; }
-.cards-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: thin; scrollbar-color: var(--muted-dark) transparent; }
-.cards-scroll::-webkit-scrollbar { height: 6px; }
-.cards-scroll::-webkit-scrollbar-track { background: transparent; }
-.cards-scroll::-webkit-scrollbar-thumb { background: var(--muted-dark); border-radius: 3px; }
-.cards-scroll::-webkit-scrollbar-thumb:hover { background: var(--muted-mid); }
+.rated-genres {
+  aspect-ratio: 1 / 1;
+  max-width: 400px;
+  width: 100%;
+  justify-self: end;
+}
+
+.chart-wrapper {
+  flex: 1;
+  min-height: 280px;
+  position: relative;
+}
+
+@media (max-width: 1000px) {
+  .charts-row.genres-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rated-genres {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: auto;
+  }
+}
+
+.gems-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.gems-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cards-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-dark) transparent;
+}
+
+.cards-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cards-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cards-scroll::-webkit-scrollbar-thumb {
+  background: var(--muted-dark);
+  border-radius: 3px;
+}
+
+.cards-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-mid);
+}
 </style>

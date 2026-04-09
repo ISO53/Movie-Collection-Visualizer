@@ -218,14 +218,13 @@ pub async fn sync_watched_directory(
     
     let state: State<crate::DbState> = app_handle.state();
     
-    let (api_key, existing_paths, failed_paths, all_movies, limit_reached_on) = {
+    let (api_key, existing_paths, failed_paths, limit_reached_on) = {
         let conn_guard = state.0.lock().unwrap();
         let key = db::get_setting(&conn_guard, "omdb_api_key").unwrap_or_default().unwrap_or_default();
         let existing = db::get_movie_file_names(&conn_guard).unwrap_or_default();
         let failed = db::get_failed_import_file_names(&conn_guard).unwrap_or_default();
-        let all = db::get_all_movies(&conn_guard).unwrap_or_default();
         let limit = db::get_setting(&conn_guard, "api_limit_reached_on").unwrap_or_default().unwrap_or_default();
-        (key, existing, failed, all, limit)
+        (key, existing, failed, limit)
     };
     
     if api_key.is_empty() { return; }
@@ -235,7 +234,6 @@ pub async fn sync_watched_directory(
     if limit_reached_on == today {
         let _ = app_handle.emit("watched-dir-sync-result", WatchedDirSyncResult {
             new_count: 0,
-            removed_count: 0,
             rate_limited: true,
         });
         return;
@@ -244,20 +242,7 @@ pub async fn sync_watched_directory(
     let scan = scan_directory(Path::new(dir));
     let detected_entries = detect_titles(&scan);
     
-    let current_lower: HashSet<String> = detected_entries.iter().map(|(_, p)| p.to_lowercase()).collect();
-    let mut removed_count = 0;
-    
-    {
-        let conn_guard = state.0.lock().unwrap();
-        for movie in all_movies {
-            if !current_lower.contains(&movie.file_name.to_lowercase()) && db::delete_movie_by_file_name(&conn_guard, &movie.file_name).is_ok() {
-                removed_count += 1;
-                if let Some(path) = movie.poster_path {
-                    let _ = std::fs::remove_file(path);
-                }
-            }
-        }
-    }
+    let removed_count = 0;
     
     let new_entries: Vec<(String, String)> = detected_entries.into_iter().filter(|(_, p)| {
         let existing_lower: HashSet<String> = existing_paths.iter().map(|s| s.to_lowercase()).collect();
@@ -270,7 +255,6 @@ pub async fn sync_watched_directory(
     } else {
         let _ = app_handle.emit("watched-dir-sync-result", WatchedDirSyncResult {
             new_count: 0,
-            removed_count,
             rate_limited: false,
         });
     }

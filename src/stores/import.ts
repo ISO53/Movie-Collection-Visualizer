@@ -16,7 +16,6 @@ export const useImportStore = defineStore('import', () => {
   const lastResult = ref<ImportComplete | null>(null)
   
   const newCount = ref(0)
-  const removedCount = ref(0)
   const showSummary = ref(false)
   const rateLimited = ref(false)
   
@@ -70,17 +69,12 @@ export const useImportStore = defineStore('import', () => {
 
     await listen<WatchedDirSyncResult>('watched-dir-sync-result', e => {
       newCount.value = e.payload.newCount
-      removedCount.value = e.payload.removedCount
       rateLimited.value = e.payload.rateLimited
       
       if (e.payload.rateLimited) {
         toastStore.show('warning', 'Daily API limit reached. Syncing newly found movies will resume tomorrow.')
         showSummary.value = true
-      } else if (e.payload.newCount === 0 && e.payload.removedCount > 0) {
-         toastStore.show('info', `Sync complete — Removed ${e.payload.removedCount} missing movies`)
-         movieStore.load()
-         showSummary.value = true
-      } else if (e.payload.newCount === 0 && e.payload.removedCount === 0) {
+      } else if (e.payload.newCount === 0) {
         // Handled by SettingsPanel toast usually
       }
     })
@@ -100,7 +94,7 @@ export const useImportStore = defineStore('import', () => {
 
   return { 
     isImporting, current, total, currentTitle, elapsedSecs, lastResult, 
-    newCount, removedCount, showSummary, rateLimited,
+    newCount, showSummary, rateLimited,
     setupListeners, cancelImport, dismissSummary 
   }
 })

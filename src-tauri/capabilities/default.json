@@ -1,7 +1,9 @@
 {
   "identifier": "default",
   "description": "Default permissions for the app",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "core:webview:allow-internal-toggle-devtools",

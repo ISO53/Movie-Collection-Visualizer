@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { X, Search } from 'lucide-vue-next'
 import { invoke } from '@tauri-apps/api/core'
 import { useDialogStore } from '../../stores/dialog'
@@ -13,6 +13,7 @@ const toastStore = useToastStore()
 
 const movie = computed(() => dialogStore.wrongMovieData)
 const searchQuery = ref('')
+const parsedFileName = ref('') // Added to store the cleaned name
 const isSearching = ref(false)
 const searchResults = ref<OmdbSearchResult[]>([])
 const hasSearched = ref(false)
@@ -49,26 +50,45 @@ async function selectMovie(imdbId: string) {
     
     movieStore.load()
     toastStore.show('success', 'Movie updated successfully')
-    dialogStore.closeWrongMovie()
+    close() // Reset state and close dialog via store
   } catch (e: any) {
     toastStore.show('warning', 'Update failed: ' + e)
   }
 }
 
-dialogStore.$subscribe((_mutation, state) => {
-  if (state.wrongMovieData && !hasSearched.value) {
-    const fullPath = state.wrongMovieData.fileName
+// Watch for movie changes to reset search state when a new movie is opened
+watch(movie, async (newMovie) => {
+  if (newMovie) {
+    // Reset state for new session
+    hasSearched.value = false
+    searchResults.value = []
+    
+    // Use backend parser to get a clean movie title from the filename
+    const fullPath = newMovie.fileName
     const filename = fullPath.split(/[\\/]/).pop() || fullPath
-    const withoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename
-    searchQuery.value = withoutExt
+    
+    try {
+      const parsed = await invoke<string>('parse_filename', { filename })
+      searchQuery.value = parsed
+      parsedFileName.value = parsed
+    } catch {
+      // Fallback to simple name without extension
+      const withoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename
+      searchQuery.value = withoutExt
+      parsedFileName.value = withoutExt
+    }
+  } else {
+    // Also clean up when it becomes null
+    hasSearched.value = false
+    searchResults.value = []
+    searchQuery.value = ''
+    parsedFileName.value = ''
   }
 })
 
 function close() {
   dialogStore.closeWrongMovie()
-  hasSearched.value = false
-  searchResults.value = []
-  searchQuery.value = ''
+  // state reset is handled by the watch(movie) above
 }
 </script>
 
@@ -82,6 +102,14 @@ function close() {
         The file <span class="mono">{{ movie.fileName }}</span> was incorrectly identified as <strong>{{ movie.title }}</strong>.
         Search for the correct movie below.
       </p>
+
+      <div class="info-banner" style="display: flex; gap: 10px; align-items: flex-start; background: rgba(0, 163, 255, 0.08); border: 1px solid rgba(0, 163, 255, 0.2); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; color: #75d0ff; font-size: 13px;">
+        <Info :size="16" style="margin-top: 2px" />
+        <div>
+          <span style="font-weight: 600; margin-bottom: 4px; display: block;">Search Tips:</span>
+          <span style="opacity: 0.9; font-size: 12px; line-height: 1.4; display: block;">Our parser cannot always guess missing punctuation (like apostrophes in "Ocean's" or colons). Try adding them manually, or simplifying the query if the exact match fails.</span>
+        </div>
+      </div>
 
       <div class="search-row">
         <input 

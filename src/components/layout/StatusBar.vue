@@ -127,8 +127,7 @@ function handleCancelLeave() { isCancelHovered.value = false }
           <div class="stat-value">{{ importStore.lastResult?.totalImported || 0 }} movies</div>
         </div>
         <div class="stat-item">
-          <div class="stat-label">REMOVED FROM DISK</div>
-          <div class="stat-value highlight-red">{{ importStore.removedCount }} items</div>
+          <!-- Empty space or can be used for something else, but for now we'll just keep the 3 column feel by adjusting CSS or leaving as is if it's grid -->
         </div>
       </div>
       

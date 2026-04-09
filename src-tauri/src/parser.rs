@@ -44,7 +44,59 @@ pub fn parse_movie_title(filename: &str) -> String {
         }
     }
 
-    result
+    // Apply Title Casing
+    to_title_case(&result)
+}
+
+fn to_title_case(s: &str) -> String {
+    let lowercase_words = ["a", "an", "the", "and", "but", "or", "for", "nor", "on", "at", "to", "from", "by", "in", "of", "with", "vs", "vs."];
+    let mut words: Vec<String> = Vec::new();
+    let tokens: Vec<&str> = s.split_whitespace().collect();
+    
+    for (i, token) in tokens.iter().enumerate() {
+        let token_lower = token.to_lowercase();
+        
+        let is_last = i == tokens.len() - 1;
+        let is_first = i == 0;
+        
+        if lowercase_words.contains(&token_lower.as_str()) && !is_first && !is_last {
+            words.push(token_lower.to_string());
+        } else if is_roman_numeral(&token_lower) {
+            words.push(token_lower.to_uppercase());
+        } else {
+            // Capitalize first letter, lowercase rest
+            let mut char_iter = token.chars();
+            if let Some(first) = char_iter.next() {
+                // Check if there's a hyphen in the token, e.g. "Spider-Man"
+                if token.contains('-') {
+                    let sub_tokens: Vec<&str> = token.split('-').collect();
+                    let mut capitalized_subs = Vec::new();
+                    for sub in sub_tokens {
+                        let mut sub_iter = sub.chars();
+                        if let Some(s_first) = sub_iter.next() {
+                            let mut cap_sub = String::new();
+                            cap_sub.extend(s_first.to_uppercase());
+                            cap_sub.push_str(&sub_iter.collect::<String>().to_lowercase());
+                            capitalized_subs.push(cap_sub);
+                        } else {
+                            capitalized_subs.push(String::new());
+                        }
+                    }
+                    words.push(capitalized_subs.join("-"));
+                } else {
+                    let mut capitalized = String::new();
+                    capitalized.extend(first.to_uppercase());
+                    capitalized.push_str(&char_iter.collect::<String>().to_lowercase());
+                    words.push(capitalized);
+                }
+            }
+        }
+    }
+    words.join(" ")
+}
+
+fn is_roman_numeral(s: &str) -> bool {
+    matches!(s, "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" | "viii" | "ix" | "x")
 }
 
 fn find_stop_index(cleaned: &str) -> usize {

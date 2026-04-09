@@ -170,7 +170,7 @@ pub async fn sync_watched_directory_now(state: State<'_, crate::DbState>, cancel
     
     cancel_state.0.store(false, Ordering::SeqCst);
     importer::sync_watched_directory(&dir, app_handle).await;
-    Ok(WatchedDirSyncResult { new_count: 0, removed_count: 0, rate_limited: false }) 
+    Ok(WatchedDirSyncResult { new_count: 0, rate_limited: false }) 
 }
 
 #[tauri::command]

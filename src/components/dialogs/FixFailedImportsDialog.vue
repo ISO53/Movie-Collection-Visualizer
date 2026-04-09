@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { X, Search, ChevronRight, ChevronLeft, Info } from 'lucide-vue-next'
 import { invoke } from '@tauri-apps/api/core'
 import { useDialogStore } from '../../stores/dialog'
@@ -20,17 +20,30 @@ const isSearching = ref(false)
 const searchResults = ref<OmdbSearchResult[]>([])
 const hasSearched = ref(false)
 
-// Set initial search query when dialog opens
-dialogStore.$subscribe((_mutation, state) => {
-  if (state.failedImportsData.length > 0 && searchQuery.value === '') {
+// Set initial search query when dialog opens or item changes
+watch(currentItem, (newItem) => {
+  if (newItem) {
     updateSearchQuery()
+  } else {
+    // Reset state if no current item (dialog closing)
+    searchQuery.value = ''
+    searchResults.value = []
+    hasSearched.value = false
+    currentIndex.value = 0
   }
 })
 
-function updateSearchQuery() {
+async function updateSearchQuery() {
   if (!currentItem.value) return
-  const filename = currentItem.value.parsedTitle
-  searchQuery.value = filename
+  const filename = currentItem.value.fileName.split(/[\\/]/).pop() || currentItem.value.fileName
+  
+  try {
+    const parsed = await invoke<string>('parse_filename', { filename })
+    searchQuery.value = parsed
+  } catch {
+    searchQuery.value = currentItem.value.parsedTitle
+  }
+  
   searchResults.value = []
   hasSearched.value = false
 }
@@ -121,13 +134,19 @@ function close() {
       </div>
 
       <div class="info-banner">
-        <Info :size="16" />
-        <span>We couldn't automatically find a match for this file. Please verify the title below.</span>
+        <Info :size="16" style="margin-top: 2px; flex-shrink: 0;" />
+        <div>
+          <span style="display: block; margin-bottom: 4px; font-weight: 500;">We couldn't automatically find a match for this file. Please verify the title below.</span>
+          <div class="tips" style="font-size: 12px; opacity: 0.9; line-height: 1.4;">
+            <strong>Tip:</strong> If the search fails, our parser might have missed punctuation. Try removing numbers or adding characters 
+            (e.g., apostrophes for "Ocean's", colons for sequels) that are missing from the filename.
+          </div>
+        </div>
       </div>
 
       <div class="file-box">
         <div class="label">FILE ON DISK</div>
-        <div class="filename">{{ currentItem?.fileName }}</div>
+        <div class="filename">{{ currentItem?.fileName.split(/[\\/]/).pop() || currentItem?.fileName }}</div>
       </div>
 
       <div class="search-row">

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { useMovieStore } from '../stores/movies'
 import { useDialogStore } from '../stores/dialog'
-import { parseImdbRating, splitAndTrim, parseRuntime } from '../lib/utils'
+import { parseImdbRating, splitAndTrim, parseRuntime, formatTotalRuntime } from '../lib/utils'
 import HeroBanner from '../components/home/HeroBanner.vue'
 
 const movieStore = useMovieStore()
@@ -24,7 +24,6 @@ const stats = computed(() => {
   const uniqueDirectors = new Set(allDirectors).size
   
   const totalMinutes = movieStore.movies.reduce((acc, m) => acc + parseRuntime(m.runtime), 0)
-  const totalHours = Math.round(totalMinutes / 60)
   
   const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   const thisMonthCount = movieStore.movies.filter(m => new Date(m.addedAt) >= firstDayOfMonth).length
@@ -33,7 +32,7 @@ const stats = computed(() => {
     { label: 'TOTAL MOVIES', value: total, trend: `↑ ${thisMonthCount} this month` },
     { label: 'AVG RATING', value: avgRating, trend: '↑ 0.1 from last week' },
     { label: 'DIRECTORS', value: uniqueDirectors, trend: '↑ 2 new' },
-    { label: 'TOTAL RUNTIME', value: `${totalHours}h`, trend: '↑ 14h this month' }
+    { label: 'TOTAL RUNTIME', value: formatTotalRuntime(totalMinutes), trend: '↑ 14h this month' }
   ]
 })
 

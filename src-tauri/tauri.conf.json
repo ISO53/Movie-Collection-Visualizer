@@ -1,6 +1,6 @@
 {
   "productName": "Movie Collection Visualizer",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "identifier": "com.iso53.moviecollectionvisualizer",
   "build": {
     "frontendDist": "../dist",

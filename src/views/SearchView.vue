@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useMovieStore } from '../stores/movies'
 import { SortOption } from '../types/movie'
 import SearchBar from '../components/search/SearchBar.vue'
 import FilterBar from '../components/search/FilterBar.vue'
 import SortDropdown from '../components/search/SortDropdown.vue'
 import MovieGrid from '../components/search/MovieGrid.vue'
+import { ArrowDown } from 'lucide-vue-next'
 
 import { useRoute } from 'vue-router'
 
@@ -18,7 +19,17 @@ const route = useRoute()
 
 const query = ref('')
 const selectedGenres = ref<string[]>([])
-const sortOption = ref<SortOption>('added_desc')
+const sortType = ref('added')
+const sortOrder = ref<'asc' | 'desc'>('desc')
+
+const currentSortOption = computed((): SortOption => {
+  if (sortType.value === 'shuffle') return 'shuffle'
+  return `${sortType.value}_${sortOrder.value}` as SortOption
+})
+
+function toggleOrder() {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+}
 
 onMounted(() => {
   if (props.prefilterGenre) {
@@ -80,7 +91,18 @@ function onToggleGenre(genre: string) {
     <div class="top-section">
       <div class="search-sort-row">
         <SearchBar :value="query" @update="onSearch" class="search-bar-flex" />
-        <SortDropdown v-model="sortOption" />
+        <div class="sort-controls">
+          <SortDropdown v-model="sortType" />
+          <button 
+            class="direction-toggle" 
+            :class="{ 'rotated': sortOrder === 'asc' }"
+            @click="toggleOrder" 
+            :disabled="sortType === 'shuffle'"
+            :title="sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'"
+          >
+            <ArrowDown :size="18" />
+          </button>
+        </div>
       </div>
       <FilterBar 
         :genres="movieStore.allGenres" 
@@ -93,7 +115,7 @@ function onToggleGenre(genre: string) {
       <MovieGrid 
         :query="query" 
         :genres="selectedGenres" 
-        :sort="sortOption" 
+        :sort="currentSortOption" 
       />
     </div>
   </div>
@@ -119,8 +141,46 @@ function onToggleGenre(genre: string) {
 
 .search-sort-row {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.direction-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--bg-light);
+  border: 1px solid var(--muted-dark);
+  border-radius: 8px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.direction-toggle:hover:not(:disabled) {
+  background-color: rgba(255,255,255,0.08);
+  border-color: var(--muted-mid);
+}
+
+.direction-toggle.rotated svg {
+  transform: rotate(180deg);
+}
+
+.direction-toggle svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.direction-toggle:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .search-bar-flex {

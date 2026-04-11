@@ -4,37 +4,30 @@ import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-vue-next'
 import { SortOption } from '../../types/movie'
 
 const props = defineProps<{
-  modelValue: SortOption
+  modelValue: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', val: SortOption): void
+  (e: 'update:modelValue', val: string): void
 }>()
 
 const isOpen = ref(false)
 
 const options = [
-  { val_asc: 'added_asc', val_desc: 'added_desc', label: 'Date Added' },
-  { val_asc: 'alpha_asc', val_desc: 'alpha_desc', label: 'Alphabetical' },
-  { val_asc: 'rating_asc', val_desc: 'rating_desc', label: 'IMDB Rating' },
-  { val_asc: 'release_asc', val_desc: 'release_desc', label: 'Release Date' },
-  { val_asc: 'runtime_asc', val_desc: 'runtime_desc', label: 'Runtime' },
-  { val_asc: 'shuffle', val_desc: 'shuffle', label: 'Shuffle' }
+  { val: 'added', label: 'Date Added' },
+  { val: 'alpha', label: 'Alphabetical' },
+  { val: 'rating', label: 'IMDB Rating' },
+  { val: 'release', label: 'Release Date' },
+  { val: 'runtime', label: 'Runtime' },
+  { val: 'shuffle', label: 'Shuffle' }
 ]
 
 function getLabel() {
-  if (props.modelValue === 'shuffle') return 'Shuffle'
-  return options.find(o => o.val_asc === props.modelValue || o.val_desc === props.modelValue)?.label
+  return options.find(o => o.val === props.modelValue)?.label || 'Sort By'
 }
 
-function selectOption(opt: any) {
-  if (opt.val_asc === 'shuffle') {
-    emit('update:modelValue', 'shuffle')
-  } else if (props.modelValue === opt.val_desc) {
-    emit('update:modelValue', opt.val_asc as SortOption)
-  } else {
-    emit('update:modelValue', opt.val_desc as SortOption)
-  }
+function selectOption(val: string) {
+  emit('update:modelValue', val)
   isOpen.value = false
 }
 </script>
@@ -53,15 +46,10 @@ function selectOption(opt: any) {
         v-for="opt in options" 
         :key="opt.label"
         class="dropdown-item"
-        @click="selectOption(opt)"
+        :class="{ active: modelValue === opt.val }"
+        @click="selectOption(opt.val)"
       >
         <span class="item-label">{{ opt.label }}</span>
-        <div class="icon-indicator">
-          <template v-if="opt.val_asc !== 'shuffle'">
-            <ArrowDown v-if="modelValue === opt.val_desc" :size="14" class="active-icon" />
-            <ArrowUp v-else-if="modelValue === opt.val_asc" :size="14" class="active-icon" />
-          </template>
-        </div>
       </button>
     </div>
   </div>
@@ -86,7 +74,8 @@ function selectOption(opt: any) {
 }
 
 .dropdown-btn:hover {
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255,255,255,0.08);
+  border-color: var(--muted-mid);
 }
 
 .overlay {
@@ -125,6 +114,11 @@ function selectOption(opt: any) {
 
 .dropdown-item:hover {
   background-color: rgba(255,255,255,0.1);
+}
+
+.dropdown-item.active {
+  color: var(--accent-four);
+  background-color: rgba(236, 130, 0, 0.05);
 }
 
 .active-icon {

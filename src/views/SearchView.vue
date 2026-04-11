@@ -34,6 +34,8 @@ function toggleOrder() {
 const isTucked = ref(false);
 let lastScrollY = 0;
 let isAnimating = false;
+let mainEl: Element | null = null;
+let scrollRafId: number | null = null;
 
 function setTucked(val: boolean) {
     if (isTucked.value === val) return;
@@ -43,13 +45,11 @@ function setTucked(val: boolean) {
     
     setTimeout(() => {
         isAnimating = false;
-        const mainEl = document.querySelector('.app-main');
         if (mainEl) lastScrollY = mainEl.scrollTop;
     }, 400); 
 }
 
-function handleScroll() {
-    const mainEl = document.querySelector('.app-main');
+function handleScrollInner() {
     if (!mainEl) return;
     const currentScrollY = mainEl.scrollTop;
     
@@ -69,6 +69,14 @@ function handleScroll() {
     lastScrollY = currentScrollY;
 }
 
+function handleScroll() {
+    if (scrollRafId !== null) return;
+    scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = null;
+        handleScrollInner();
+    });
+}
+
 onMounted(() => {
     if (props.prefilterGenre) {
         selectedGenres.value = [props.prefilterGenre];
@@ -83,17 +91,20 @@ onMounted(() => {
         selectedGenres.value = [route.query.genre as string];
     }
     
-    const mainEl = document.querySelector('.app-main');
+    mainEl = document.querySelector('.app-main');
     if (mainEl) {
         mainEl.addEventListener('scroll', handleScroll, { passive: true });
     }
 });
 
 onUnmounted(() => {
-    const mainEl = document.querySelector('.app-main');
     if (mainEl) {
         mainEl.removeEventListener('scroll', handleScroll);
     }
+    if (scrollRafId !== null) {
+        cancelAnimationFrame(scrollRafId);
+    }
+    mainEl = null;
 });
 
 watch(
@@ -190,6 +201,8 @@ function onToggleGenre(genre: string) {
     top: 0;
     z-index: 20;
     transition: padding 0.3s ease;
+    will-change: transform;
+    contain: layout style;
 }
 
 .top-section.is-tucked {
@@ -253,8 +266,6 @@ function onToggleGenre(genre: string) {
     width: 48px;
     height: 48px;
     background-color: var(--bg-light-glass);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--muted-dark);
     border-radius: 8px;
     color: var(--text-main);

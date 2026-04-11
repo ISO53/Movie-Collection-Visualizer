@@ -59,8 +59,6 @@ function clear() {
     display: flex;
     align-items: center;
     background-color: var(--bg-light-glass);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     border-radius: 8px;
     height: 48px;
     border: 1px solid var(--muted-dark);

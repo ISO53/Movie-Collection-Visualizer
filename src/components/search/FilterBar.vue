@@ -54,8 +54,6 @@ const sortedGenres = computed(() => {
 .genre-chip {
     padding: 6px 16px;
     background-color: var(--bg-light-glass);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--muted-dark);
     border-radius: 9999px;
     color: var(--muted-mid);

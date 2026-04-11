@@ -82,6 +82,9 @@ function triggerDelete() {
   overflow: hidden;
   cursor: pointer;
   background-color: var(--bg-light);
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px auto 240px;
 }
 
 .poster {

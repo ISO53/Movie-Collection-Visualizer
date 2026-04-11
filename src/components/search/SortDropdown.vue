@@ -65,8 +65,6 @@ function selectOption(val: string) {
     align-items: center;
     gap: 8px;
     background-color: var(--bg-light-glass);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--muted-dark);
     color: var(--text-main);
     padding: 0 16px;

@@ -11,6 +11,8 @@ const settingsStore = useSettingsStore()
 const toastStore = useToastStore()
 const importStore = useImportStore()
 
+const isKeyValid = ref<boolean | null>(null)
+const isValidating = ref(false)
 const localKey = ref('')
 const appVersion = ref('')
 const updateInfo = ref<any>(null)
@@ -18,12 +20,44 @@ const updateInfo = ref<any>(null)
 onMounted(async () => {
   localKey.value = settingsStore.omdbApiKey || ''
   appVersion.value = await invoke('get_app_version')
+  
+  if (localKey.value) {
+    validateApiKey(localKey.value)
+  }
 })
+
+async function validateApiKey(key: string) {
+  if (!key.trim()) {
+    isKeyValid.value = null
+    return
+  }
+  
+  isValidating.value = true
+  try {
+    // We send a tiny request to check if the key works
+    const response = await fetch(`https://www.omdbapi.com/?apikey=${key}&i=tt0000001`)
+    const data = await response.json()
+    
+    if (data.Response === 'True' || data.Error !== 'Invalid API key!') {
+      // If it's another error like "Movie not found", the key is still valid
+      isKeyValid.value = true
+    } else {
+      isKeyValid.value = false
+    }
+  } catch (e) {
+    console.error('API validation failed', e)
+    // Could be network error, we don't necessarily want to mark it invalid
+    // But for simplicity in this case we'll keep it null or false
+  } finally {
+    isValidating.value = false
+  }
+}
 
 async function saveKey() {
   if (localKey.value.trim() !== '') {
     await settingsStore.saveApiKey(localKey.value)
     toastStore.show('success', 'API key saved')
+    validateApiKey(localKey.value)
   }
 }
 
@@ -135,10 +169,24 @@ async function importImdb() {
         </div>
         
         <div class="info-footer">
-          <div v-if="settingsStore.omdbApiKey" class="status-badge success">
-            <div class="dot"></div>
-            Key Active: ••••••••{{ settingsStore.omdbApiKey.slice(-4) }}
+          <div v-if="isValidating" class="status-badge warning">
+            <RefreshCw :size="12" class="rotating" />
+            Validating key...
           </div>
+          <template v-else-if="settingsStore.omdbApiKey">
+            <div v-if="isKeyValid === true" class="status-badge success">
+              <div class="dot"></div>
+              Key Active & Valid: ••••••••{{ settingsStore.omdbApiKey.slice(-4) }}
+            </div>
+            <div v-else-if="isKeyValid === false" class="status-badge danger">
+              <div class="dot"></div>
+              Invalid API Key
+            </div>
+            <div v-else class="status-badge success">
+              <div class="dot"></div>
+              Key Active: ••••••••{{ settingsStore.omdbApiKey.slice(-4) }}
+            </div>
+          </template>
           <div v-else class="status-badge warning">
             <div class="dot"></div>
             No API key configured
@@ -490,6 +538,7 @@ async function importImdb() {
 
 .status-badge.success { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
 .status-badge.warning { background: rgba(234, 179, 8, 0.1); color: #facc15; }
+.status-badge.danger { background: rgba(239, 68, 68, 0.1); color: #f87171; }
 
 .dot {
   width: 6px;
@@ -616,5 +665,13 @@ async function importImdb() {
   color: var(--muted-mid);
   margin-bottom: 20px;
   line-height: 1.6;
+}
+.rotating {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

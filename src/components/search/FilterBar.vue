@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   genres: string[]
   selected: string[]
 }>()
@@ -7,19 +9,32 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'toggle', genre: string): void
 }>()
+
+const sortedGenres = computed(() => {
+  return [...props.genres].sort((a, b) => {
+    const aSelected = props.selected.includes(a)
+    const bSelected = props.selected.includes(b)
+    if (aSelected && !bSelected) return -1
+    if (!aSelected && bSelected) return 1
+    // Maintain original order for non-selected/selected groups
+    return props.genres.indexOf(a) - props.genres.indexOf(b)
+  })
+})
 </script>
 
 <template>
   <div class="filter-bar">
-    <button 
-      v-for="genre in genres" 
-      :key="genre"
-      class="genre-chip"
-      :class="{ active: selected.includes(genre) }"
-      @click="emit('toggle', genre)"
-    >
-      {{ genre }}
-    </button>
+    <TransitionGroup name="list">
+      <button 
+        v-for="genre in sortedGenres" 
+        :key="genre"
+        class="genre-chip"
+        :class="{ active: selected.includes(genre) }"
+        @click="emit('toggle', genre)"
+      >
+        {{ genre }}
+      </button>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -57,5 +72,18 @@ const emit = defineEmits<{
   background-color: rgba(236, 130, 0, 0.1);
   border-color: var(--accent-four);
   color: var(--accent-four);
+}
+
+/* Transitions */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 </style>

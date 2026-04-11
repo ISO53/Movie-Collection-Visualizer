@@ -136,7 +136,7 @@ function onToggleGenre(genre: string) {
   background-color: var(--bg-dark);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
 }
 
 .search-sort-row {

@@ -54,14 +54,21 @@ function goSettings() {
 <style scoped>
 .sidebar {
   width: 64px;
-  background-color: var(--bg-dark);
-  border-right: 1px solid var(--muted-dark);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--bg-dark-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: width 250ms ease;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  position: relative;
+  z-index: 50;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar:hover {
@@ -96,7 +103,7 @@ function goSettings() {
   margin-left: 20px;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 250ms ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar:hover .logo-text,
@@ -155,7 +162,7 @@ function goSettings() {
   font-weight: 500;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 250ms ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .divider {

@@ -75,13 +75,13 @@ onMounted(async () => {
 }
 
 .app-sidebar {
-  flex-shrink: 0;
-  z-index: 10;
+  z-index: 50;
 }
 
 .app-main {
   flex-grow: 1;
   overflow-y: auto;
   position: relative;
+  padding-left: 64px; /* Space for the collapsed sidebar */
 }
 </style>

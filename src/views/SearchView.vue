@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, watch, computed} from "vue";
+import {ref, onMounted, onUnmounted, watch, computed} from "vue";
 import {useMovieStore} from "../stores/movies";
 import {SortOption} from "../types/movie";
 import SearchBar from "../components/search/SearchBar.vue";
@@ -31,6 +31,44 @@ function toggleOrder() {
     sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
 }
 
+const isTucked = ref(false);
+let lastScrollY = 0;
+let isAnimating = false;
+
+function setTucked(val: boolean) {
+    if (isTucked.value === val) return;
+    
+    isTucked.value = val;
+    isAnimating = true;
+    
+    setTimeout(() => {
+        isAnimating = false;
+        const mainEl = document.querySelector('.app-main');
+        if (mainEl) lastScrollY = mainEl.scrollTop;
+    }, 400); 
+}
+
+function handleScroll() {
+    const mainEl = document.querySelector('.app-main');
+    if (!mainEl) return;
+    const currentScrollY = mainEl.scrollTop;
+    
+    if (isAnimating) {
+        lastScrollY = currentScrollY;
+        return;
+    }
+    
+    if (currentScrollY <= 20) {
+        setTucked(false);
+    } else if (currentScrollY > lastScrollY + 12) {
+        setTucked(true);
+    } else if (currentScrollY < lastScrollY - 12) {
+        setTucked(false);
+    }
+    
+    lastScrollY = currentScrollY;
+}
+
 onMounted(() => {
     if (props.prefilterGenre) {
         selectedGenres.value = [props.prefilterGenre];
@@ -43,6 +81,18 @@ onMounted(() => {
     }
     if (route.query.genre) {
         selectedGenres.value = [route.query.genre as string];
+    }
+    
+    const mainEl = document.querySelector('.app-main');
+    if (mainEl) {
+        mainEl.addEventListener('scroll', handleScroll, { passive: true });
+    }
+});
+
+onUnmounted(() => {
+    const mainEl = document.querySelector('.app-main');
+    if (mainEl) {
+        mainEl.removeEventListener('scroll', handleScroll);
     }
 });
 
@@ -95,7 +145,7 @@ function onToggleGenre(genre: string) {
 
 <template>
     <div class="search-container">
-        <div class="top-section">
+        <div class="top-section" :class="{ 'is-tucked': isTucked }">
             <div class="glass-background"></div>
             <div class="search-content">
                 <div class="search-sort-row">
@@ -113,7 +163,11 @@ function onToggleGenre(genre: string) {
                         </button>
                     </div>
                 </div>
-                <FilterBar :genres="movieStore.allGenres" :selected="selectedGenres" @toggle="onToggleGenre" />
+                <Transition name="filter-slide">
+                    <div class="filter-wrapper" v-show="!isTucked">
+                        <FilterBar :genres="movieStore.allGenres" :selected="selectedGenres" @toggle="onToggleGenre" />
+                    </div>
+                </Transition>
             </div>
         </div>
 
@@ -127,7 +181,7 @@ function onToggleGenre(genre: string) {
 .search-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100%;
 }
 
 .top-section {
@@ -135,6 +189,11 @@ function onToggleGenre(genre: string) {
     position: sticky;
     top: 0;
     z-index: 20;
+    transition: padding 0.3s ease;
+}
+
+.top-section.is-tucked {
+    padding: 24px 40px 24px 40px;
 }
 
 .glass-background {
@@ -150,7 +209,7 @@ function onToggleGenre(genre: string) {
 .search-content {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 0;
     position: relative;
     z-index: 1;
 }
@@ -159,6 +218,26 @@ function onToggleGenre(genre: string) {
     display: flex;
     gap: 12px;
     align-items: center;
+    margin-bottom: 24px;
+    transition: margin-bottom 0.3s ease;
+}
+
+.top-section.is-tucked .search-sort-row {
+    margin-bottom: 0px;
+}
+
+.filter-slide-enter-active,
+.filter-slide-leave-active {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 100px;
+    opacity: 1;
+    overflow: hidden;
+}
+
+.filter-slide-enter-from,
+.filter-slide-leave-to {
+    max-height: 0;
+    opacity: 0;
 }
 
 .sort-controls {

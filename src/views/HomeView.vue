@@ -140,18 +140,41 @@ const topDirectors = computed(() => {
     })
   })
   
-  return Array.from(counts.entries())
+  const allDirectors = Array.from(counts.entries())
+  if (allDirectors.length === 0) return []
+
+  // Use current day for variety
+  const now = new Date()
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000)
+
+  // Pool of top 20 directors for selection
+  const pool = allDirectors
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([name, count]) => {
-      const directorMovies = movieStore.movies
-        .filter(m => splitAndTrim(m.director).includes(name))
-        .slice(0, 4)
-      
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-      
-      return { name, count, movies: directorMovies, initials }
-    })
+    .slice(0, 20)
+
+  const selectedDirectors: [string, number][] = []
+  const used = new Set<string>()
+  let offset = 0
+  
+  while (selectedDirectors.length < 4 && selectedDirectors.length < pool.length) {
+    const idx = (dayOfYear + offset) % pool.length
+    const d = pool[idx]
+    if (!used.has(d[0])) {
+      used.add(d[0])
+      selectedDirectors.push(d)
+    }
+    offset++
+  }
+  
+  return selectedDirectors.map(([name, count]) => {
+    const directorMovies = movieStore.movies
+      .filter(m => splitAndTrim(m.director).includes(name))
+      .slice(0, 4)
+    
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    
+    return { name, count, movies: directorMovies, initials }
+  })
 })
 
 function getInitialsGradient(name: string) {
@@ -290,26 +313,28 @@ function getPosterUrl(movie: any) {
             <div 
               v-for="director in topDirectors" 
               :key="director.name"
-              class="director-card"
+              class="director-card-new"
               @click="router.push(`/search?director=${director.name}`)"
             >
-              <div class="director-avatar" :style="{ background: getInitialsGradient(director.name) }">
-                {{ director.initials }}
-              </div>
-              <h3 class="director-name">{{ director.name }}</h3>
-              <p class="director-count">{{ director.count }} films</p>
-              
-              <div class="mini-posters">
+              <!-- Background posters stack -->
+              <div class="director-bg-wrapper">
                 <div 
-                  v-for="i in 4" 
-                  :key="i"
-                  class="mini-poster-placeholder"
-                >
-                  <img 
-                    v-if="director.movies[i-1]" 
-                    :src="getPosterUrl(director.movies[i-1])" 
-                    alt=""
-                  />
+                  v-for="(movie, index) in director.movies.slice(0, 3)" 
+                  :key="movie.imdbId"
+                  class="director-bg-poster"
+                  :class="'p-' + index"
+                  :style="{ backgroundImage: `url(${getPosterUrl(movie)})` }"
+                ></div>
+              </div>
+              
+              <!-- Glass Overlay -->
+              <div class="director-glass-overlay">
+                <div class="director-bottom-info">
+                  <span class="director-label">DIRECTOR</span>
+                  <h3 class="director-name-new">{{ director.name }}</h3>
+                  <div class="director-meta">
+                    <span class="count-pill">{{ director.count }} films</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -565,67 +590,145 @@ function getPosterUrl(movie: any) {
   gap: 16px;
 }
 
-.director-card {
-  background: #1a1a1a;
-  border: 1px solid #222;
-  border-radius: 12px;
-  padding: 24px 16px;
-  text-align: center;
+.director-card-new {
+  position: relative;
+  height: 320px;
+  border-radius: 20px;
+  overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.director-card:hover {
+.director-card-new:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   border-color: var(--accent-four);
 }
 
-.director-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  margin: 0 auto 12px auto;
+.director-bg-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 20px;
-  font-weight: 700;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
 }
 
-.director-name {
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.director-bg-poster {
+  position: absolute;
+  width: 140px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+  filter: blur(1px) brightness(0.5);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.director-count {
-  color: var(--muted-mid);
-  font-size: 12px;
-  margin: 4px 0 16px 0;
+.director-bg-poster.p-0 {
+  z-index: 3;
+  transform: translate(0, 5px);
+  filter: blur(0px) brightness(0.7);
 }
 
-.mini-posters {
+.director-bg-poster.p-1 {
+  z-index: 2;
+  transform: translate(-50px, -5px) rotate(-12deg);
+  opacity: 0.7;
+}
+
+.director-bg-poster.p-2 {
+  z-index: 1;
+  transform: translate(50px, 15px) rotate(12deg);
+  opacity: 0.7;
+}
+
+.director-card-new:hover .director-bg-poster.p-0 {
+  transform: translate(0, -10px) scale(1.1);
+  filter: blur(0) brightness(0.9);
+}
+
+.director-card-new:hover .director-bg-poster.p-1 {
+  transform: translate(-70px, -20px) rotate(-20deg) scale(1.05);
+  opacity: 0.4;
+}
+
+.director-card-new:hover .director-bg-poster.p-2 {
+  transform: translate(70px, 20px) rotate(20deg) scale(1.05);
+  opacity: 0.4;
+}
+
+.director-glass-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: linear-gradient(
+    to bottom, 
+    rgba(0,0,0,0.1) 0%, 
+    rgba(0,0,0,0.3) 50%, 
+    rgba(0,0,0,0.85) 100%
+  );
+  backdrop-filter: blur(2px);
   display: flex;
-  justify-content: center;
-  gap: 4px;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  transition: all 0.4s ease;
 }
 
-.mini-poster-placeholder {
-  width: 28px;
-  height: 40px;
-  border-radius: 4px;
-  background: #000;
-  overflow: hidden;
+.director-card-new:hover .director-glass-overlay {
+  backdrop-filter: blur(0px);
+  background: linear-gradient(
+    to bottom, 
+    rgba(0,0,0,0) 0%, 
+    rgba(0,0,0,0.2) 50%, 
+    rgba(0,0,0,0.95) 100%
+  );
 }
 
-.mini-poster-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.director-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-four);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  display: block;
+  opacity: 0.8;
+}
+
+.director-name-new {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.director-meta {
+  margin-top: 12px;
+}
+
+.count-pill {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.director-card-new:hover .count-pill {
+    background: var(--accent-four);
+    color: black;
+    transform: scale(1.05);
 }
 
 /* Empty State */

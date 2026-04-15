@@ -54,9 +54,6 @@ function findSimilar() {
 <template>
   <div v-if="randomMovie" class="hero-banner" :style="{ backgroundImage: bgImage }">
     <div class="hero-overlay"></div>
-    <button class="refresh-btn" @click="pickRandom" title="Pick another random movie">
-      <RefreshCcw :size="20" />
-    </button>
     <div class="hero-content">
       <h1 class="hero-title">{{ randomMovie.title }}</h1>
       <div class="hero-meta">
@@ -100,28 +97,6 @@ function findSimilar() {
   inset: 0;
   background: linear-gradient(to right, rgba(16, 16, 16, 0.95) 20%, rgba(16, 16, 16, 0.4) 60%, rgba(16, 16, 16, 0.1) 100%),
     linear-gradient(to top, rgba(16, 16, 16, 1) 0px, rgba(16, 16, 16, 1) 4px, rgba(16, 16, 16, 0) 25%);
-}
-
-.refresh-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.5);
-  color: var(--muted-light);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms;
-}
-
-.refresh-btn:hover {
-  background: var(--accent-four);
-  color: #101010;
-  transform: rotate(30deg);
 }
 
 .hero-content {

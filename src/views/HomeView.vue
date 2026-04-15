@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { RefreshCcw } from 'lucide-vue-next'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { useMovieStore } from '../stores/movies'
 import { useDialogStore } from '../stores/dialog'
@@ -10,6 +11,19 @@ import HeroBanner from '../components/home/HeroBanner.vue'
 const movieStore = useMovieStore()
 const dialogStore = useDialogStore()
 const router = useRouter()
+
+const seedOffset = ref(0)
+const reshuffle = () => {
+  seedOffset.value += 1
+}
+
+const dayOfYear = computed(() => {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  const diff = now.getTime() - start.getTime()
+  const oneDay = 1000 * 60 * 60 * 24
+  return Math.floor(diff / oneDay) + seedOffset.value
+})
 
 const isEmpty = computed(() => movieStore.movies.length === 0)
 
@@ -46,9 +60,8 @@ const featuredMovies = computed(() => {
     return allMovies.map(m => ({ ...m, pill: 'COLLECTION' }))
   }
 
-  // Use current day to keep selection stable for the "night", but different every day
-  const now = new Date()
-  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000)
+  // Use current day + offset to keep selection stable but refreshable
+  const currentDay = dayOfYear.value
   
   // Create pools for variety
   const topRatedPool = [...allMovies]
@@ -70,7 +83,7 @@ const featuredMovies = computed(() => {
   const addFromPool = (pool: any[], label: string, offset: number) => {
     if (pool.length === 0) return false
     // Pick based on day + offset to get different movies from the same pool
-    let idx = (dayOfYear + offset) % pool.length
+    let idx = (currentDay + offset) % pool.length
     let attempts = 0
     while (attempts < pool.length) {
       const movie = pool[idx]
@@ -124,10 +137,25 @@ const moodGenres = computed(() => {
     { name: 'Documentary', emoji: '📽️', color: '#fbc2eb' }
   ]
 
-  return Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([name, count]) => {
+  const allGenres = Array.from(counts.entries())
+  const pool = allGenres.sort((a, b) => b[1] - a[1]).slice(0, 16)
+  
+  const selectedGenres: [string, number][] = []
+  const used = new Set<string>()
+  let offset = 0
+  const currentDay = dayOfYear.value
+
+  while (selectedGenres.length < 8 && selectedGenres.length < pool.length) {
+    const idx = (currentDay + offset) % pool.length
+    const g = pool[idx]
+    if (!used.has(g[0])) {
+      used.add(g[0])
+      selectedGenres.push(g)
+    }
+    offset++
+  }
+
+  return selectedGenres.map(([name, count]) => {
       const preset = genreData.find(g => g.name === name) || {
         name,
         emoji: '🎞️',
@@ -149,9 +177,8 @@ const topDirectors = computed(() => {
   const allDirectors = Array.from(counts.entries())
   if (allDirectors.length === 0) return []
 
-  // Use current day for variety
-  const now = new Date()
-  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000)
+  // Use current day + offset for variety
+  const currentDay = dayOfYear.value
 
   // Pool of top 20 directors for selection
   const pool = allDirectors
@@ -163,7 +190,7 @@ const topDirectors = computed(() => {
   let offset = 0
   
   while (selectedDirectors.length < 4 && selectedDirectors.length < pool.length) {
-    const idx = (dayOfYear + offset) % pool.length
+    const idx = (currentDay + offset) % pool.length
     const d = pool[idx]
     if (!used.has(d[0])) {
       used.add(d[0])
@@ -214,8 +241,8 @@ function getPosterUrl(movie: any) {
       </div>
     </div>
     
-    <div v-else-if="!isEmpty" class="scroll-content">
-      <HeroBanner />
+    <div v-else-if="!isEmpty" class="scroll-content relative-container">
+      <HeroBanner :key="seedOffset" />
       
       <div class="content-sections">
         <!-- Section 1: Stats Strip -->
@@ -348,12 +375,41 @@ function getPosterUrl(movie: any) {
         </section>
       </div>
     </div>
+
+    <!-- Global Floating Refresh Button -->
+    <button v-if="!isEmpty" class="global-refresh-btn" @click="reshuffle" title="Curate a new night">
+      <RefreshCcw :size="24" />
+    </button>
   </div>
 </template>
 
 <style scoped>
 .home-container {
   height: 100%;
+  position: relative;
+}
+
+.global-refresh-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 50;
+  background: var(--accent-four);
+  color: #101010;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.global-refresh-btn:hover {
+  transform: rotate(30deg) scale(1.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(236, 130, 0, 0.5);
 }
 
 .scroll-content {

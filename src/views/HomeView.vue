@@ -110,22 +110,28 @@ const moodGenres = computed(() => {
   })
   
   const genreData = [
-    { name: 'Action', emoji: '🔥', gradient: 'linear-gradient(135deg, #451a1a 0%, #2a0a0a 100%)' },
-    { name: 'Comedy', emoji: '😂', gradient: 'linear-gradient(135deg, #1a451a 0%, #0a2a0a 100%)' },
-    { name: 'Horror', emoji: '👻', gradient: 'linear-gradient(135deg, #1a1a45 0%, #0a0a2a 100%)' },
-    { name: 'Drama', emoji: '🎭', gradient: 'linear-gradient(135deg, #451a45 0%, #2a0a2a 100%)' },
-    { name: 'Sci-Fi', emoji: '🚀', gradient: 'linear-gradient(135deg, #1a4545 0%, #0a2a2a 100%)' },
-    { name: 'Thriller', emoji: '🔪', gradient: 'linear-gradient(135deg, #45451a 0%, #2a2a0a 100%)' }
+    { name: 'Action', emoji: '🏹', color: '#ff4b2b' },
+    { name: 'Drama', emoji: '🎭', color: '#ff9a9e' },
+    { name: 'Adventure', emoji: '🧭', color: '#f9d423' },
+    { name: 'Thriller', emoji: '👁️', color: '#43e97b' },
+    { name: 'Sci-Fi', emoji: '🪐', color: '#4facfe' },
+    { name: 'Crime', emoji: '🔍', color: '#a18cd1' },
+    { name: 'Mystery', emoji: '🗝️', color: '#f093fb' },
+    { name: 'Horror', emoji: '🕯️', color: '#fa709a' },
+    { name: 'Comedy', emoji: '🎪', color: '#ffecd2' },
+    { name: 'Fantasy', emoji: '🏰', color: '#84fab0' },
+    { name: 'Animation', emoji: '🖌️', color: '#a6c1ee' },
+    { name: 'Documentary', emoji: '📽️', color: '#fbc2eb' }
   ]
 
   return Array.from(counts.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
+    .slice(0, 8)
     .map(([name, count]) => {
       const preset = genreData.find(g => g.name === name) || {
         name,
-        emoji: '🎬',
-        gradient: `linear-gradient(135deg, #333 0%, #111 100%)`
+        emoji: '🎞️',
+        color: '#888'
       }
       return { ...preset, count }
     })
@@ -290,7 +296,7 @@ function getPosterUrl(movie: any) {
               v-for="genre in moodGenres" 
               :key="genre.name"
               class="genre-tile"
-              :style="{ background: genre.gradient }"
+              :style="{ '--genre-color': genre.color }"
               @click="router.push(`/search?genre=${genre.name}`)"
             >
               <div class="genre-info">
@@ -536,25 +542,45 @@ function getPosterUrl(movie: any) {
 /* Section 3: Mood */
 .mood-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
 .genre-tile {
-  height: 90px;
-  border-radius: 12px;
-  padding: 16px;
+  height: 100px;
+  border-radius: 16px;
+  padding: 20px;
   position: relative;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   overflow: hidden;
-  transition: transform 0.2s;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.genre-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 50%, var(--genre-color), transparent 60%);
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
 }
 
 .genre-tile:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--genre-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 
+              0 0 15px -5px var(--genre-color);
+}
+
+.genre-tile:hover::before {
+  opacity: 0.35;
 }
 
 .genre-info {
@@ -562,25 +588,30 @@ function getPosterUrl(movie: any) {
 }
 
 .genre-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
   color: white;
+  letter-spacing: -0.5px;
 }
 
 .genre-count {
   font-size: 11px;
-  color: rgba(255,255,255,0.6);
-  margin-top: 2px;
+  font-weight: 600;
+  color: var(--muted-mid);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .genre-emoji {
-  font-size: 48px;
-  opacity: 0.15;
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  user-select: none;
+  font-size: 40px;
+  z-index: 2;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+.genre-tile:hover .genre-emoji {
+  transform: scale(1.2) rotate(10deg);
 }
 
 /* Section 4: Directors */

@@ -38,10 +38,66 @@ const stats = computed(() => {
 
 // Section 2: Featured Mosaic
 const featuredMovies = computed(() => {
-  return [...movieStore.movies]
-    .filter(m => m.imdbRating && m.imdbRating !== 'N/A')
+  const allMovies = [...movieStore.movies].filter(m => m.imdbRating && m.imdbRating !== 'N/A')
+  if (allMovies.length === 0) return []
+  
+  // If we have few movies, just show what we have
+  if (allMovies.length <= 5) {
+    return allMovies.map(m => ({ ...m, pill: 'COLLECTION' }))
+  }
+
+  // Use current day to keep selection stable for the "night", but different every day
+  const now = new Date()
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000)
+  
+  // Create pools for variety
+  const topRatedPool = [...allMovies]
     .sort((a, b) => parseImdbRating(b.imdbRating) - parseImdbRating(a.imdbRating))
-    .slice(0, 5)
+    .slice(0, 30)
+    
+  const gemsPool = allMovies.filter(m => {
+    const r = parseImdbRating(m.imdbRating)
+    return r >= 7.2 && r < 8.2
+  })
+
+  const vaultPool = [...allMovies]
+    .sort((a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime())
+    .slice(0, 30)
+
+  const result: any[] = []
+  const ids = new Set<string>()
+
+  const addFromPool = (pool: any[], label: string, offset: number) => {
+    if (pool.length === 0) return false
+    // Pick based on day + offset to get different movies from the same pool
+    let idx = (dayOfYear + offset) % pool.length
+    let attempts = 0
+    while (attempts < pool.length) {
+      const movie = pool[idx]
+      if (!ids.has(movie.imdbId)) {
+        ids.add(movie.imdbId)
+        result.push({ ...movie, pill: label })
+        return true
+      }
+      idx = (idx + 1) % pool.length
+      attempts++
+    }
+    return false
+  }
+
+  // Assemble variety (Large card first)
+  addFromPool(topRatedPool, 'TOP RATED', 0)
+  addFromPool(gemsPool.length > 0 ? gemsPool : allMovies, 'HIDDEN GEM', 7)
+  addFromPool(vaultPool, 'FROM THE VAULT', 13)
+  
+  // Fill remaining slots with "Discover" picks from all movies
+  let discoverOffset = 21
+  while (result.length < 5) {
+    if (!addFromPool(allMovies, 'DISCOVER', discoverOffset)) break
+    discoverOffset += 5
+  }
+
+  return result
 })
 
 // Section 3: Browse by Mood
@@ -153,7 +209,7 @@ function getPosterUrl(movie: any) {
         <section class="section-container">
           <header class="section-header">
             <h2 class="section-title">Handpicked for tonight</h2>
-            <router-link to="/search?sort=rating_desc" class="see-all-link">See all →</router-link>
+            <router-link to="/search" class="see-all-link">Explore all →</router-link>
           </header>
           
           <div class="mosaic-grid" v-if="featuredMovies.length > 0">
@@ -166,7 +222,7 @@ function getPosterUrl(movie: any) {
               <div class="mosaic-overlay">
                 <div class="mosaic-top">
                   <span class="rating-badge">★ {{ featuredMovies[0].imdbRating }}</span>
-                  <span class="top-rated-pill">TOP RATED</span>
+                  <span class="top-rated-pill">{{ (featuredMovies[0] as any).pill || 'TOP RATED' }}</span>
                 </div>
                 <div class="mosaic-bottom">
                   <h3 class="movie-title">{{ featuredMovies[0].title }}</h3>
@@ -187,6 +243,7 @@ function getPosterUrl(movie: any) {
                 <div class="mosaic-overlay">
                   <div class="mosaic-top">
                     <span class="rating-badge small">★ {{ movie.imdbRating }}</span>
+                    <span class="top-rated-pill small" v-if="(movie as any).pill">{{ (movie as any).pill }}</span>
                   </div>
                   <div class="mosaic-bottom">
                     <h4 class="movie-title small">{{ movie.title }}</h4>
@@ -422,6 +479,12 @@ function getPosterUrl(movie: any) {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.top-rated-pill.small {
+  padding: 2px 6px;
+  font-size: 8px;
 }
 
 .movie-title {

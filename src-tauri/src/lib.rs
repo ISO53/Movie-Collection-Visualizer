@@ -4,6 +4,7 @@ pub mod parser;
 pub mod omdb;
 pub mod importer;
 pub mod commands;
+pub mod recommender;
 
 use rusqlite::Connection;
 use std::sync::Mutex;
@@ -60,7 +61,8 @@ pub fn run() {
             commands::open_external,
             commands::get_failed_imports,
             commands::resolve_failed_import,
-            commands::import_imdb_csv
+            commands::import_imdb_csv,
+            commands::get_recommendations
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

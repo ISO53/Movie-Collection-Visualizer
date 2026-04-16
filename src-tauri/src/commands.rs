@@ -477,3 +477,85 @@ fn parse_csv_line(line: &str) -> Vec<&str> {
 
     fields
 }
+
+#[tauri::command]
+pub async fn get_recommendations(
+    state: State<'_, crate::DbState>,
+    app_handle: AppHandle,
+) -> Result<Vec<crate::models::RecommendationCluster>, String> {
+    use tauri::Manager;
+
+    // Grab the OMDB API key — enrichment is best-effort, not required
+    let api_key = {
+        let conn = state.0.lock().map_err(|e| e.to_string())?;
+        db::get_setting(&conn, "omdb_api_key")
+            .unwrap_or_default()
+            .unwrap_or_default()
+    };
+
+    // Resolve paths
+    let user_db_path = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?
+        .join("mcv.db");
+
+    let ml_db_path = app_handle
+        .path()
+        .resource_dir()
+        .map_err(|e| e.to_string())?
+        .join("resources")
+        .join("movies_info.db");
+
+    // Sanity check — if the ML db is not found yet (dev mode) fall back to the
+    // project-local copy so development works without a full bundle.
+    let ml_db_path = if ml_db_path.exists() {
+        ml_db_path
+    } else {
+        let dev_path = std::env::current_dir()
+            .unwrap_or_default()
+            .join("resources")
+            .join("movies_info.db");
+        if dev_path.exists() {
+            dev_path
+        } else {
+            return Err("movies_info.db not found. Make sure it is in src-tauri/resources/".into());
+        }
+    };
+
+    if !user_db_path.exists() {
+        return Err("User database not found".into());
+    }
+
+    // Run the heavy ML work on a blocking thread
+    let mut clusters = tokio::task::spawn_blocking(move || {
+        crate::recommender::get_recommendations(&user_db_path, &ml_db_path)
+    })
+    .await
+    .map_err(|e| e.to_string())??;
+
+    // Enrich each movie with real metadata from OMDB (best-effort)
+    if !api_key.is_empty() {
+        for cluster in &mut clusters {
+            for movie in &mut cluster.recommendations {
+                // Small courtesy delay to avoid rate limiting
+                tokio::time::sleep(std::time::Duration::from_millis(120)).await;
+                if let Ok(res) = omdb::fetch_by_id(&movie.imdb_id, &api_key).await {
+                    if res.response == "True" || !res.title.is_empty() {
+                        movie.title = res.title;
+                        movie.year = res.year;
+                        // Keep genres from our ML db if OMDB returns empty
+                        if !res.genre.is_empty() && res.genre != "N/A" {
+                            movie.genres = res.genre;
+                        }
+                        if !res.poster.is_empty() && res.poster != "N/A" {
+                            movie.poster_url = res.poster;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(clusters)
+}

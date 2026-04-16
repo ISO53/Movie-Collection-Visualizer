@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { RefreshCcw } from 'lucide-vue-next'
+import { RefreshCcw, Sparkles, ExternalLink } from 'lucide-vue-next'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { invoke } from '@tauri-apps/api/core'
 import { useMovieStore } from '../stores/movies'
 import { useDialogStore } from '../stores/dialog'
 import { parseImdbRating, splitAndTrim, parseRuntime, formatTotalRuntime } from '../lib/utils'
@@ -12,9 +13,52 @@ const movieStore = useMovieStore()
 const dialogStore = useDialogStore()
 const router = useRouter()
 
+// ── Recommender state ─────────────────────────────────────────────────────────
+interface RecommendedMovie {
+  imdbId: string
+  averageRating: number
+  totalVotes: number
+  similarity: number
+  posterUrl: string
+  title: string
+  year: string
+  genres: string
+}
+
+interface RecommendationCluster {
+  mood: string
+  recommendations: RecommendedMovie[]
+}
+
+const recommendedClusters = ref<RecommendationCluster[]>([])
+const recommendationsLoading = ref(false)
+const recommendationsError = ref<string | null>(null)
+
+async function fetchRecommendations() {
+  if (movieStore.movies.length === 0) return
+  recommendationsLoading.value = true
+  recommendationsError.value = null
+  try {
+    const clusters = await invoke<RecommendationCluster[]>('get_recommendations')
+    recommendedClusters.value = clusters
+  } catch (e: any) {
+    recommendationsError.value = String(e)
+  } finally {
+    recommendationsLoading.value = false
+  }
+}
+
+onMounted(fetchRecommendations)
+
+function openImdb(imdbId: string) {
+  const url = `https://www.imdb.com/title/${imdbId}/`
+  invoke('open_external', { url })
+}
+
 const seedOffset = ref(0)
 const reshuffle = () => {
   seedOffset.value += 1
+  fetchRecommendations()
 }
 
 const dayOfYear = computed(() => {
@@ -227,6 +271,51 @@ function getPosterUrl(movie: any) {
   if (movie.posterUrl && movie.posterUrl !== 'N/A') return movie.posterUrl
   return ''
 }
+
+function genreGradient(genres: string): string {
+  const palette: Record<string, [string, string]> = {
+    'Action':      ['#ff4b2b', '#ff416c'],
+    'Drama':       ['#4776e6', '#8e54e9'],
+    'Adventure':   ['#f7971e', '#ffd200'],
+    'Thriller':    ['#0f0c29', '#302b63'],
+    'Sci-Fi':      ['#00b4db', '#0083b0'],
+    'Crime':       ['#373b44', '#4286f4'],
+    'Mystery':     ['#5c258d', '#4389a2'],
+    'Horror':      ['#1a1a1a', '#8b0000'],
+    'Comedy':      ['#f7971e', '#ffd200'],
+    'Fantasy':     ['#134e5e', '#71b280'],
+    'Animation':   ['#f953c6', '#b91d73'],
+    'Documentary': ['#1d4350', '#a43931'],
+    'Romance':     ['#ee9ca7', '#ffdde1'],
+    'Music':       ['#355c7d', '#6c5b7b'],
+    'War':         ['#373b44', '#4286f4'],
+    'Western':     ['#c85250', '#6a3093'],
+    'Biography':   ['#396afc', '#2948ff'],
+    'History':     ['#4e4376', '#2b5876'],
+  }
+  const tokens = genres.split(',').map(g => g.trim())
+  for (const t of tokens) {
+    for (const [key, [a, b]] of Object.entries(palette)) {
+      if (t.toLowerCase().includes(key.toLowerCase())) {
+        return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
+      }
+    }
+  }
+  // Generic fallback
+  const hash = genres.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const hue = (hash * 37) % 360
+  return `linear-gradient(135deg, hsl(${hue},50%,20%) 0%, hsl(${(hue+60)%360},60%,35%) 100%)`
+}
+
+/** Turns raw stemmed keywords into a readable lowercase hint string */
+function formatMoodHint(mood: string): string {
+  // mood is 'PIXAR, ANIM, DISNEY, ...' — take first few, lowercase them
+  return mood
+    .toLowerCase()
+    .split(', ')
+    .slice(0, 4)
+    .join(' · ')
+}
 </script>
 
 <template>
@@ -373,6 +462,80 @@ function getPosterUrl(movie: any) {
             </div>
           </div>
         </section>
+
+        <!-- Section 5: Recommended New Movies -->
+        <section class="section-container" v-if="!isEmpty">
+          <header class="section-header">
+            <h2 class="section-title recs-title">
+              Recommended New Movies
+            </h2>
+          </header>
+
+          <!-- Loading state -->
+          <div v-if="recommendationsLoading" class="recs-loading">
+            <div class="recs-spinner"></div>
+            <span>Analysing your taste profile…</span>
+          </div>
+
+          <!-- Error state -->
+          <div v-else-if="recommendationsError" class="recs-error">
+            <span>⚠️ {{ recommendationsError }}</span>
+          </div>
+
+          <!-- Clusters -->
+          <div v-else-if="recommendedClusters.length > 0" class="recs-clusters">
+            <div
+              v-for="cluster in recommendedClusters"
+              :key="cluster.mood"
+              class="recs-cluster"
+            >
+              <div class="recs-cards">
+                <div
+                  v-for="movie in cluster.recommendations"
+                  :key="movie.imdbId"
+                  class="rec-card"
+                  :style="{
+                    backgroundImage: movie.posterUrl && movie.posterUrl !== 'N/A'
+                      ? `url(${movie.posterUrl})`
+                      : 'none'
+                  }"
+                  @click="openImdb(movie.imdbId)"
+                  :title="`Open ${movie.title || movie.imdbId} on IMDb`"
+                >
+                  <!-- Gradient fallback when no poster -->
+                  <div
+                    v-if="!movie.posterUrl || movie.posterUrl === 'N/A'"
+                    class="rec-card-fallback"
+                    :style="{ background: genreGradient(movie.genres) }"
+                  ></div>
+
+                  <!-- Dark gradient overlay (always present) -->
+                  <div class="rec-card-overlay">
+                    <div class="rec-card-top">
+                      <span class="rec-rating-badge">★ {{ movie.averageRating.toFixed(1) }}</span>
+                      <span class="rec-match-badge">{{ Math.round(movie.similarity * 100) }}% match</span>
+                    </div>
+                    <div class="rec-card-bottom">
+                      <p class="rec-card-genres-text">{{ movie.genres }}</p>
+                      <h4 class="rec-card-title">{{ movie.title || movie.imdbId }}</h4>
+                      <div class="rec-card-footer">
+                        <span class="rec-card-year">{{ movie.year }}</span>
+                        <ExternalLink :size="12" class="rec-ext-icon" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Subtle taste hint beneath each cluster -->
+              <p class="recs-cluster-hint">because you enjoy · {{ formatMoodHint(cluster.mood) }}</p>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div v-else class="recs-empty">
+            Add more movies to your collection to unlock personalised recommendations.
+          </div>
+        </section>
       </div>
     </div>
 
@@ -517,6 +680,11 @@ function getPosterUrl(movie: any) {
   background-position: center;
   position: relative;
   cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.mosaic-card:hover {
+  box-shadow: inset 0 0 0 1px var(--accent-four);
 }
 
 .mosaic-card::before {
@@ -628,11 +796,8 @@ function getPosterUrl(movie: any) {
 }
 
 .genre-tile:hover {
-  transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.05);
-  border-color: var(--genre-color);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 
-              0 0 15px -5px var(--genre-color);
+  border-color: var(--accent-four);
 }
 
 .genre-tile:hover::before {
@@ -689,8 +854,6 @@ function getPosterUrl(movie: any) {
 }
 
 .director-card-new:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   border-color: var(--accent-four);
 }
 
@@ -860,5 +1023,218 @@ function getPosterUrl(movie: any) {
 
 .primary-btn:hover {
   opacity: 0.9;
+}
+
+/* ── Section 5: Recommended New Movies ────────────────────────────────────── */
+
+.recs-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recs-icon {
+  color: var(--accent-four);
+  flex-shrink: 0;
+}
+
+.recs-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted-mid);
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+.recs-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent-four);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.recs-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+.recs-empty {
+  color: var(--muted-mid);
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+.recs-clusters {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.recs-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recs-cluster-mood {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--accent-four);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.recs-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.rec-card {
+  height: 260px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-color: #111;
+  transition: all 0.3s ease;
+}
+
+/* Permanent dark-to-transparent gradient so text is always readable */
+.rec-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.35) 55%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.rec-card:hover {
+  background-color: #1a1a1a;
+  box-shadow: inset 0 0 0 1px var(--accent-four);
+}
+
+/* No-poster gradient fill */
+.rec-card-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+/* Content layer above the gradients */
+.rec-card-overlay {
+  position: relative;
+  z-index: 2;
+  padding: 12px 14px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.rec-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.rec-rating-badge {
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  color: var(--accent-four);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rec-match-badge {
+  background: var(--accent-four);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.rec-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rec-card-genres-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rec-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rec-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.rec-card-year {
+  font-size: 11px;
+  color: rgba(255,255,255,0.38);
+}
+
+.rec-ext-icon {
+  color: rgba(255,255,255,0.3);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.rec-card:hover .rec-ext-icon {
+  color: var(--accent-four);
+  transform: translate(1px, -1px);
+}
+
+/* Subtle taste hint under each cluster row */
+.recs-cluster-hint {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(255,255,255,0.2);
+  margin: 8px 0 0;
+  letter-spacing: 0.3px;
 }
 </style>

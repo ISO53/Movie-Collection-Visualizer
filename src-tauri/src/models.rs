@@ -141,3 +141,25 @@ pub struct UpdateInfo {
     pub body: Option<String>,
     pub url: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RecommendedMovie {
+    /// Full IMDb ID e.g. "tt0114709"
+    pub imdb_id: String,
+    pub average_rating: f64,
+    pub total_votes: i64,
+    pub similarity: f64,
+    pub poster_url: String,
+    pub title: String,
+    pub year: String,
+    pub genres: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RecommendationCluster {
+    /// Top describing keywords for this taste cluster
+    pub mood: String,
+    pub recommendations: Vec<RecommendedMovie>,
+}

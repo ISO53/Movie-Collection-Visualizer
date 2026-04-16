@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { RefreshCcw, Sparkles, ExternalLink } from 'lucide-vue-next'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { invoke } from '@tauri-apps/api/core'
+import { RefreshCcw, ExternalLink } from 'lucide-vue-next'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { useMovieStore } from '../stores/movies'
 import { useDialogStore } from '../stores/dialog'
 import { parseImdbRating, splitAndTrim, parseRuntime, formatTotalRuntime } from '../lib/utils'
@@ -253,13 +252,6 @@ const topDirectors = computed(() => {
     return { name, count, movies: directorMovies, initials }
   })
 })
-
-function getInitialsGradient(name: string) {
-  const hues = [200, 260, 320, 20, 50, 140]
-  const charCodeSum = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  const hue = hues[charCodeSum % hues.length]
-  return `linear-gradient(135deg, hsl(${hue}, 60%, 40%) 0%, hsl(${hue}, 70%, 20%) 100%)`
-}
 
 function openMovie(movie: any) {
   dialogStore.openMovieDetail(movie)

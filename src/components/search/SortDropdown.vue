@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {ArrowUpDown, ArrowUp, ArrowDown} from "lucide-vue-next";
-import {SortOption} from "../../types/movie";
+import {ArrowUpDown} from "lucide-vue-next";
 
 const props = defineProps<{
     modelValue: string;

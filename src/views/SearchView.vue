@@ -39,25 +39,25 @@ let scrollRafId: number | null = null;
 
 function setTucked(val: boolean) {
     if (isTucked.value === val) return;
-    
+
     isTucked.value = val;
     isAnimating = true;
-    
+
     setTimeout(() => {
         isAnimating = false;
         if (mainEl) lastScrollY = mainEl.scrollTop;
-    }, 400); 
+    }, 400);
 }
 
 function handleScrollInner() {
     if (!mainEl) return;
     const currentScrollY = mainEl.scrollTop;
-    
+
     if (isAnimating) {
         lastScrollY = currentScrollY;
         return;
     }
-    
+
     if (currentScrollY <= 20) {
         setTucked(false);
     } else if (currentScrollY > lastScrollY + 12) {
@@ -65,7 +65,7 @@ function handleScrollInner() {
     } else if (currentScrollY < lastScrollY - 12) {
         setTucked(false);
     }
-    
+
     lastScrollY = currentScrollY;
 }
 
@@ -90,16 +90,16 @@ onMounted(() => {
     if (route.query.genre) {
         selectedGenres.value = [route.query.genre as string];
     }
-    
-    mainEl = document.querySelector('.app-main');
+
+    mainEl = document.querySelector(".app-main");
     if (mainEl) {
-        mainEl.addEventListener('scroll', handleScroll, { passive: true });
+        mainEl.addEventListener("scroll", handleScroll, {passive: true});
     }
 });
 
 onUnmounted(() => {
     if (mainEl) {
-        mainEl.removeEventListener('scroll', handleScroll);
+        mainEl.removeEventListener("scroll", handleScroll);
     }
     if (scrollRafId !== null) {
         cancelAnimationFrame(scrollRafId);
@@ -156,7 +156,7 @@ function onToggleGenre(genre: string) {
 
 <template>
     <div class="search-container">
-        <div class="top-section" :class="{ 'is-tucked': isTucked }">
+        <div class="top-section" :class="{'is-tucked': isTucked}">
             <div class="glass-background"></div>
             <div class="search-content">
                 <div class="search-sort-row">
@@ -241,7 +241,9 @@ function onToggleGenre(genre: string) {
 
 .filter-slide-enter-active,
 .filter-slide-leave-active {
-    transition: max-height 0.3s ease, opacity 0.3s ease;
+    transition:
+        max-height 0.3s ease,
+        opacity 0.3s ease;
     max-height: 100px;
     opacity: 1;
     overflow: hidden;

@@ -37,7 +37,6 @@ const MAX_DF_RATIO: f64 = 0.85;
 struct MlRow {
     imdb_id: String, // bare numeric string, e.g. "0114709"
     genres: String,
-    average_rating: f64,
     total_rating_count: i64,
     tags: String, // pipe-separated stemmed tags
 }
@@ -144,7 +143,7 @@ pub fn get_recommendations(
             let sim_nudge: f64 = rng.gen_range(-0.005..0.005);
             cluster_recs.push(RecommendedMovie {
                 imdb_id: format!("tt{}", row.imdb_id),
-                average_rating: row.average_rating,
+                imdb_rating: String::new(),
                 total_votes: row.total_rating_count,
                 similarity: (sim + sim_nudge).clamp(0.0, 1.0),
                 poster_url: format!(
@@ -154,6 +153,7 @@ pub fn get_recommendations(
                 title: format!("tt{}", row.imdb_id), // title resolved on click via IMDb
                 year: String::new(),
                 genres: row.genres.replace('|', ", "),
+                plot: String::new(),
             });
         }
 
@@ -187,16 +187,15 @@ fn load_user_ids(path: &Path) -> SqlResult<HashSet<String>> {
 fn load_ml_data(path: &Path) -> SqlResult<Vec<MlRow>> {
     let conn = Connection::open(path)?;
     let mut stmt = conn.prepare(
-        "SELECT imdbId, genres, average_rating, total_rating_count, tags \
+        "SELECT imdbId, genres, total_rating_count, tags \
          FROM movies_data WHERE tags IS NOT NULL",
     )?;
     let rows = stmt.query_map([], |row| {
         Ok(MlRow {
             imdb_id: row.get::<_, String>(0)?,
             genres: row.get::<_, String>(1).unwrap_or_default(),
-            average_rating: row.get::<_, f64>(2).unwrap_or(0.0),
-            total_rating_count: row.get::<_, i64>(3).unwrap_or(0),
-            tags: row.get::<_, String>(4).unwrap_or_default(),
+            total_rating_count: row.get::<_, i64>(2).unwrap_or(0),
+            tags: row.get::<_, String>(3).unwrap_or_default(),
         })
     })?;
     let mut out = Vec::new();

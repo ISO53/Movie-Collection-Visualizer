@@ -62,7 +62,6 @@ function clear() {
     border-radius: 8px;
     height: 48px;
     border: 1px solid var(--muted-dark);
-    transition: all 200ms;
 }
 
 .search-wrapper:focus-within {

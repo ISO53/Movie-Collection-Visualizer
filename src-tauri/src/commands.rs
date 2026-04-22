@@ -540,18 +540,25 @@ pub async fn get_recommendations(
             for movie in &mut cluster.recommendations {
                 // Small courtesy delay to avoid rate limiting
                 tokio::time::sleep(std::time::Duration::from_millis(120)).await;
-                if let Ok(res) = omdb::fetch_by_id(&movie.imdb_id, &api_key).await {
-                    if res.response == "True" || !res.title.is_empty() {
-                        movie.title = res.title;
-                        movie.year = res.year;
-                        // Keep genres from our ML db if OMDB returns empty
-                        if !res.genre.is_empty() && res.genre != "N/A" {
-                            movie.genres = res.genre;
-                        }
-                        if !res.poster.is_empty() && res.poster != "N/A" {
-                            movie.poster_url = res.poster;
+                let omdb_res = omdb::fetch_by_id(&movie.imdb_id, &api_key).await;
+                match omdb_res {
+                    Ok(res) => {
+                        if res.response == "True" || !res.title.is_empty() {
+                            movie.title = res.title;
+                            movie.year = res.year;
+                            movie.imdb_rating = res.imdb_rating;
+                            if !res.genre.is_empty() && res.genre != "N/A" {
+                                movie.genres = res.genre;
+                            }
+                            if !res.plot.is_empty() && res.plot != "N/A" {
+                                movie.plot = res.plot;
+                            }
+                            if !res.poster.is_empty() && res.poster != "N/A" {
+                                movie.poster_url = res.poster;
+                            }
                         }
                     }
+                    Err(_) => {}
                 }
             }
         }

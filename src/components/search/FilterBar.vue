@@ -60,7 +60,6 @@ const sortedGenres = computed(() => {
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
-    transition: all 200ms;
 }
 
 .genre-chip:hover {

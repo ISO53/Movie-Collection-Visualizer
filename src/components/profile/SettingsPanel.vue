@@ -486,7 +486,6 @@ async function importImdb() {
     padding: 0 16px;
     color: var(--text-main);
     font-size: 14px;
-    transition: all 0.2s ease;
 }
 
 .modern-input:focus {
@@ -504,7 +503,6 @@ async function importImdb() {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.2s ease;
     user-select: none;
 }
 
@@ -516,7 +514,6 @@ async function importImdb() {
 
 .action-btn.primary:hover {
     background: var(--accent-three);
-    transform: translateY(-1px);
 }
 
 /* Outline/Secondary Button Style (Change, Remove, GitHub, Check for Updates) */
@@ -529,7 +526,6 @@ async function importImdb() {
 .action-btn.outline:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
 }
 
 /* Specific Danger States for Outline Buttons */
@@ -550,7 +546,6 @@ async function importImdb() {
 
 .action-btn.danger-solid:hover {
     background: #dc2626;
-    transform: translateY(-1px);
 }
 
 .action-btn.large {

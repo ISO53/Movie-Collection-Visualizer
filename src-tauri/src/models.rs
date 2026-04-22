@@ -147,13 +147,14 @@ pub struct UpdateInfo {
 pub struct RecommendedMovie {
     /// Full IMDb ID e.g. "tt0114709"
     pub imdb_id: String,
-    pub average_rating: f64,
+    pub imdb_rating: String,
     pub total_votes: i64,
     pub similarity: f64,
     pub poster_url: String,
     pub title: String,
     pub year: String,
     pub genres: String,
+    pub plot: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

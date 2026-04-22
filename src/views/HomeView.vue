@@ -1,7 +1,29 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { RefreshCcw, ExternalLink } from 'lucide-vue-next'
+import { 
+  RefreshCcw, 
+  ExternalLink, 
+  Crosshair, 
+  Search, 
+  Rocket, 
+  Skull, 
+  Drama, 
+  Compass, 
+  Zap, 
+  Key, 
+  PartyPopper, 
+  Wand2, 
+  Palette, 
+  Video, 
+  Film,
+  Heart,
+  Music,
+  Swords,
+  Mountain,
+  User,
+  History
+} from 'lucide-vue-next'
 import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { useMovieStore } from '../stores/movies'
 import { useDialogStore } from '../stores/dialog'
@@ -166,18 +188,24 @@ const moodGenres = computed(() => {
   })
   
   const genreData = [
-    { name: 'Action', emoji: '🏹', color: '#ff4b2b' },
-    { name: 'Drama', emoji: '🎭', color: '#ff9a9e' },
-    { name: 'Adventure', emoji: '🧭', color: '#f9d423' },
-    { name: 'Thriller', emoji: '👁️', color: '#43e97b' },
-    { name: 'Sci-Fi', emoji: '🪐', color: '#4facfe' },
-    { name: 'Crime', emoji: '🔍', color: '#a18cd1' },
-    { name: 'Mystery', emoji: '🗝️', color: '#f093fb' },
-    { name: 'Horror', emoji: '🕯️', color: '#fa709a' },
-    { name: 'Comedy', emoji: '🎪', color: '#ffecd2' },
-    { name: 'Fantasy', emoji: '🏰', color: '#84fab0' },
-    { name: 'Animation', emoji: '🖌️', color: '#a6c1ee' },
-    { name: 'Documentary', emoji: '📽️', color: '#fbc2eb' }
+    { name: 'Action', icon: Crosshair, color: '#ff4b2b' },
+    { name: 'Drama', icon: Drama, color: '#ff9a9e' },
+    { name: 'Adventure', icon: Compass, color: '#f9d423' },
+    { name: 'Thriller', icon: Zap, color: '#43e97b' },
+    { name: 'Sci-Fi', icon: Rocket, color: '#4facfe' },
+    { name: 'Crime', icon: Search, color: '#a18cd1' },
+    { name: 'Mystery', icon: Key, color: '#f093fb' },
+    { name: 'Horror', icon: Skull, color: '#fa709a' },
+    { name: 'Comedy', icon: PartyPopper, color: '#ffecd2' },
+    { name: 'Fantasy', icon: Wand2, color: '#84fab0' },
+    { name: 'Animation', icon: Palette, color: '#a6c1ee' },
+    { name: 'Documentary', icon: Video, color: '#fbc2eb' },
+    { name: 'Romance', icon: Heart, color: '#ee9ca7' },
+    { name: 'Music', icon: Music, color: '#355c7d' },
+    { name: 'War', icon: Swords, color: '#373b44' },
+    { name: 'Western', icon: Mountain, color: '#c85250' },
+    { name: 'Biography', icon: User, color: '#396afc' },
+    { name: 'History', icon: History, color: '#4e4376' }
   ]
 
   const allGenres = Array.from(counts.entries())
@@ -201,7 +229,7 @@ const moodGenres = computed(() => {
   return selectedGenres.map(([name, count]) => {
       const preset = genreData.find(g => g.name === name) || {
         name,
-        emoji: '🎞️',
+        icon: Film,
         color: '#888'
       }
       return { ...preset, count }
@@ -411,7 +439,7 @@ function formatMoodHint(mood: string): string {
                 <div class="genre-name">{{ genre.name }}</div>
                 <div class="genre-count">{{ genre.count }} films</div>
               </div>
-              <div class="genre-emoji">{{ genre.emoji }}</div>
+              <component :is="genre.icon" :size="18" class="genre-icon" />
             </div>
           </div>
         </section>
@@ -763,9 +791,9 @@ function formatMoodHint(mood: string): string {
 }
 
 .genre-tile {
-  height: 100px;
-  border-radius: 16px;
-  padding: 20px;
+  height: 72px;
+  border-radius: 12px;
+  padding: 12px 18px;
   position: relative;
   cursor: pointer;
   display: flex;
@@ -796,36 +824,43 @@ function formatMoodHint(mood: string): string {
   opacity: 0.35;
 }
 
+.genre-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: var(--muted-mid);
+  opacity: 0.4;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-width: 1.5px;
+}
+
+.genre-tile:hover .genre-icon {
+  color: var(--accent-four);
+  opacity: 1;
+  transform: rotate(12deg) scale(1.1);
+}
+
 .genre-info {
   z-index: 2;
 }
 
 .genre-name {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 600;
   color: white;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.2px;
 }
 
 .genre-count {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
   color: var(--muted-mid);
-  margin-top: 4px;
+  margin-top: 2px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
-.genre-emoji {
-  font-size: 40px;
-  z-index: 2;
-  transition: transform 0.3s ease;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
 
-.genre-tile:hover .genre-emoji {
-  transform: scale(1.2) rotate(10deg);
-}
 
 /* Section 4: Directors */
 .director-grid {

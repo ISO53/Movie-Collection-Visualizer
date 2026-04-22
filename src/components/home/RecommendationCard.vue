@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ExternalLink, Star} from "lucide-vue-next";
 
-const props = defineProps<{
+defineProps<{
     movie: {
         imdbId: string;
         title: string;

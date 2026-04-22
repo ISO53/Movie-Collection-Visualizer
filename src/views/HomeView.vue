@@ -3,7 +3,6 @@ import {ref, computed, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import {
     RefreshCcw,
-    ExternalLink,
     Crosshair,
     Search,
     Rocket,
@@ -293,41 +292,6 @@ function getPosterUrl(movie: any) {
     if (movie.posterPath) return convertFileSrc(movie.posterPath);
     if (movie.posterUrl && movie.posterUrl !== "N/A") return movie.posterUrl;
     return "";
-}
-
-function genreGradient(genres: string): string {
-    const palette: Record<string, [string, string]> = {
-        Action: ["#ff4b2b", "#ff416c"],
-        Drama: ["#4776e6", "#8e54e9"],
-        Adventure: ["#f7971e", "#ffd200"],
-        Thriller: ["#0f0c29", "#302b63"],
-        "Sci-Fi": ["#00b4db", "#0083b0"],
-        Crime: ["#373b44", "#4286f4"],
-        Mystery: ["#5c258d", "#4389a2"],
-        Horror: ["#1a1a1a", "#8b0000"],
-        Comedy: ["#f7971e", "#ffd200"],
-        Fantasy: ["#134e5e", "#71b280"],
-        Animation: ["#f953c6", "#b91d73"],
-        Documentary: ["#1d4350", "#a43931"],
-        Romance: ["#ee9ca7", "#ffdde1"],
-        Music: ["#355c7d", "#6c5b7b"],
-        War: ["#373b44", "#4286f4"],
-        Western: ["#c85250", "#6a3093"],
-        Biography: ["#396afc", "#2948ff"],
-        History: ["#4e4376", "#2b5876"],
-    };
-    const tokens = genres.split(",").map((g) => g.trim());
-    for (const t of tokens) {
-        for (const [key, [a, b]] of Object.entries(palette)) {
-            if (t.toLowerCase().includes(key.toLowerCase())) {
-                return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`;
-            }
-        }
-    }
-    // Generic fallback
-    const hash = genres.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    const hue = (hash * 37) % 360;
-    return `linear-gradient(135deg, hsl(${hue},50%,20%) 0%, hsl(${(hue + 60) % 360},60%,35%) 100%)`;
 }
 
 /** Turns raw stemmed keywords into a readable lowercase hint string */

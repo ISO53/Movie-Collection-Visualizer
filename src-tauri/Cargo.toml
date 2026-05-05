@@ -2,8 +2,8 @@
 name = "movie-collection-visualizer"
 version = "2.3.0"
 description = "Movie Collection Visualizer"
-authors = ["you"]
-edition = "2021"
+authors = ["iso53"]
+edition = "2026"
 default-run = "movie-collection-visualizer"
 
 [build-dependencies]

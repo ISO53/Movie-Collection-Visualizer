@@ -32,5 +32,5 @@ name = "movie-collection-visualizer"
 path = "src/main.rs"
 
 [[bin]]
-name = "csv_generator"p
+name = "csv_generator"
 path = "src/bin/csv_generator.rs"

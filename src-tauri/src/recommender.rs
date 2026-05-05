@@ -10,7 +10,7 @@
 ///      A random jitter is applied to the candidate pool so that repeat calls
 ///      surface different titles every time (fulfils the "refresh" requirement).
 use rand::seq::SliceRandom;
-use rand::Rng;
+use rand::RngExt;
 use rusqlite::{Connection, Result as SqlResult};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -98,7 +98,7 @@ pub fn get_recommendations(
 
     // ── 6. per-cluster recommendations ───────────────────────────────────────
     let feature_names = vocab_feature_names(&vocab);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut results: Vec<RecommendationCluster> = Vec::new();
 
     for cluster_idx in 0..n_clusters {
@@ -140,7 +140,7 @@ pub fn get_recommendations(
         for (idx, sim) in pool.iter().take(RECS_PER_CLUSTER) {
             let row = &ml_rows[*idx];
             // Add a tiny random nudge so similarity values look natural
-            let sim_nudge: f64 = rng.gen_range(-0.005..0.005);
+            let sim_nudge: f64 = rng.random_range(-0.005..0.005);
             cluster_recs.push(RecommendedMovie {
                 imdb_id: format!("tt{}", row.imdb_id),
                 imdb_rating: String::new(),
@@ -255,7 +255,7 @@ fn build_vocab_idf(rows: &[MlRow]) -> (HashMap<String, usize>, Vec<f64>) {
 
 fn vocab_feature_names(vocab: &HashMap<String, usize>) -> Vec<String> {
     let mut items: Vec<(&String, &usize)> = vocab.iter().collect();
-    items.sort_by_key(|(_, &i)| i);
+    items.sort_by_key(|&(_, &i)| i);
     items.into_iter().map(|(t, _)| t.clone()).collect()
 }
 
@@ -305,10 +305,10 @@ fn kmeans(
 ) -> Vec<Vec<f64>> {
     // Initialise centres with k-means++ style spread
     let mut centres: Vec<Vec<f64>> = Vec::with_capacity(k);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     // First centre: pick a random user movie
-    let first = indices[rng.gen_range(0..indices.len())];
+    let first = indices[rng.random_range(0..indices.len())];
     centres.push(matrix[first].clone());
 
     for _ in 1..k {
@@ -325,10 +325,10 @@ fn kmeans(
         let total_w: f64 = weights.iter().sum();
         if total_w < 1e-12 {
             // Degenerate — just add a random user movie
-            centres.push(matrix[indices[rng.gen_range(0..indices.len())]].clone());
+            centres.push(matrix[indices[rng.random_range(0..indices.len())]].clone());
             continue;
         }
-        let mut threshold = rng.gen_range(0.0..total_w);
+        let mut threshold = rng.random_range(0.0..total_w);
         let mut chosen = indices[0];
         for (&idx, &w) in indices.iter().zip(weights.iter()) {
             threshold -= w;
